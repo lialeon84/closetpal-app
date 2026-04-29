@@ -1,0 +1,44 @@
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+export default function StylistScreen() {
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <Text style={styles.icon}>✨</Text>
+        <Text style={styles.title}>AI Stylist</Text>
+        <Text style={styles.subtitle}>Your personal AI stylist is coming soon</Text>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#0a0a1a',
+  },
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#0a0a1a',
+  },
+  icon: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#888',
+    textAlign: 'center',
+    paddingHorizontal: 40,
+  },
+});
