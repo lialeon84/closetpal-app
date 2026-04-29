@@ -14,16 +14,30 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Picker } from '@react-native-picker/picker';
 import { supabase } from '../lib/supabase';
+import {
+  US_STATES,
+  GENDERS,
+  formatDateForDisplay,
+  formatDateForDB,
+  parseDateFromDB,
+} from '../lib/constants';
 
 export default function EditProfileScreen({ navigation }) {
-  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [gender, setGender] = useState('');
+  const [dob, setDob] = useState(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
 
   useEffect(() => {
@@ -33,7 +47,6 @@ export default function EditProfileScreen({ navigation }) {
   const loadProfile = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-
       if (user) {
         const { data, error } = await supabase
           .from('profiles')
@@ -43,9 +56,13 @@ export default function EditProfileScreen({ navigation }) {
 
         if (error) throw error;
 
-        setProfile(data);
-        setFullName(data.full_name || '');
         setUsername(data.username || '');
+        setFirstName(data.first_name || '');
+        setLastName(data.last_name || '');
+        setCity(data.city || '');
+        setState(data.state || '');
+        setGender(data.gender || '');
+        setDob(data.date_of_birth ? parseDateFromDB(data.date_of_birth) : null);
         setProfileImage(data.profile_picture_url || null);
       }
     } catch (error) {
@@ -110,8 +127,9 @@ export default function EditProfileScreen({ navigation }) {
   };
 
   const saveProfile = async () => {
-    if (!fullName.trim() || !username.trim()) {
-      Alert.alert('Error', 'Display name and username are required');
+    if (!username.trim() || !firstName.trim() || !lastName.trim() ||
+        !city.trim() || !state || !gender || !dob) {
+      Alert.alert('Error', 'All fields are required');
       return;
     }
 
@@ -123,8 +141,13 @@ export default function EditProfileScreen({ navigation }) {
       const { error } = await supabase
         .from('profiles')
         .update({
-          full_name: fullName.trim(),
           username: username.toLowerCase().trim(),
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          city: city.trim(),
+          state,
+          gender,
+          date_of_birth: formatDateForDB(dob),
           profile_picture_url: profileImage,
         })
         .eq('id', user.id);
@@ -208,14 +231,79 @@ export default function EditProfileScreen({ navigation }) {
               autoCapitalize="none"
             />
 
-            <Text style={styles.label}>Display Name</Text>
+            <Text style={styles.label}>First Name</Text>
             <TextInput
               style={styles.input}
-              value={fullName}
-              onChangeText={setFullName}
-              placeholder="Your Name"
+              value={firstName}
+              onChangeText={setFirstName}
+              placeholder="First Name"
               placeholderTextColor="#888"
             />
+
+            <Text style={styles.label}>Last Name</Text>
+            <TextInput
+              style={styles.input}
+              value={lastName}
+              onChangeText={setLastName}
+              placeholder="Last Name"
+              placeholderTextColor="#888"
+            />
+
+            <Text style={styles.label}>City</Text>
+            <TextInput
+              style={styles.input}
+              value={city}
+              onChangeText={setCity}
+              placeholder="e.g. Los Angeles"
+              placeholderTextColor="#888"
+            />
+
+            <Text style={styles.label}>State</Text>
+            <View style={styles.pickerContainer}>
+              <Picker
+                selectedValue={state}
+                onValueChange={setState}
+                style={styles.picker}
+                dropdownIconColor="#9b59b6"
+              >
+                {US_STATES.map((s) => (
+                  <Picker.Item key={s.value} label={s.label} value={s.value} color="#fff" />
+                ))}
+              </Picker>
+            </View>
+
+            <Text style={styles.label}>Gender</Text>
+            <View style={styles.pickerContainer}>
+              <Picker
+                selectedValue={gender}
+                onValueChange={setGender}
+                style={styles.picker}
+                dropdownIconColor="#9b59b6"
+              >
+                {GENDERS.map((g) => (
+                  <Picker.Item key={g.value} label={g.label} value={g.value} color="#fff" />
+                ))}
+              </Picker>
+            </View>
+
+            <Text style={styles.label}>Date of Birth</Text>
+            <Pressable style={styles.dateButton} onPress={() => setShowDatePicker(true)}>
+              <Text style={styles.dateButtonText}>
+                {dob ? formatDateForDisplay(dob) : 'MM/DD/YYYY'}
+              </Text>
+            </Pressable>
+            {showDatePicker && (
+              <DateTimePicker
+                value={dob || new Date(2000, 0, 1)}
+                mode="date"
+                display="default"
+                maximumDate={new Date()}
+                onChange={(event, selectedDate) => {
+                  setShowDatePicker(Platform.OS === 'ios');
+                  if (selectedDate) setDob(selectedDate);
+                }}
+              />
+            )}
           </View>
 
           <Pressable
@@ -350,6 +438,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#2a2a3e',
+  },
+  pickerContainer: {
+    backgroundColor: '#1a1a2e',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#2a2a3e',
+    overflow: 'hidden',
+  },
+  picker: {
+    color: '#fff',
+    backgroundColor: '#1a1a2e',
+  },
+  dateButton: {
+    backgroundColor: '#1a1a2e',
+    padding: 15,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#2a2a3e',
+  },
+  dateButtonText: {
+    color: '#fff',
+    fontSize: 16,
   },
   saveButton: {
     backgroundColor: '#9b59b6',

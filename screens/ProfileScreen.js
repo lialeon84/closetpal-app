@@ -174,9 +174,11 @@ export default function ProfileScreen({ navigation }) {
         </View>
 
         {/* Display name */}
-        {profile.full_name ? (
+        {(profile.first_name || profile.last_name) ? (
           <View style={styles.section}>
-            <Text style={styles.fullName}>{profile.full_name}</Text>
+            <Text style={styles.fullName}>
+              {[profile.first_name, profile.last_name].filter(Boolean).join(' ')}
+            </Text>
           </View>
         ) : null}
 
