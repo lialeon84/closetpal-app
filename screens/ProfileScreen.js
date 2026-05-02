@@ -203,10 +203,10 @@ export default function ProfileScreen({ navigation }) {
 const styles = StyleSheet.create({
   fullScreen: {
     flex: 1,
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F7F5F0',
   },
   brandHeaderContainer: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#EDEAE4',
     zIndex: 10,
   },
   brandHeader: {
@@ -222,11 +222,11 @@ const styles = StyleSheet.create({
   brandText: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1C1C1C',
   },
   container: {
     flex: 1,
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F7F5F0',
   },
   scrollView: {
     flex: 1,
@@ -235,10 +235,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F7F5F0',
   },
   header: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#EDEAE4',
     alignItems: 'center',
     justifyContent: 'center',
     borderBottomLeftRadius: 30,
@@ -285,13 +285,13 @@ const styles = StyleSheet.create({
   },
   username: {
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1C1C1C',
     marginBottom: 5,
   },
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#EDEAE4',
     marginHorizontal: 15,
     marginTop: 15,
     marginBottom: 15,
@@ -309,10 +309,10 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 12,
-    color: '#888',
+    color: '#6B7280',
   },
   section: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#EDEAE4',
     marginHorizontal: 15,
     marginBottom: 15,
     padding: 20,
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
   },
   fullName: {
     fontSize: 18,
-    color: '#fff',
+    color: '#1C1C1C',
     fontWeight: '600',
     textAlign: 'center',
   },
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
   },
   subscriptionLabel: {
     fontSize: 16,
-    color: '#888',
+    color: '#6B7280',
   },
   subscriptionValue: {
     fontSize: 16,

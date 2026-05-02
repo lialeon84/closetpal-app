@@ -187,20 +187,20 @@ export default function SubscriptionScreen({ navigation }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#EDEAE4',
   },
   container: {
     flex: 1,
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F7F5F0',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F7F5F0',
   },
   header: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#EDEAE4',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderBottomWidth: 2,
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1C1C1C',
   },
   placeholder: {
     width: 28,
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   subscriptionCard: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#EDEAE4',
     borderRadius: 20,
     padding: 32,
     alignItems: 'center',
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   tierName: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#fff',
+    color: '#1C1C1C',
     marginBottom: 16,
   },
   statusContainer: {
@@ -274,20 +274,20 @@ const styles = StyleSheet.create({
   },
   renewalText: {
     fontSize: 14,
-    color: '#ccc',
+    color: '#555555',
   },
   featuresCard: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#EDEAE4',
     borderRadius: 16,
     padding: 20,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#2a2a3e',
+    borderColor: '#D9D5CE',
   },
   featuresTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#fff',
+    color: '#1C1C1C',
     marginBottom: 16,
   },
   feature: {
@@ -303,10 +303,10 @@ const styles = StyleSheet.create({
   },
   featureText: {
     fontSize: 16,
-    color: '#fff',
+    color: '#1C1C1C',
   },
   manageButton: {
-    backgroundColor: '#2a2a3e',
+    backgroundColor: '#F7F5F0',
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
@@ -320,12 +320,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   noSubscriptionCard: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#EDEAE4',
     borderRadius: 20,
     padding: 32,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#2a2a3e',
+    borderColor: '#D9D5CE',
     marginBottom: 20,
   },
   noSubIcon: {
@@ -335,12 +335,12 @@ const styles = StyleSheet.create({
   noSubTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#fff',
+    color: '#1C1C1C',
     marginBottom: 12,
   },
   noSubText: {
     fontSize: 16,
-    color: '#ccc',
+    color: '#555555',
     textAlign: 'center',
     lineHeight: 24,
   },
@@ -367,21 +367,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   supportCard: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#EDEAE4',
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#2a2a3e',
+    borderColor: '#D9D5CE',
   },
   supportTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#fff',
+    color: '#1C1C1C',
     marginBottom: 8,
   },
   supportText: {
     fontSize: 14,
-    color: '#ccc',
+    color: '#555555',
     lineHeight: 20,
   },
   bottomSpacer: {

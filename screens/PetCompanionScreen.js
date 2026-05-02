@@ -17,13 +17,13 @@ export default function PetCompanionScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F7F5F0',
   },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F7F5F0',
   },
   icon: {
     fontSize: 64,
@@ -32,12 +32,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1C1C1C',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#888',
+    color: '#6B7280',
     textAlign: 'center',
     paddingHorizontal: 40,
   },
