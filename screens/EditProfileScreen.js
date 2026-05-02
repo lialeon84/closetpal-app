@@ -227,7 +227,7 @@ export default function EditProfileScreen({ navigation }) {
               value={username}
               onChangeText={setUsername}
               placeholder="username"
-              placeholderTextColor="#888"
+              placeholderTextColor="#9B9B9B"
               autoCapitalize="none"
             />
 
@@ -237,7 +237,7 @@ export default function EditProfileScreen({ navigation }) {
               value={firstName}
               onChangeText={setFirstName}
               placeholder="First Name"
-              placeholderTextColor="#888"
+              placeholderTextColor="#9B9B9B"
             />
 
             <Text style={styles.label}>Last Name</Text>
@@ -246,7 +246,7 @@ export default function EditProfileScreen({ navigation }) {
               value={lastName}
               onChangeText={setLastName}
               placeholder="Last Name"
-              placeholderTextColor="#888"
+              placeholderTextColor="#9B9B9B"
             />
 
             <Text style={styles.label}>City</Text>
@@ -255,7 +255,7 @@ export default function EditProfileScreen({ navigation }) {
               value={city}
               onChangeText={setCity}
               placeholder="e.g. Los Angeles"
-              placeholderTextColor="#888"
+              placeholderTextColor="#9B9B9B"
             />
 
             <Text style={styles.label}>State</Text>
@@ -267,7 +267,7 @@ export default function EditProfileScreen({ navigation }) {
                 dropdownIconColor="#9b59b6"
               >
                 {US_STATES.map((s) => (
-                  <Picker.Item key={s.value} label={s.label} value={s.value} color="#fff" />
+                  <Picker.Item key={s.value} label={s.label} value={s.value} color="#1C1C1C" />
                 ))}
               </Picker>
             </View>
@@ -281,7 +281,7 @@ export default function EditProfileScreen({ navigation }) {
                 dropdownIconColor="#9b59b6"
               >
                 {GENDERS.map((g) => (
-                  <Picker.Item key={g.value} label={g.label} value={g.value} color="#fff" />
+                  <Picker.Item key={g.value} label={g.label} value={g.value} color="#1C1C1C" />
                 ))}
               </Picker>
             </View>
@@ -324,20 +324,20 @@ export default function EditProfileScreen({ navigation }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#EDEAE4',
   },
   container: {
     flex: 1,
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F7F5F0',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F7F5F0',
   },
   header: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#EDEAE4',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderBottomWidth: 2,
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1C1C1C',
   },
   placeholder: {
     width: 28,
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
   imageSection: {
     alignItems: 'center',
     paddingVertical: 30,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#EDEAE4',
     marginBottom: 20,
   },
   imageContainer: {
@@ -431,34 +431,34 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   input: {
-    backgroundColor: '#1a1a2e',
-    color: '#fff',
+    backgroundColor: '#EDEAE4',
+    color: '#1C1C1C',
     padding: 15,
     borderRadius: 10,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#2a2a3e',
+    borderColor: '#D9D5CE',
   },
   pickerContainer: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#EDEAE4',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#2a2a3e',
+    borderColor: '#D9D5CE',
     overflow: 'hidden',
   },
   picker: {
-    color: '#fff',
-    backgroundColor: '#1a1a2e',
+    color: '#1C1C1C',
+    backgroundColor: '#EDEAE4',
   },
   dateButton: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#EDEAE4',
     padding: 15,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#2a2a3e',
+    borderColor: '#D9D5CE',
   },
   dateButtonText: {
-    color: '#fff',
+    color: '#1C1C1C',
     fontSize: 16,
   },
   saveButton: {

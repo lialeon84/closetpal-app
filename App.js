@@ -59,7 +59,7 @@ function MainTabs() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#1a1a2e',
+          backgroundColor: '#EDEAE4',
           borderTopColor: '#9b59b6',
           borderTopWidth: 1,
           height: 70,
@@ -67,7 +67,7 @@ function MainTabs() {
           paddingTop: 8,
         },
         tabBarActiveTintColor: '#9b59b6',
-        tabBarInactiveTintColor: '#666',
+        tabBarInactiveTintColor: '#AAAAAA',
         tabBarShowLabel: false,
       }}
     >
@@ -129,11 +129,11 @@ function MainTabs() {
                   width: 32,
                   height: 32,
                   borderRadius: 16,
-                  backgroundColor: focused ? '#9b59b6' : '#666',
+                  backgroundColor: focused ? '#9b59b6' : '#CCCCCC',
                   justifyContent: 'center',
                   alignItems: 'center',
                   borderWidth: 2,
-                  borderColor: focused ? '#e1bee7' : '#888',
+                  borderColor: focused ? '#e1bee7' : '#BBBBBB',
                 }}
               >
                 <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>
@@ -194,9 +194,9 @@ export default function App() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0a0a1a' }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F7F5F0' }}>
         <ActivityIndicator size="large" color="#9b59b6" />
-        <Text style={{ color: '#fff', marginTop: 10 }}>Loading...</Text>
+        <Text style={{ color: '#1C1C1C', marginTop: 10 }}>Loading...</Text>
       </View>
     );
   }

@@ -70,7 +70,7 @@ export default function SignupScreen({ navigation }) {
               <TextInput
                 style={styles.input}
                 placeholder="Email"
-                placeholderTextColor="#888"
+                placeholderTextColor="#9B9B9B"
                 value={email}
                 onChangeText={setEmail}
                 autoCapitalize="none"
@@ -81,7 +81,7 @@ export default function SignupScreen({ navigation }) {
               <TextInput
                 style={styles.input}
                 placeholder="Password (min 6 characters)"
-                placeholderTextColor="#888"
+                placeholderTextColor="#9B9B9B"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
@@ -91,7 +91,7 @@ export default function SignupScreen({ navigation }) {
               <TextInput
                 style={styles.input}
                 placeholder="Confirm Password"
-                placeholderTextColor="#888"
+                placeholderTextColor="#9B9B9B"
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry
@@ -126,7 +126,7 @@ export default function SignupScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F7F5F0',
   },
   scrollContainer: {
     flexGrow: 1,
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1C1C1C',
     textAlign: 'center',
     marginBottom: 10,
   },
@@ -153,14 +153,14 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   input: {
-    backgroundColor: '#1a1a2e',
-    color: '#fff',
+    backgroundColor: '#EDEAE4',
+    color: '#1C1C1C',
     padding: 15,
     borderRadius: 10,
     fontSize: 16,
     marginBottom: 15,
     borderWidth: 1,
-    borderColor: '#2a2a3e',
+    borderColor: '#D9D5CE',
   },
   button: {
     backgroundColor: '#9b59b6',
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   linkText: {
-    color: '#888',
+    color: '#6B7280',
     textAlign: 'center',
     marginTop: 20,
     fontSize: 14,

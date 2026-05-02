@@ -158,20 +158,20 @@ export default function SettingsScreen({ navigation }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F7F5F0',
   },
   container: {
     flex: 1,
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F7F5F0',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F7F5F0',
   },
   brandHeader: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#EDEAE4',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderBottomWidth: 2,
@@ -192,10 +192,10 @@ const styles = StyleSheet.create({
   brandText: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1C1C1C',
   },
   section: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#EDEAE4',
     margin: 15,
     padding: 20,
     borderRadius: 15,
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1C1C1C',
     marginBottom: 15,
   },
   settingButton: {
@@ -212,11 +212,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#2a2a3e',
+    borderBottomColor: '#D9D5CE',
   },
   settingButtonText: {
     fontSize: 16,
-    color: '#fff',
+    color: '#1C1C1C',
   },
   settingButtonArrow: {
     fontSize: 18,

@@ -90,7 +90,7 @@ export default function ProfileSetupScreen() {
           <TextInput
             style={styles.input}
             placeholder="e.g. stylerose"
-            placeholderTextColor="#888"
+            placeholderTextColor="#9B9B9B"
             value={username}
             onChangeText={setUsername}
             autoCapitalize="none"
@@ -100,7 +100,7 @@ export default function ProfileSetupScreen() {
           <TextInput
             style={styles.input}
             placeholder="First Name"
-            placeholderTextColor="#888"
+            placeholderTextColor="#9B9B9B"
             value={firstName}
             onChangeText={setFirstName}
           />
@@ -109,7 +109,7 @@ export default function ProfileSetupScreen() {
           <TextInput
             style={styles.input}
             placeholder="Last Name"
-            placeholderTextColor="#888"
+            placeholderTextColor="#9B9B9B"
             value={lastName}
             onChangeText={setLastName}
           />
@@ -118,7 +118,7 @@ export default function ProfileSetupScreen() {
           <TextInput
             style={styles.input}
             placeholder="e.g. Los Angeles"
-            placeholderTextColor="#888"
+            placeholderTextColor="#9B9B9B"
             value={city}
             onChangeText={setCity}
           />
@@ -132,7 +132,7 @@ export default function ProfileSetupScreen() {
               dropdownIconColor="#9b59b6"
             >
               {US_STATES.map((s) => (
-                <Picker.Item key={s.value} label={s.label} value={s.value} color="#fff" />
+                <Picker.Item key={s.value} label={s.label} value={s.value} color="#1C1C1C" />
               ))}
             </Picker>
           </View>
@@ -146,7 +146,7 @@ export default function ProfileSetupScreen() {
               dropdownIconColor="#9b59b6"
             >
               {GENDERS.map((g) => (
-                <Picker.Item key={g.value} label={g.label} value={g.value} color="#fff" />
+                <Picker.Item key={g.value} label={g.label} value={g.value} color="#1C1C1C" />
               ))}
             </Picker>
           </View>
@@ -192,7 +192,7 @@ export default function ProfileSetupScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a1a',
+    backgroundColor: '#F7F5F0',
   },
   scrollContent: {
     flexGrow: 1,
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#1C1C1C',
     marginBottom: 10,
   },
   subtitle: {
@@ -224,34 +224,34 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   input: {
-    backgroundColor: '#1a1a2e',
-    color: '#fff',
+    backgroundColor: '#EDEAE4',
+    color: '#1C1C1C',
     padding: 15,
     borderRadius: 10,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#2a2a3e',
+    borderColor: '#D9D5CE',
   },
   pickerContainer: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#EDEAE4',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#2a2a3e',
+    borderColor: '#D9D5CE',
     overflow: 'hidden',
   },
   picker: {
-    color: '#fff',
-    backgroundColor: '#1a1a2e',
+    color: '#1C1C1C',
+    backgroundColor: '#EDEAE4',
   },
   dateButton: {
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#EDEAE4',
     padding: 15,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#2a2a3e',
+    borderColor: '#D9D5CE',
   },
   dateButtonText: {
-    color: '#fff',
+    color: '#1C1C1C',
     fontSize: 16,
   },
   button: {
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   note: {
-    color: '#888',
+    color: '#6B7280',
     fontSize: 12,
     textAlign: 'center',
     marginTop: 20,
