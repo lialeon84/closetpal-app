@@ -5,7 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { supabase } from './lib/supabase';
-import { initializeRevenueCat } from './lib/revenuecat';
+import { initializeRevenueCat, loginRevenueCat, logoutRevenueCat } from './lib/revenuecat';
 
 import WelcomeScreen from './screens/WelcomeScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -153,21 +153,25 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    initializeRevenueCat();
+
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       if (session) {
+        await loginRevenueCat(session.user.id);
         checkProfile(session.user.id);
       } else {
         setLoading(false);
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       if (session) {
+        await loginRevenueCat(session.user.id);
         checkProfile(session.user.id);
-        initializeRevenueCat();
       } else {
+        await logoutRevenueCat();
         setHasProfile(false);
         setLoading(false);
       }
