@@ -9,8 +9,12 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getCustomerInfo, restorePurchases } from '../lib/revenuecat';
-import Purchases from 'react-native-purchases';
+import {
+  ENTITLEMENT_ID,
+  getCustomerInfo,
+  restorePurchases,
+  presentCustomerCenter,
+} from '../lib/revenuecat';
 
 export default function SubscriptionScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
@@ -27,8 +31,8 @@ export default function SubscriptionScreen({ navigation }) {
       const info = await getCustomerInfo();
       setCustomerInfo(info);
 
-      if (info.entitlements.active.premium_access) {
-        const entitlement = info.entitlements.active.premium_access;
+      if (info.entitlements.active[ENTITLEMENT_ID]) {
+        const entitlement = info.entitlements.active[ENTITLEMENT_ID];
         setActiveSubscription({
           expirationDate: entitlement.expirationDate,
           willRenew: entitlement.willRenew,
@@ -43,27 +47,14 @@ export default function SubscriptionScreen({ navigation }) {
     }
   };
 
-  const handleManageSubscription = () => {
-    Alert.alert(
-      'Manage Subscription',
-      'You can manage your subscription in your device settings.',
-      [
-        {
-          text: 'Open Settings',
-          onPress: async () => {
-            try {
-              await Purchases.showManagementURL();
-            } catch (error) {
-              Alert.alert(
-                'Manual Instructions',
-                'Go to Settings > [Your Name] > Subscriptions on iOS, or Play Store > Subscriptions on Android'
-              );
-            }
-          },
-        },
-        { text: 'Cancel', style: 'cancel' },
-      ]
-    );
+  const handleManageSubscription = async () => {
+    try {
+      await presentCustomerCenter();
+      // Refresh subscription info after Customer Center closes
+      await loadSubscriptionInfo();
+    } catch (error) {
+      Alert.alert('Error', 'Unable to open subscription management.');
+    }
   };
 
   const handleRestore = async () => {
