@@ -108,7 +108,7 @@ export default function ProfileScreen({ navigation }) {
       <View style={styles.brandHeaderContainer}>
         <SafeAreaView edges={['top']}>
           <View style={styles.brandHeader}>
-            <Text style={styles.brandSymbol}>🐾</Text>
+            <Text style={styles.brandSymbol}>ClosetPal 🐾</Text>
           </View>
         </SafeAreaView>
       </View>
@@ -157,10 +157,20 @@ export default function ProfileScreen({ navigation }) {
           { useNativeDriver: false }
         )}
       >
+       
+        {/* Display name */}
+        {(profile.first_name || profile.last_name) ? (
+          <View style={styles.section}>
+            <Text style={styles.fullName}>
+              {[profile.first_name, profile.last_name].filter(Boolean).join(' ')}
+            </Text>
+          </View>
+        ) : null} 
+
         {/* Stats — followers/following stored for future social features */}
         <View style={styles.statsContainer}>
           <View style={styles.statBox}>
-            <Text style={styles.statNumber}>0</Text>
+            <Text style={styles.statNumber}>{profile.outfits_count || 0}</Text>
             <Text style={styles.statLabel}>Outfits</Text>
           </View>
           <View style={styles.statBox}>
@@ -173,14 +183,7 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View>
 
-        {/* Display name */}
-        {(profile.first_name || profile.last_name) ? (
-          <View style={styles.section}>
-            <Text style={styles.fullName}>
-              {[profile.first_name, profile.last_name].filter(Boolean).join(' ')}
-            </Text>
-          </View>
-        ) : null}
+
 
         {/* Subscription badge */}
         <View style={styles.section}>
@@ -206,7 +209,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F7F5F0',
   },
   brandHeaderContainer: {
-    backgroundColor: '#EDEAE4',
+    // backgroundColor: '#EDEAE4',
     zIndex: 10,
   },
   brandHeader: {
