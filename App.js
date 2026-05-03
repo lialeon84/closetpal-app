@@ -20,6 +20,8 @@ import SettingsScreen from './screens/SettingsScreen';
 import EditProfileScreen from './screens/EditProfileScreen';
 import PaywallScreen from './screens/PaywallScreen';
 import SubscriptionScreen from './screens/SubscriptionScreen';
+import AddItemScreen from './screens/AddItemScreen';
+import ItemDetailScreen from './screens/ItemDetailScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -212,6 +214,8 @@ export default function App() {
               <Stack.Screen name="EditProfile" component={EditProfileScreen} />
               <Stack.Screen name="Paywall" component={PaywallScreen} />
               <Stack.Screen name="Subscription" component={SubscriptionScreen} />
+              <Stack.Screen name="AddItem" component={AddItemScreen} />
+              <Stack.Screen name="ItemDetail" component={ItemDetailScreen} />
             </>
           ) : (
             <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />

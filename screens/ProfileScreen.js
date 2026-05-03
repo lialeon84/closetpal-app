@@ -159,13 +159,13 @@ export default function ProfileScreen({ navigation }) {
       >
        
         {/* Display name */}
-        {(profile.first_name || profile.last_name) ? (
-          <View style={styles.section}>
+        {/* {(profile.first_name || profile.last_name) ? (
+          <View style={[styles.section, { marginTop: 40 }]}>
             <Text style={styles.fullName}>
               {[profile.first_name, profile.last_name].filter(Boolean).join(' ')}
             </Text>
           </View>
-        ) : null} 
+        ) : null}  */}
 
         {/* Stats — followers/following stored for future social features */}
         <View style={styles.statsContainer}>
@@ -173,20 +173,20 @@ export default function ProfileScreen({ navigation }) {
             <Text style={styles.statNumber}>{profile.outfits_count || 0}</Text>
             <Text style={styles.statLabel}>Outfits</Text>
           </View>
-          <View style={styles.statBox}>
+          {/* <View style={styles.statBox}>
             <Text style={styles.statNumber}>{profile.followers_count || 0}</Text>
             <Text style={styles.statLabel}>Followers</Text>
           </View>
           <View style={styles.statBox}>
             <Text style={styles.statNumber}>{profile.following_count || 0}</Text>
             <Text style={styles.statLabel}>Following</Text>
-          </View>
+          </View> */}
         </View>
 
 
 
         {/* Subscription badge */}
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <View style={styles.subscriptionRow}>
             <Text style={styles.subscriptionLabel}>Plan</Text>
             <Pressable onPress={() => navigation.navigate('Subscription')}>
@@ -195,7 +195,7 @@ export default function ProfileScreen({ navigation }) {
               </Text>
             </Pressable>
           </View>
-        </View>
+        </View> */}
 
         <View style={styles.bottomSpacer} />
       </Animated.ScrollView>
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F7F5F0',
   },
   header: {
-    backgroundColor: '#EDEAE4',
+    // backgroundColor: '#EDEAE4',
     alignItems: 'center',
     justifyContent: 'center',
     borderBottomLeftRadius: 30,
