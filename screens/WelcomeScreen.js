@@ -4,8 +4,8 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 export default function WelcomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>ClosetPal 🐾</Text>
-      <Text style={styles.subtitle}>Your AI wardrobe companion</Text>
+      <Text style={styles.title}>Blossom 🌸</Text>
+      <Text style={styles.subtitle}>Your AI Wardrobe Stylist</Text>
 
       <Pressable
         style={styles.button}
@@ -39,12 +39,12 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 18,
-    color: '#5B5BD6',
+    color: '#F4DBE9',
     marginBottom: 50,
     textAlign: 'center',
   },
   button: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#F4DBE9',
     padding: 16,
     borderRadius: 12,
     width: '100%',
@@ -59,9 +59,9 @@ const styles = StyleSheet.create({
   secondaryButton: {
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: '#6366f1',
+    borderColor: '#F4DBE9',
   },
   secondaryButtonText: {
-    color: '#6366f1',
+    color: '#F4DBE9',
   },
 });
