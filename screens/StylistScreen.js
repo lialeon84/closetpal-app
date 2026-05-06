@@ -43,7 +43,8 @@ export default function StylistScreen() {
       var { data: wardrobe, error: wErr } = await supabase
         .from('clothing_items')
         .select('id, name, category, subcategory, color, season, formality, image_url')
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .eq('is_lent', false);
 
       if (wErr) throw wErr;
 

@@ -211,7 +211,9 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.favSectionHeader}>
             <Text style={styles.favSectionTitle}>Favorite Outfits</Text>
             <Text style={styles.favCount}>
-              {favorites.length} of {(userTier && userTier !== 'free') ? 50 : 5} saved
+              {(userTier && userTier !== 'free')
+                ? `${favorites.length} saved`
+                : `${favorites.length} of 5 saved`}
             </Text>
           </View>
           {favorites.length === 0 ? (

@@ -25,6 +25,9 @@ import ItemDetailScreen from './screens/ItemDetailScreen';
 import DeleteAccountScreen from './screens/DeleteAccountScreen';
 import NotificationPreferencesScreen from './screens/NotificationPreferencesScreen';
 import ExportDataScreen from './screens/ExportDataScreen';
+import TripsScreen from './screens/TripsScreen';
+import NewTripScreen from './screens/NewTripScreen';
+import TripDetailScreen from './screens/TripDetailScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -100,6 +103,15 @@ function MainTabs() {
         options={{
           tabBarIcon: () => (
             <Text style={{ fontSize: 24 }}>✨</Text>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Trips"
+        component={TripsScreen}
+        options={{
+          tabBarIcon: () => (
+            <Text style={{ fontSize: 24 }}>✈️</Text>
           ),
         }}
       />
@@ -224,6 +236,8 @@ export default function App() {
               <Stack.Screen name="DeleteAccount" component={DeleteAccountScreen} />
               <Stack.Screen name="NotificationPreferences" component={NotificationPreferencesScreen} />
               <Stack.Screen name="ExportData" component={ExportDataScreen} />
+              <Stack.Screen name="NewTrip" component={NewTripScreen} />
+              <Stack.Screen name="TripDetail" component={TripDetailScreen} />
             </>
           ) : (
             <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />

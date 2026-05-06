@@ -83,7 +83,7 @@ export default function HomeScreen() {
   var findFavorite = (outfit) =>
     favorites.find(f => [...f.clothing_item_ids].sort().join(',') === outfitKey(outfit));
 
-  var getFavoriteLimit = (tier) => (tier && tier !== 'free') ? 50 : 5;
+  var getFavoriteLimit = (tier) => (tier && tier !== 'free') ? null : 5;
 
   var loadFavoritesAndTier = async (userId) => {
     var [{ data: favData }, { data: profileData }] = await Promise.all([
@@ -126,10 +126,26 @@ export default function HomeScreen() {
         if (inserted) setFavorites(prev => [...prev, inserted]);
       };
 
-      if (favorites.length >= limit) {
+      // Paid users: safety valve at 1,000
+      if (limit === null && favorites.length >= 1000) {
+        Alert.alert('Limit Reached', 'You have too many saved favorites. Please remove some before adding more.');
+        return;
+      }
+
+      // Free users over limit due to downgrade: block without auto-delete
+      if (limit !== null && favorites.length > limit) {
         Alert.alert(
           'Favorites Limit Reached',
-          `You've reached your favorites limit (${limit}). Replace your oldest favorite with this one?`,
+          `You have ${favorites.length} saved favorites but your free plan allows ${limit}. Remove some to add new ones.`
+        );
+        return;
+      }
+
+      // Free users exactly at limit: offer to replace oldest
+      if (limit !== null && favorites.length === limit) {
+        Alert.alert(
+          'Favorites Limit Reached',
+          `You've reached your free favorites limit (${limit}). Replace your oldest favorite with this one?`,
           [
             { text: 'Cancel', style: 'cancel' },
             {
@@ -161,7 +177,8 @@ export default function HomeScreen() {
       var { data: wardrobe, error: wErr } = await supabase
         .from('clothing_items')
         .select('id, name, category, subcategory, color, season, image_url')
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .eq('is_lent', false);
 
       if (wErr) throw wErr;
 

@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '../lib/supabase';
 
-const CATEGORIES = ['All', 'Tops', 'Bottoms', 'Shoes', 'Outerwear', 'Accessories', 'Dresses'];
+const CATEGORIES = ['All', 'Tops', 'Bottoms', 'Shoes', 'Outerwear', 'Accessories', 'Dresses', 'Lent'];
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CARD_WIDTH = (SCREEN_WIDTH - 15 * 2 - 10) / 2;
 
@@ -52,22 +52,29 @@ export default function WardrobeScreen({ navigation }) {
   };
 
   const filteredItems =
-    selectedCategory === 'All'
-      ? items
-      : items.filter((item) => item.category === selectedCategory);
+    selectedCategory === 'All' ? items
+    : selectedCategory === 'Lent' ? items.filter(item => item.is_lent)
+    : items.filter(item => item.category === selectedCategory);
 
   const renderItem = ({ item }) => (
     <Pressable
-      style={styles.card}
+      style={[styles.card, item.is_lent && styles.cardLent]}
       onPress={() => navigation.navigate('ItemDetail', { item })}
     >
-      {item.image_url ? (
-        <Image source={{ uri: item.image_url }} style={styles.cardImage} />
-      ) : (
-        <View style={styles.cardImagePlaceholder}>
-          <Text style={styles.cardImagePlaceholderIcon}>👗</Text>
-        </View>
-      )}
+      <View>
+        {item.image_url ? (
+          <Image source={{ uri: item.image_url }} style={styles.cardImage} />
+        ) : (
+          <View style={styles.cardImagePlaceholder}>
+            <Text style={styles.cardImagePlaceholderIcon}>👗</Text>
+          </View>
+        )}
+        {item.is_lent && (
+          <View style={styles.lentBadge}>
+            <Text style={styles.lentBadgeText}>Lent</Text>
+          </View>
+        )}
+      </View>
       <View style={styles.cardFooter}>
         <Text style={styles.cardName} numberOfLines={1}>{item.name}</Text>
         <Text style={styles.cardCategory}>{item.category}</Text>
@@ -261,6 +268,23 @@ const styles = StyleSheet.create({
   cardCategory: {
     fontSize: 12,
     color: '#6B7280',
+  },
+  cardLent: {
+    opacity: 0.6,
+  },
+  lentBadge: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    backgroundColor: '#F59E0B',
+    borderRadius: 6,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+  },
+  lentBadgeText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: '700',
   },
   fab: {
     position: 'absolute',
