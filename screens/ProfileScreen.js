@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Image } from 'react-native';
+import { Image, TouchableOpacity } from 'react-native';
 import {
   View,
   Text,
@@ -12,11 +12,15 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
+import { Heart } from 'lucide-react-native';
 import { supabase } from '../lib/supabase';
 
 export default function ProfileScreen({ navigation }) {
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [profile, setProfile]       = useState(null);
+  const [loading, setLoading]       = useState(true);
+  const [favorites, setFavorites]   = useState([]);
+  const [wardrobeMap, setWardrobeMap] = useState({});
+  const [userTier, setUserTier]     = useState('free');
   const scrollY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -34,14 +38,20 @@ export default function ProfileScreen({ navigation }) {
       const { data: { user } } = await supabase.auth.getUser();
 
       if (user) {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
+        const [{ data, error }, { data: favData }, { data: wardrobeData }] = await Promise.all([
+          supabase.from('profiles').select('*').eq('id', user.id).single(),
+          supabase.from('favorite_outfits')
+            .select('id, clothing_item_ids, styling_note, created_at')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false }),
+          supabase.from('clothing_items').select('id, name, image_url').eq('user_id', user.id),
+        ]);
 
         if (error) throw error;
         setProfile(data);
+        setUserTier(data?.subscription_tier ?? 'free');
+        if (favData) setFavorites(favData);
+        if (wardrobeData) setWardrobeMap(Object.fromEntries(wardrobeData.map(i => [i.id, i])));
       }
     } catch (error) {
       Alert.alert('Error', error.message);
@@ -170,8 +180,8 @@ export default function ProfileScreen({ navigation }) {
         {/* Stats — followers/following stored for future social features */}
         <View style={styles.statsContainer}>
           <View style={styles.statBox}>
-            <Text style={styles.statNumber}>{profile.outfits_count || 0}</Text>
-            <Text style={styles.statLabel}>Outfits</Text>
+            <Text style={styles.statNumber}>{favorites.length}</Text>
+            <Text style={styles.statLabel}>Favorite Outfits</Text>
           </View>
           {/* <View style={styles.statBox}>
             <Text style={styles.statNumber}>{profile.followers_count || 0}</Text>
@@ -197,8 +207,60 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View> */}
 
+        <View style={styles.favSection}>
+          <View style={styles.favSectionHeader}>
+            <Text style={styles.favSectionTitle}>Favorite Outfits</Text>
+            <Text style={styles.favCount}>
+              {favorites.length} of {(userTier && userTier !== 'free') ? 50 : 5} saved
+            </Text>
+          </View>
+          {favorites.length === 0 ? (
+            <Text style={styles.favEmpty}>
+              No favorites yet — heart an outfit on the home screen.
+            </Text>
+          ) : (
+            favorites.map(fav => (
+              <FavoriteOutfitCard
+                key={fav.id}
+                favorite={fav}
+                wardrobeMap={wardrobeMap}
+                onUnfavorite={async () => {
+                  await supabase.from('favorite_outfits').delete().eq('id', fav.id);
+                  setFavorites(prev => prev.filter(f => f.id !== fav.id));
+                }}
+              />
+            ))
+          )}
+        </View>
+
         <View style={styles.bottomSpacer} />
       </Animated.ScrollView>
+    </View>
+  );
+}
+
+function FavoriteOutfitCard({ favorite, wardrobeMap, onUnfavorite }) {
+  var images = favorite.clothing_item_ids.slice(0, 4).map(id => wardrobeMap[id] ?? null);
+  return (
+    <View style={styles.favCard}>
+      <View style={styles.favImageGrid}>
+        {images.map((item, idx) =>
+          item?.image_url ? (
+            <Image key={idx} source={{ uri: item.image_url }} style={styles.favImage} resizeMode="cover" />
+          ) : (
+            <View key={idx} style={[styles.favImage, styles.favImagePlaceholder]}>
+              <Text style={styles.favImagePlaceholderText}>?</Text>
+            </View>
+          )
+        )}
+      </View>
+      {favorite.styling_note ? (
+        <Text style={styles.favNote} numberOfLines={3}>{favorite.styling_note}</Text>
+      ) : null}
+      <TouchableOpacity onPress={onUnfavorite} style={styles.favUnfavBtn}>
+        <Heart size={14} color="#E53935" fill="#E53935" />
+        <Text style={styles.favUnfavText}>Remove</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -349,5 +411,88 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 100,
+  },
+
+  favSection: {
+    marginHorizontal: 15,
+    marginBottom: 15,
+  },
+  favSectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  favSectionTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#1C1C1C',
+  },
+  favCount: {
+    fontSize: 13,
+    color: '#6B7280',
+  },
+  favEmpty: {
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
+    paddingVertical: 24,
+    backgroundColor: '#EDEAE4',
+    borderRadius: 15,
+    paddingHorizontal: 20,
+  },
+  favCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    padding: 14,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  favImageGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginBottom: 10,
+  },
+  favImage: {
+    width: 72,
+    height: 72,
+    borderRadius: 10,
+    backgroundColor: '#EDEAE4',
+  },
+  favImagePlaceholder: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  favImagePlaceholderText: {
+    fontSize: 22,
+    color: '#9CA3AF',
+  },
+  favNote: {
+    fontSize: 13,
+    color: '#374151',
+    lineHeight: 19,
+    marginBottom: 10,
+  },
+  favUnfavBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    alignSelf: 'flex-start',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#FECACA',
+    backgroundColor: '#FFF5F5',
+  },
+  favUnfavText: {
+    fontSize: 12,
+    color: '#E53935',
+    fontWeight: '600',
   },
 });

@@ -25,6 +25,7 @@ const ANTHROPIC_API_KEY = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
 
 const CATEGORIES = ['Tops', 'Bottoms', 'Shoes', 'Outerwear', 'Accessories', 'Dresses'];
 const SEASONS = ['Spring', 'Summer', 'Fall', 'Winter', 'All Season'];
+const FORMALITY_OPTIONS = ['Casual', 'Business Casual', 'Business', 'Formal', 'Athletic'];
 const SUBCATEGORIES = {
   Tops: ['T-Shirt', 'Tank Top', 'Blouse', 'Button-Down', 'Sweater', 'Hoodie', 'Business Casual Top', 'Polo'],
   Bottoms: ['Jeans', 'Leggings', 'Shorts', 'Skirt', 'Dress Pants', 'Business Casual Pants', 'Sweatpants'],
@@ -93,6 +94,7 @@ export default function AddItemScreen({ navigation }) {
   const [color, setColor] = useState('');
   const [isOtherColor, setIsOtherColor] = useState(false);
   const [season, setSeason] = useState('All Season');
+  const [formality, setFormality] = useState(null);
   const [saving, setSaving] = useState(false);
 
   const handleCategoryChange = (newCat) => {
@@ -357,6 +359,7 @@ export default function AddItemScreen({ navigation }) {
           subcategory,
           color: color.trim(),
           season,
+          formality: formality ?? null,
           image_url: publicData.publicUrl,
         });
       if (insertError) throw insertError;
@@ -545,6 +548,21 @@ export default function AddItemScreen({ navigation }) {
                 >
                   <Text style={[styles.chipText, season === s && styles.chipTextSelected]}>
                     {s}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+
+            <Text style={styles.label}>Formality</Text>
+            <View style={styles.chipRow}>
+              {FORMALITY_OPTIONS.map((f) => (
+                <Pressable
+                  key={f}
+                  style={[styles.chip, formality === f && styles.chipSelected]}
+                  onPress={() => setFormality(formality === f ? null : f)}
+                >
+                  <Text style={[styles.chipText, formality === f && styles.chipTextSelected]}>
+                    {f}
                   </Text>
                 </Pressable>
               ))}

@@ -14,7 +14,7 @@ import ProfileSetupScreen from './screens/ProfileSetupScreen';
 import HomeScreen from './screens/HomeScreen';
 import WardrobeScreen from './screens/WardrobeScreen';
 import StylistScreen from './screens/StylistScreen';
-import PetCompanionScreen from './screens/PetCompanionScreen';
+// import PetCompanionScreen from './screens/PetCompanionScreen'; // Temporarily disabled — re-enable with the Tab.Screen block below
 import ProfileScreen from './screens/ProfileScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import EditProfileScreen from './screens/EditProfileScreen';
@@ -22,6 +22,9 @@ import PaywallScreen from './screens/PaywallScreen';
 import SubscriptionScreen from './screens/SubscriptionScreen';
 import AddItemScreen from './screens/AddItemScreen';
 import ItemDetailScreen from './screens/ItemDetailScreen';
+import DeleteAccountScreen from './screens/DeleteAccountScreen';
+import NotificationPreferencesScreen from './screens/NotificationPreferencesScreen';
+import ExportDataScreen from './screens/ExportDataScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -100,6 +103,8 @@ function MainTabs() {
           ),
         }}
       />
+      {/* Temporarily disabled — Pet Companion tab hidden for initial launch.
+          To re-enable: uncomment this block and the PetCompanionScreen import above.
       <Tab.Screen
         name="Pet"
         component={PetCompanionScreen}
@@ -108,7 +113,7 @@ function MainTabs() {
             <Text style={{ fontSize: 24 }}>🐾</Text>
           ),
         }}
-      />
+      /> */}
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
@@ -216,6 +221,9 @@ export default function App() {
               <Stack.Screen name="Subscription" component={SubscriptionScreen} />
               <Stack.Screen name="AddItem" component={AddItemScreen} />
               <Stack.Screen name="ItemDetail" component={ItemDetailScreen} />
+              <Stack.Screen name="DeleteAccount" component={DeleteAccountScreen} />
+              <Stack.Screen name="NotificationPreferences" component={NotificationPreferencesScreen} />
+              <Stack.Screen name="ExportData" component={ExportDataScreen} />
             </>
           ) : (
             <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />

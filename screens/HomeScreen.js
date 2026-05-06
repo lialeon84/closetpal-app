@@ -10,9 +10,11 @@ import {
   Modal,
   Pressable,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
+import { Heart } from 'lucide-react-native';
 import { supabase } from '../lib/supabase';
 
 var ANTHROPIC_API_KEY = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
@@ -54,12 +56,15 @@ function decodeWeather(code) {
 }
 
 export default function HomeScreen() {
-  var [outfits, setOutfits]     = useState([]);
-  var [weather, setWeather]     = useState(null);
-  var [occasion, setOccasion]   = useState(null);
-  var [loading, setLoading]     = useState(false);
-  var [error, setError]         = useState(null);
-  var [showPicker, setShowPicker] = useState(false);
+  var [outfits, setOutfits]         = useState([]);
+  var [weather, setWeather]         = useState(null);
+  var [occasion, setOccasion]       = useState(null);
+  var [loading, setLoading]         = useState(false);
+  var [error, setError]             = useState(null);
+  var [showPicker, setShowPicker]   = useState(false);
+  var [favorites, setFavorites]     = useState([]);
+  var [userTier, setUserTier]       = useState('free');
+  var [togglingKey, setTogglingKey] = useState(null);
 
   var handleGetOutfits = () => {
     setOutfits([]);
@@ -71,6 +76,80 @@ export default function HomeScreen() {
     setOccasion(selected);
     setShowPicker(false);
     await generateOutfits(selected);
+  };
+
+  var outfitKey = (outfit) => outfit.items.map(i => i.id).sort().join(',');
+
+  var findFavorite = (outfit) =>
+    favorites.find(f => [...f.clothing_item_ids].sort().join(',') === outfitKey(outfit));
+
+  var getFavoriteLimit = (tier) => (tier && tier !== 'free') ? 50 : 5;
+
+  var loadFavoritesAndTier = async (userId) => {
+    var [{ data: favData }, { data: profileData }] = await Promise.all([
+      supabase.from('favorite_outfits')
+        .select('id, clothing_item_ids, created_at')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: true }),
+      supabase.from('profiles').select('subscription_tier').eq('id', userId).single(),
+    ]);
+    if (favData) setFavorites(favData);
+    if (profileData) setUserTier(profileData.subscription_tier ?? 'free');
+  };
+
+  var toggleFavorite = async (outfit) => {
+    var key = outfitKey(outfit);
+    if (togglingKey === key) return;
+    setTogglingKey(key);
+    try {
+      var { data: { user } } = await supabase.auth.getUser();
+      var existing = findFavorite(outfit);
+
+      if (existing) {
+        await supabase.from('favorite_outfits').delete().eq('id', existing.id);
+        setFavorites(prev => prev.filter(f => f.id !== existing.id));
+        return;
+      }
+
+      var limit = getFavoriteLimit(userTier);
+
+      var doInsert = async () => {
+        var { data: inserted } = await supabase
+          .from('favorite_outfits')
+          .insert({
+            user_id: user.id,
+            clothing_item_ids: outfit.items.map(i => i.id),
+            styling_note: outfit.styling_note ?? null,
+          })
+          .select()
+          .single();
+        if (inserted) setFavorites(prev => [...prev, inserted]);
+      };
+
+      if (favorites.length >= limit) {
+        Alert.alert(
+          'Favorites Limit Reached',
+          `You've reached your favorites limit (${limit}). Replace your oldest favorite with this one?`,
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Replace',
+              onPress: async () => {
+                var oldest = favorites[0];
+                await supabase.from('favorite_outfits').delete().eq('id', oldest.id);
+                setFavorites(prev => prev.filter(f => f.id !== oldest.id));
+                await doInsert();
+              },
+            },
+          ]
+        );
+        return;
+      }
+
+      await doInsert();
+    } finally {
+      setTogglingKey(null);
+    }
   };
 
   var generateOutfits = async (selectedOccasion) => {
@@ -162,6 +241,7 @@ export default function HomeScreen() {
       }));
 
       setOutfits(enriched);
+      await loadFavoritesAndTier(user.id);
     } catch (err) {
       console.error('[OutfitRec]', err.message);
       setError('generic');
@@ -237,11 +317,19 @@ export default function HomeScreen() {
         {/* Outfit cards */}
         {outfits.length > 0 && (
           <>
-            {outfits.map(outfit => (
-              <OutfitCard key={outfit.outfit_number} outfit={outfit} weather={weather} occasion={occasion} />
+            {outfits.map((outfit, idx) => (
+              <OutfitCard
+                key={idx}
+                outfit={outfit}
+                weather={weather}
+                occasion={occasion}
+                isFavorited={!!findFavorite(outfit)}
+                isToggling={togglingKey === outfitKey(outfit)}
+                onToggleFavorite={() => toggleFavorite(outfit)}
+              />
             ))}
             <TouchableOpacity style={styles.refreshBtn} onPress={handleGetOutfits} activeOpacity={0.85}>
-              <Text style={styles.refreshBtnText}>🔄  Regenerate Outfits</Text>
+              <Text style={styles.refreshBtnText}>Regenerate Outfits</Text>
             </TouchableOpacity>
           </>
         )}
@@ -276,12 +364,12 @@ export default function HomeScreen() {
   );
 }
 
-function OutfitCard({ outfit, weather, occasion }) {
+function OutfitCard({ outfit, weather, occasion, isFavorited, isToggling, onToggleFavorite }) {
   var displayImages = outfit.items.filter(i => i.image_url).slice(0, 4);
 
   return (
     <View style={styles.card}>
-      {/* Top row: weather+occasion tag + outfit number */}
+      {/* Top row: weather+occasion tag + outfit number + heart */}
       <View style={styles.cardTopRow}>
         {weather && occasion && (
           <View style={styles.cardTag}>
@@ -291,19 +379,27 @@ function OutfitCard({ outfit, weather, occasion }) {
           </View>
         )}
         <Text style={styles.outfitLabel}>Outfit {outfit.outfit_number}</Text>
+        <TouchableOpacity
+          onPress={onToggleFavorite}
+          disabled={isToggling}
+          style={styles.heartBtn}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Heart size={20} color="#E53935" fill={isFavorited ? '#E53935' : 'transparent'} />
+        </TouchableOpacity>
       </View>
 
       {/* Photo grid */}
       {displayImages.length > 0 ? (
         <View style={styles.photoGrid}>
           {displayImages.map((item, idx) => (
-          <Image
-            key={`${outfit.outfit_number}-${item.id}-${idx}`}
-            source={{ uri: item.image_url }}
-            style={styles.photoCell}
-            resizeMode="cover"
-          />
-        ))}
+            <Image
+              key={item.id ?? idx}
+              source={{ uri: item.image_url }}
+              style={styles.photoCell}
+              resizeMode="cover"
+            />
+          ))}
         </View>
       ) : (
         <View style={styles.noPhotos}>
@@ -314,7 +410,7 @@ function OutfitCard({ outfit, weather, occasion }) {
       {/* Item names */}
       <View style={styles.itemList}>
         {outfit.items.map((item, idx) => (
-          <Text key={`${outfit.outfit_number}-${item.id}-${idx}`} style={styles.itemName}>• {item.name}</Text>
+          <Text key={item.id ?? idx} style={styles.itemName}>• {item.name}</Text>
         ))}
       </View>
 
@@ -360,12 +456,12 @@ var styles = StyleSheet.create({
   ctaCard: {
     marginHorizontal: 16,
     marginTop: 24,
-    backgroundColor: '#9b59b6',
+    backgroundColor: '#D8C3F9',
     borderRadius: 20,
     paddingVertical: 36,
     paddingHorizontal: 24,
     alignItems: 'center',
-    shadowColor: '#9b59b6',
+    shadowColor: '#e0d4e7',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
     shadowRadius: 12,
@@ -458,6 +554,11 @@ var styles = StyleSheet.create({
     fontSize: 13,
     color: '#6B7280',
     fontWeight: '500',
+    textAlign: 'center',
+  },
+  heartBtn: {
+    padding: 4,
+    marginLeft: 8,
   },
 
   // ── Photo grid ──────────────────────────────────────────────────────────────

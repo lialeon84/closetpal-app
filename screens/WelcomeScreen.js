@@ -39,12 +39,12 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 18,
-    color: '#F4DBE9',
+    color: '#9b59b6',
     marginBottom: 50,
     textAlign: 'center',
   },
   button: {
-    backgroundColor: '#F4DBE9',
+    backgroundColor: '#9b59b6',
     padding: 16,
     borderRadius: 12,
     width: '100%',
@@ -59,9 +59,9 @@ const styles = StyleSheet.create({
   secondaryButton: {
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: '#F4DBE9',
+    borderColor: '#9b59b6',
   },
   secondaryButtonText: {
-    color: '#F4DBE9',
+    color: '#9b59b6',
   },
 });

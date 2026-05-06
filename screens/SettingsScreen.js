@@ -10,6 +10,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '../lib/supabase';
+import * as WebBrowser from 'expo-web-browser';
+
+const PRIVACY_URL = 'https://closetpal.app/privacy';
+const TERMS_URL   = 'https://closetpal.app/terms';
 
 export default function SettingsScreen({ navigation }) {
   const [profile, setProfile] = useState(null);
@@ -107,13 +111,16 @@ export default function SettingsScreen({ navigation }) {
             <Text style={styles.settingButtonArrow}>→</Text>
           </Pressable>
 
+          {/* Temporarily disabled — Blocked Users entry point hidden for launch.
+              Re-enable by uncommenting this block.
           <Pressable style={styles.settingButton}>
             <Text style={styles.settingButtonText}>Blocked Users</Text>
             <Text style={styles.settingButtonArrow}>→</Text>
-          </Pressable>
+          </Pressable> */}
         </View>
 
-        {/* Notifications */}
+        {/* Temporarily disabled — Notifications section hidden for launch.
+            Re-enable by uncommenting this block.
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Notifications</Text>
 
@@ -121,7 +128,7 @@ export default function SettingsScreen({ navigation }) {
             <Text style={styles.settingButtonText}>Notification Preferences</Text>
             <Text style={styles.settingButtonArrow}>→</Text>
           </Pressable>
-        </View>
+        </View> */}
 
         {/* About */}
         <View style={styles.section}>
@@ -131,21 +138,42 @@ export default function SettingsScreen({ navigation }) {
             <Text style={styles.settingButtonText}>Help & Support</Text>
             <Text style={styles.settingButtonArrow}>→</Text>
           </Pressable>
+        </View>
 
-          <Pressable style={styles.settingButton}>
+        {/* Privacy & Data */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Privacy & Data</Text>
+
+          <Pressable style={styles.settingButton} onPress={() => navigation.navigate('DeleteAccount')}>
+            <Text style={[styles.settingButtonText, styles.dangerText]}>Delete Account</Text>
+            <Text style={styles.settingButtonArrow}>→</Text>
+          </Pressable>
+
+          <Pressable style={styles.settingButton} onPress={() => navigation.navigate('ExportData')}>
+            <Text style={styles.settingButtonText}>Export My Data</Text>
+            <Text style={styles.settingButtonArrow}>→</Text>
+          </Pressable>
+
+          <Pressable style={styles.settingButton} onPress={() => navigation.navigate('NotificationPreferences')}>
+            <Text style={styles.settingButtonText}>Notification Preferences</Text>
+            <Text style={styles.settingButtonArrow}>→</Text>
+          </Pressable>
+
+          <Pressable style={styles.settingButton} onPress={() => WebBrowser.openBrowserAsync(PRIVACY_URL)}>
+            <Text style={styles.settingButtonText}>Privacy Policy</Text>
+            <Text style={styles.settingButtonArrow}>→</Text>
+          </Pressable>
+
+          <Pressable style={styles.settingButton} onPress={() => WebBrowser.openBrowserAsync(TERMS_URL)}>
             <Text style={styles.settingButtonText}>Terms of Service</Text>
             <Text style={styles.settingButtonArrow}>→</Text>
           </Pressable>
 
-          <Pressable style={styles.settingButton}>
-            <Text style={styles.settingButtonText}>Privacy Policy</Text>
-            <Text style={styles.settingButtonArrow}>→</Text>
-          </Pressable>
-        </View>
+          <View style={styles.sectionDivider} />
 
-        <View style={styles.logoutContainer}>
-          <Pressable style={styles.logoutButton} onPress={handleLogout}>
-            <Text style={styles.logoutButtonText}>Logout</Text>
+          <Pressable style={styles.settingButton} onPress={handleLogout}>
+            <Text style={styles.settingButtonText}>Sign Out</Text>
+            <Text style={styles.settingButtonArrow}>→</Text>
           </Pressable>
         </View>
 
@@ -223,20 +251,13 @@ const styles = StyleSheet.create({
     color: '#9b59b6',
     fontWeight: 'bold',
   },
-  logoutContainer: {
-    paddingHorizontal: 15,
-    marginTop: 20,
+  dangerText: {
+    color: '#E53935',
   },
-  logoutButton: {
-    backgroundColor: '#ff6b6b',
-    padding: 16,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  logoutButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+  sectionDivider: {
+    height: 1,
+    backgroundColor: '#D9D5CE',
+    marginVertical: 8,
   },
   bottomSpacer: {
     height: 40,

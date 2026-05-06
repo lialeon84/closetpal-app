@@ -113,7 +113,7 @@ export default function WardrobeScreen({ navigation }) {
       <View style={styles.gridContainer}>
         {loading ? (
           <View style={styles.centered}>
-            <ActivityIndicator size="large" color="#F4DBE9" />
+            <ActivityIndicator size="large" color="#9b59b6" />
           </View>
         ) : filteredItems.length === 0 ? (
           <View style={styles.centered}>
@@ -191,8 +191,8 @@ const styles = StyleSheet.create({
     borderColor: '#D9D5CE',
   },
   filterChipSelected: {
-    backgroundColor: '#F4DBE9',
-    borderColor: '#F4DBE9',
+    backgroundColor: '#9b59b6',
+    borderColor: '#9b59b6',
   },
   filterChipText: {
     color: '#6B7280',
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#F4DBE9',
+    backgroundColor: '#9b59b6',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
