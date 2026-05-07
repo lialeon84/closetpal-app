@@ -159,7 +159,7 @@ export default function EditProfileScreen({ navigation }) {
           throw error;
         }
       } else {
-        Alert.alert('Success', 'Profile updated! 🐾', [
+        Alert.alert('Success', 'Profile updated! ', [
           { text: 'OK', onPress: () => navigation.goBack() },
         ]);
       }
@@ -189,7 +189,7 @@ export default function EditProfileScreen({ navigation }) {
             <Text style={styles.backButton}>←</Text>
           </Pressable>
           <View style={styles.headerCenter}>
-            <Text style={styles.brandSymbol}>🐾</Text>
+            <Text style={styles.brandSymbol}></Text>
             <Text style={styles.headerTitle}>Edit Profile</Text>
           </View>
           <View style={styles.placeholder} />

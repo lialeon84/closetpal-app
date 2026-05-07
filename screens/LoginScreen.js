@@ -50,7 +50,7 @@ export default function LoginScreen({ navigation }) {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.content}>
-            <Text style={styles.title}>Welcome Back 🐾</Text>
+            <Text style={styles.title}>Welcome Back </Text>
             <Text style={styles.subtitle}>Sign in to your account</Text>
 
             <View style={styles.form}>

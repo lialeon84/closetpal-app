@@ -17,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import { supabase } from '../lib/supabase';
+import { scheduleLentNotifications, cancelLentNotifications } from '../lib/notifications';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { formatDateForDisplay, formatDateForDB, parseDateFromDB } from '../lib/constants';
 
@@ -37,13 +38,20 @@ export default function ItemDetailScreen({ route, navigation }) {
   const [deleting, setDeleting] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Lend state (edit mode)
-  const [isLent, setIsLent] = useState(false);
-  const [lentToName, setLentToName] = useState('');
-  const [lentDate, setLentDate] = useState(new Date());
-  const [expectedReturnDate, setExpectedReturnDate] = useState(null);
+  // Lent state (view mode)
+  const [isLent, setIsLent] = useState(currentItem.is_lent ?? false);
+  const [lentToName, setLentToName] = useState(currentItem.lent_to_name ?? '');
+  const [lentDate, setLentDate] = useState(
+    currentItem.lent_date ? parseDateFromDB(currentItem.lent_date) : new Date()
+  );
+  const [expectedReturnDate, setExpectedReturnDate] = useState(
+    currentItem.expected_return_date ? parseDateFromDB(currentItem.expected_return_date) : null
+  );
   const [showLentDatePicker, setShowLentDatePicker] = useState(false);
   const [showReturnDatePicker, setShowReturnDatePicker] = useState(false);
+  const [savingLent, setSavingLent] = useState(false);
+  const [lentSaved, setLentSaved] = useState(false);
+  const [lentFormOpen, setLentFormOpen] = useState(false);
 
   // Edit form state
   const [newPhoto, setNewPhoto] = useState(null);
@@ -60,10 +68,6 @@ export default function ItemDetailScreen({ route, navigation }) {
     setSubcategory(currentItem.subcategory || SUBCATEGORIES[currentItem.category]?.[0] || '');
     setColor(currentItem.color);
     setSeason(currentItem.season);
-    setIsLent(currentItem.is_lent ?? false);
-    setLentToName(currentItem.lent_to_name ?? '');
-    setLentDate(currentItem.lent_date ? parseDateFromDB(currentItem.lent_date) : new Date());
-    setExpectedReturnDate(currentItem.expected_return_date ? parseDateFromDB(currentItem.expected_return_date) : null);
     setEditing(true);
   };
 
@@ -122,6 +126,97 @@ export default function ItemDetailScreen({ route, navigation }) {
     if (!result.canceled) setNewPhoto(result.assets[0].uri);
   };
 
+  const handleEditCancel = () => {
+    Alert.alert(
+      'Discard Changes?',
+      'Are you sure you want to cancel? Any unsaved changes will be lost.',
+      [
+        { text: 'Stay', style: 'cancel' },
+        { text: 'Discard Changes', style: 'destructive', onPress: () => setEditing(false) },
+      ]
+    );
+  };
+
+  const handleLentToggle = async () => {
+    const newValue = !isLent;
+    setIsLent(newValue);
+    try {
+      setSavingLent(true);
+      if (!newValue) {
+        await cancelLentNotifications(
+          currentItem.notification_id_before,
+          currentItem.notification_id_day_of,
+        );
+        const { error } = await supabase
+          .from('clothing_items')
+          .update({ is_lent: false, lent_to_name: null, lent_date: null, expected_return_date: null, notification_id_before: null, notification_id_day_of: null })
+          .eq('id', currentItem.id);
+        if (error) throw error;
+        setCurrentItem(prev => ({ ...prev, is_lent: false, lent_to_name: null, lent_date: null, expected_return_date: null, notification_id_before: null, notification_id_day_of: null }));
+        setLentToName('');
+        setLentDate(new Date());
+        setExpectedReturnDate(null);
+        setLentFormOpen(false);
+      } else {
+        const { error } = await supabase
+          .from('clothing_items')
+          .update({ is_lent: true })
+          .eq('id', currentItem.id);
+        if (error) throw error;
+        setCurrentItem(prev => ({ ...prev, is_lent: true }));
+        setLentFormOpen(true);
+      }
+    } catch (err) {
+      setIsLent(!newValue);
+      Alert.alert('Error', err.message);
+    } finally {
+      setSavingLent(false);
+    }
+  };
+
+  const handleSaveLentDetails = async () => {
+    if (!lentToName.trim()) {
+      Alert.alert('Missing info', 'Please enter the name of who you lent this to.');
+      return;
+    }
+    try {
+      setSavingLent(true);
+      await cancelLentNotifications(
+        currentItem.notification_id_before,
+        currentItem.notification_id_day_of,
+      );
+      const notifIds = expectedReturnDate
+        ? await scheduleLentNotifications(currentItem.name, lentToName.trim(), expectedReturnDate)
+        : { before: null, dayOf: null };
+      const { error } = await supabase
+        .from('clothing_items')
+        .update({
+          lent_to_name: lentToName.trim(),
+          lent_date: formatDateForDB(lentDate),
+          expected_return_date: expectedReturnDate ? formatDateForDB(expectedReturnDate) : null,
+          notification_id_before: notifIds.before,
+          notification_id_day_of: notifIds.dayOf,
+        })
+        .eq('id', currentItem.id);
+      if (error) throw error;
+      setCurrentItem(prev => ({
+        ...prev,
+        lent_to_name: lentToName.trim(),
+        lent_date: formatDateForDB(lentDate),
+        expected_return_date: expectedReturnDate ? formatDateForDB(expectedReturnDate) : null,
+        notification_id_before: notifIds.before,
+        notification_id_day_of: notifIds.dayOf,
+      }));
+      setLentSaved(true);
+      setTimeout(() => setLentSaved(false), 2000);
+      setLentFormOpen(false);
+    } catch (err) {
+      Alert.alert('Error', err.message);
+    } finally {
+      setSavingLent(false);
+    }
+  };
+
   // ─── Save edits ───────────────────────────────────────────────────────────
 
   const handleSave = async () => {
@@ -133,11 +228,6 @@ export default function ItemDetailScreen({ route, navigation }) {
       Alert.alert('Missing color', 'Please enter the color of your item.');
       return;
     }
-    if (isLent && !lentToName.trim()) {
-      Alert.alert('Missing info', 'Please enter the name of who you lent this to.');
-      return;
-    }
-
     try {
       setSaving(true);
 
@@ -185,10 +275,6 @@ export default function ItemDetailScreen({ route, navigation }) {
           color: color.trim(),
           season,
           image_url: imageUrl,
-          is_lent: isLent,
-          lent_to_name: isLent ? lentToName.trim() : null,
-          lent_date: isLent ? formatDateForDB(lentDate) : null,
-          expected_return_date: isLent && expectedReturnDate ? formatDateForDB(expectedReturnDate) : null,
         })
         .eq('id', currentItem.id);
 
@@ -202,10 +288,6 @@ export default function ItemDetailScreen({ route, navigation }) {
         color: color.trim(),
         season,
         image_url: imageUrl,
-        is_lent: isLent,
-        lent_to_name: isLent ? lentToName.trim() : null,
-        lent_date: isLent ? formatDateForDB(lentDate) : null,
-        expected_return_date: isLent && expectedReturnDate ? formatDateForDB(expectedReturnDate) : null,
       }));
 
       setEditing(false);
@@ -258,9 +340,13 @@ export default function ItemDetailScreen({ route, navigation }) {
 
   const handleMarkReturned = async () => {
     try {
+      await cancelLentNotifications(
+        currentItem.notification_id_before,
+        currentItem.notification_id_day_of,
+      );
       const { error } = await supabase
         .from('clothing_items')
-        .update({ is_lent: false, lent_to_name: null, lent_date: null, expected_return_date: null })
+        .update({ is_lent: false, lent_to_name: null, lent_date: null, expected_return_date: null, notification_id_before: null, notification_id_day_of: null })
         .eq('id', currentItem.id);
       if (error) throw error;
       setCurrentItem(prev => ({
@@ -269,13 +355,23 @@ export default function ItemDetailScreen({ route, navigation }) {
         lent_to_name: null,
         lent_date: null,
         expected_return_date: null,
+        notification_id_before: null,
+        notification_id_day_of: null,
       }));
+      setIsLent(false);
+      setLentToName('');
+      setLentDate(new Date());
+      setExpectedReturnDate(null);
     } catch (err) {
       Alert.alert('Error', err.message);
     }
   };
 
   // ─── Render ───────────────────────────────────────────────────────────────
+
+  const isOverdue = currentItem.is_lent &&
+    currentItem.expected_return_date &&
+    currentItem.expected_return_date <= new Date().toISOString().split('T')[0];
 
   const detailRows = [
     { label: 'Category', value: currentItem.category },
@@ -291,8 +387,8 @@ export default function ItemDetailScreen({ route, navigation }) {
       {/* Header */}
       <View style={styles.header}>
         {editing ? (
-          <Pressable onPress={() => setEditing(false)} disabled={saving}>
-            <Text style={[styles.headerAction, saving && styles.headerActionDisabled]}>Cancel</Text>
+          <Pressable onPress={handleEditCancel} disabled={saving}>
+            <Text style={[styles.backButton, saving && styles.headerActionDisabled]}>←</Text>
           </Pressable>
         ) : (
           <Pressable onPress={() => navigation.goBack()}>
@@ -301,7 +397,7 @@ export default function ItemDetailScreen({ route, navigation }) {
         )}
 
         <Text style={styles.headerTitle} numberOfLines={1}>
-          {editing ? 'Edit Item' : currentItem.name}
+          {editing ? 'Edit Item' : `${currentItem.subcategory || currentItem.category} Detail`}
         </Text>
 
         {editing ? (
@@ -360,38 +456,143 @@ export default function ItemDetailScreen({ route, navigation }) {
           {/* View mode: detail card + delete */}
           {!editing && (
             <>
-              {currentItem.is_lent && (
-                <View style={styles.lentBanner}>
-                  <View style={styles.lentBannerRow}>
-                    <Text style={styles.lentBannerIcon}>🤝</Text>
-                    <View style={styles.lentBannerInfo}>
-                      <Text style={styles.lentBannerTitle}>
-                        Lent to {currentItem.lent_to_name}
-                      </Text>
-                      {currentItem.lent_date && (
-                        <Text style={styles.lentBannerSub}>
-                          Since {formatDateForDisplay(parseDateFromDB(currentItem.lent_date))}
-                          {currentItem.expected_return_date
-                            ? ` · Return by ${formatDateForDisplay(parseDateFromDB(currentItem.expected_return_date))}`
-                            : ''}
-                        </Text>
-                      )}
-                    </View>
-                  </View>
-                  <Pressable style={styles.returnedButton} onPress={handleMarkReturned}>
-                    <Text style={styles.returnedButtonText}>Mark as Returned</Text>
-                  </Pressable>
-                </View>
-              )}
-
+            
               <View style={styles.detailCard}>
                 <Text style={styles.itemName}>{currentItem.name}</Text>
+
+                {currentItem.is_lent && currentItem.lent_to_name && (
+                  <View style={styles.lentBanner}>
+                    {isOverdue && (
+                      <View style={styles.lentBannerOverdueBadge}>
+                        <Text style={styles.lentBannerOverdueBadgeText}>!</Text>
+                      </View>
+                    )}
+                    <View style={styles.lentBannerRow}>
+                      <Text style={styles.lentBannerIcon}>🤝</Text>
+                      <View style={styles.lentBannerInfo}>
+                        <Text style={styles.lentBannerTitle}>
+                          Lent to {currentItem.lent_to_name}
+                        </Text>
+                        {currentItem.lent_date && (
+                          <Text style={styles.lentBannerSub}>
+                            Since {formatDateForDisplay(parseDateFromDB(currentItem.lent_date))}
+                            {currentItem.expected_return_date
+                              ? ` · Return by ${formatDateForDisplay(parseDateFromDB(currentItem.expected_return_date))}`
+                              : ''}
+                          </Text>
+                        )}
+                      </View>
+                    </View>
+                    <Pressable style={styles.returnedButton} onPress={handleMarkReturned}>
+                      <Text style={styles.returnedButtonText}>Mark as Returned</Text>
+                    </Pressable>
+                  </View>
+                )}
+
                 {detailRows.map(({ label, value }) => (
                   <View key={label} style={styles.detailRow}>
                     <Text style={styles.detailLabel}>{label}</Text>
                     <Text style={styles.detailValue}>{value}</Text>
                   </View>
                 ))}
+
+                {/* Lent toggle row */}
+                <View style={styles.detailRow}>
+                  <View style={styles.lentLabelWithCheckbox}>
+                    <Text style={styles.detailLabel}>Lent to friend</Text>
+                    <Pressable onPress={handleLentToggle} disabled={savingLent}>
+                      {savingLent ? (
+                        <ActivityIndicator size="small" color="#9b59b6" />
+                      ) : (
+                        <View style={[styles.lendCheckbox, isLent && styles.lendCheckboxChecked]}>
+                          {isLent && <Text style={styles.lendCheckboxMark}>✓</Text>}
+                        </View>
+                      )}
+                    </Pressable>
+                  </View>
+                  {isLent && !lentFormOpen && (
+                    <Pressable onPress={() => setLentFormOpen(true)}>
+                      <Text style={styles.lentEditLink}>Edit</Text>
+                    </Pressable>
+                  )}
+                </View>
+
+                {/* Lent details section */}
+                {isLent && lentFormOpen && (
+                  <View style={styles.lentSection}>
+                    <Text style={styles.lentFieldLabel}>Lent to</Text>
+                    <TextInput
+                      style={styles.lentInput}
+                      value={lentToName}
+                      onChangeText={setLentToName}
+                      placeholder="Friend's name"
+                      placeholderTextColor="#9B9B9B"
+                    />
+
+                    <Text style={styles.lentFieldLabel}>Date lent</Text>
+                    <Pressable style={styles.dateButton} onPress={() => setShowLentDatePicker(true)}>
+                      <Text style={styles.dateButtonText}>{formatDateForDisplay(lentDate)}</Text>
+                      <Text>📅</Text>
+                    </Pressable>
+                    {showLentDatePicker && (
+                      <DateTimePicker
+                        value={lentDate}
+                        mode="date"
+                        display="default"
+                        maximumDate={new Date()}
+                        onChange={(_, date) => {
+                          setShowLentDatePicker(Platform.OS === 'ios');
+                          if (date) setLentDate(date);
+                        }}
+                      />
+                    )}
+
+                    <Text style={styles.lentFieldLabel}>
+                      Expected return <Text style={styles.labelOptional}>(optional)</Text>
+                    </Text>
+                    <Pressable style={styles.dateButton} onPress={() => setShowReturnDatePicker(true)}>
+                      <Text style={styles.dateButtonText}>
+                        {expectedReturnDate ? formatDateForDisplay(expectedReturnDate) : 'Not set'}
+                      </Text>
+                      <Text>📅</Text>
+                    </Pressable>
+                    {expectedReturnDate && (
+                      <Pressable onPress={() => setExpectedReturnDate(null)}>
+                        <Text style={styles.clearDate}>Clear return date</Text>
+                      </Pressable>
+                    )}
+                    {showReturnDatePicker && (
+                      <DateTimePicker
+                        value={expectedReturnDate || new Date()}
+                        mode="date"
+                        display="default"
+                        minimumDate={lentDate}
+                        onChange={(_, date) => {
+                          setShowReturnDatePicker(Platform.OS === 'ios');
+                          if (date) setExpectedReturnDate(date);
+                        }}
+                      />
+                    )}
+
+                    <View style={styles.lentFormActions}>
+                      <Pressable
+                        style={[styles.saveLentButton, savingLent && styles.buttonDisabled]}
+                        onPress={handleSaveLentDetails}
+                        disabled={savingLent}
+                      >
+                        {savingLent ? (
+                          <ActivityIndicator size="small" color="#fff" />
+                        ) : (
+                          <Text style={styles.saveLentButtonText}>Save</Text>
+                        )}
+                      </Pressable>
+                      <Pressable onPress={() => setLentFormOpen(false)} disabled={savingLent}>
+                        <Text style={styles.lentEditLink}>Cancel</Text>
+                      </Pressable>
+                    </View>
+                    {lentSaved && <Text style={styles.lentSavedText}>Saved ✓</Text>}
+                  </View>
+                )}
               </View>
 
               <Pressable
@@ -472,82 +673,6 @@ export default function ItemDetailScreen({ route, navigation }) {
                 ))}
               </View>
 
-              <Pressable
-                style={styles.lendToggleRow}
-                onPress={() => setIsLent(v => !v)}
-              >
-                <View style={[styles.lendCheckbox, isLent && styles.lendCheckboxChecked]}>
-                  {isLent && <Text style={styles.lendCheckboxMark}>✓</Text>}
-                </View>
-                <Text style={styles.lendToggleLabel}>Lent to a friend</Text>
-              </Pressable>
-
-              {isLent && (
-                <>
-                  <Text style={styles.label}>Lent to</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={lentToName}
-                    onChangeText={setLentToName}
-                    placeholder="Friend's name"
-                    placeholderTextColor="#9B9B9B"
-                  />
-
-                  <Text style={styles.label}>Date lent</Text>
-                  <Pressable
-                    style={styles.dateButton}
-                    onPress={() => setShowLentDatePicker(true)}
-                  >
-                    <Text style={styles.dateButtonText}>{formatDateForDisplay(lentDate)}</Text>
-                    <Text>📅</Text>
-                  </Pressable>
-                  {showLentDatePicker && (
-                    <DateTimePicker
-                      value={lentDate}
-                      mode="date"
-                      display="default"
-                      maximumDate={new Date()}
-                      onChange={(_, date) => {
-                        setShowLentDatePicker(Platform.OS === 'ios');
-                        if (date) setLentDate(date);
-                      }}
-                    />
-                  )}
-
-                  <Text style={styles.label}>
-                    Expected return{' '}
-                    <Text style={styles.labelOptional}>(optional)</Text>
-                  </Text>
-                  <Pressable
-                    style={styles.dateButton}
-                    onPress={() => setShowReturnDatePicker(true)}
-                  >
-                    <Text style={styles.dateButtonText}>
-                      {expectedReturnDate
-                        ? formatDateForDisplay(expectedReturnDate)
-                        : 'Not set'}
-                    </Text>
-                    <Text>📅</Text>
-                  </Pressable>
-                  {expectedReturnDate && (
-                    <Pressable onPress={() => setExpectedReturnDate(null)}>
-                      <Text style={styles.clearDate}>Clear return date</Text>
-                    </Pressable>
-                  )}
-                  {showReturnDatePicker && (
-                    <DateTimePicker
-                      value={expectedReturnDate || new Date()}
-                      mode="date"
-                      display="default"
-                      minimumDate={lentDate}
-                      onChange={(_, date) => {
-                        setShowReturnDatePicker(Platform.OS === 'ios');
-                        if (date) setExpectedReturnDate(date);
-                      }}
-                    />
-                  )}
-                </>
-              )}
             </View>
           )}
         </ScrollView>
@@ -765,9 +890,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF7ED',
     borderLeftWidth: 4,
     borderLeftColor: '#F59E0B',
-    margin: 15,
-    borderRadius: 12,
-    padding: 14,
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 4,
   },
   lentBannerRow: {
     flexDirection: 'row',
@@ -791,6 +916,23 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#B45309',
     lineHeight: 18,
+  },
+  lentBannerOverdueBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#e74c3c',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  lentBannerOverdueBadgeText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '800',
+    lineHeight: 16,
   },
   returnedButton: {
     backgroundColor: '#F59E0B',
@@ -857,5 +999,65 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 6,
     fontWeight: '500',
+  },
+  lentToggleActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  lentLabelWithCheckbox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  lentEditLink: {
+    color: '#9b59b6',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  lentSection: {
+    marginTop: 12,
+  },
+  lentFieldLabel: {
+    color: '#9b59b6',
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 6,
+    marginTop: 12,
+  },
+  lentInput: {
+    backgroundColor: '#F7F5F0',
+    color: '#1C1C1C',
+    padding: 12,
+    borderRadius: 8,
+    fontSize: 15,
+    borderWidth: 1,
+    borderColor: '#D9D5CE',
+  },
+  lentFormActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 14,
+    marginTop: 16,
+  },
+  saveLentButton: {
+    backgroundColor: '#9b59b6',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 36,
+    alignItems: 'center',
+  },
+  saveLentButtonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  lentSavedText: {
+    color: '#9b59b6',
+    fontSize: 13,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginTop: 8,
   },
 });

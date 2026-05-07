@@ -77,7 +77,7 @@ export default function SettingsScreen({ navigation }) {
           <Pressable onPress={() => navigation.goBack()}>
             <Text style={styles.backButton}>←</Text>
           </Pressable>
-          <Text style={styles.brandSymbol}>🐾</Text>
+          <Text style={styles.brandSymbol}></Text>
           <Text style={styles.brandText}>Settings</Text>
         </View>
 

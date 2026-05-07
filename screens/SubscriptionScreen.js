@@ -90,7 +90,7 @@ export default function SubscriptionScreen({ navigation }) {
             <Text style={styles.backButton}>←</Text>
           </Pressable>
           <View style={styles.headerCenter}>
-            <Text style={styles.brandSymbol}>🐾</Text>
+            <Text style={styles.brandSymbol}></Text>
             <Text style={styles.headerTitle}>Subscription</Text>
           </View>
           <View style={styles.placeholder} />
@@ -153,7 +153,7 @@ export default function SubscriptionScreen({ navigation }) {
           ) : (
             <>
               <View style={styles.noSubscriptionCard}>
-                <Text style={styles.noSubIcon}>🐾</Text>
+                <Text style={styles.noSubIcon}></Text>
                 <Text style={styles.noSubTitle}>Free Plan</Text>
                 <Text style={styles.noSubText}>
                   Upgrade to Premium to unlock unlimited outfit suggestions, your AI stylist, and more

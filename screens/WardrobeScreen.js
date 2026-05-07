@@ -19,6 +19,12 @@ const CATEGORIES = ['All', 'Tops', 'Bottoms', 'Shoes', 'Outerwear', 'Accessories
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CARD_WIDTH = (SCREEN_WIDTH - 15 * 2 - 10) / 2;
 
+const isItemOverdue = (item) => {
+  if (!item.is_lent || !item.expected_return_date) return false;
+  const todayStr = new Date().toISOString().split('T')[0];
+  return item.expected_return_date <= todayStr;
+};
+
 export default function WardrobeScreen({ navigation }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,10 +57,14 @@ export default function WardrobeScreen({ navigation }) {
     }
   };
 
-  const filteredItems =
+  const baseFiltered =
     selectedCategory === 'All' ? items
     : selectedCategory === 'Lent' ? items.filter(item => item.is_lent)
     : items.filter(item => item.category === selectedCategory);
+
+  const filteredItems = [...baseFiltered].sort((a, b) =>
+    (isItemOverdue(b) ? 1 : 0) - (isItemOverdue(a) ? 1 : 0)
+  );
 
   const renderItem = ({ item }) => (
     <Pressable
@@ -72,6 +82,11 @@ export default function WardrobeScreen({ navigation }) {
         {item.is_lent && (
           <View style={styles.lentBadge}>
             <Text style={styles.lentBadgeText}>Lent</Text>
+          </View>
+        )}
+        {isItemOverdue(item) && (
+          <View style={styles.overdueBadge}>
+            <Text style={styles.overdueBadgeText}>!</Text>
           </View>
         )}
       </View>
@@ -285,6 +300,25 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 11,
     fontWeight: '700',
+  },
+  overdueBadge: {
+    position: 'absolute',
+    top: 6,
+    left: 6,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#e74c3c',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: '#fff',
+  },
+  overdueBadgeText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '800',
+    lineHeight: 16,
   },
   fab: {
     position: 'absolute',

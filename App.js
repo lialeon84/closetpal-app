@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { supabase } from './lib/supabase';
 import { initializeRevenueCat, loginRevenueCat, logoutRevenueCat } from './lib/revenuecat';
+import { requestNotificationPermissions } from './lib/notifications';
 
 import WelcomeScreen from './screens/WelcomeScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -35,9 +36,11 @@ const Tab = createBottomTabNavigator();
 function MainTabs() {
   const [userInitial, setUserInitial] = useState('');
   const [profilePicture, setProfilePicture] = useState(null);
+  const [hasOverdueItems, setHasOverdueItems] = useState(false);
 
   useEffect(() => {
     loadUserInfo();
+    checkOverdueItems();
   }, []);
 
   const loadUserInfo = async () => {
@@ -56,9 +59,26 @@ function MainTabs() {
     }
   };
 
+  const checkOverdueItems = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const todayStr = new Date().toISOString().split('T')[0];
+      const { data } = await supabase
+        .from('clothing_items')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('is_lent', true)
+        .not('expected_return_date', 'is', null)
+        .lte('expected_return_date', todayStr);
+      setHasOverdueItems((data || []).length > 0);
+    } catch (_) {}
+  };
+
   useFocusEffect(
     useCallback(() => {
       loadUserInfo();
+      checkOverdueItems();
     }, [])
   );
 
@@ -91,9 +111,25 @@ function MainTabs() {
       <Tab.Screen
         name="Wardrobe"
         component={WardrobeScreen}
+        listeners={{ tabPress: checkOverdueItems }}
         options={{
-          tabBarIcon: ({ focused }) => (
-            <Text style={{ fontSize: 24 }}>👗</Text>
+          tabBarIcon: () => (
+            <View>
+              <Text style={{ fontSize: 24 }}>👗</Text>
+              {hasOverdueItems && (
+                <View style={{
+                  position: 'absolute',
+                  top: -2,
+                  right: -4,
+                  width: 10,
+                  height: 10,
+                  borderRadius: 5,
+                  backgroundColor: '#e74c3c',
+                  borderWidth: 1.5,
+                  borderColor: '#EDEAE4',
+                }} />
+              )}
+            </View>
           ),
         }}
       />
@@ -122,7 +158,7 @@ function MainTabs() {
         component={PetCompanionScreen}
         options={{
           tabBarIcon: () => (
-            <Text style={{ fontSize: 24 }}>🐾</Text>
+            <Text style={{ fontSize: 24 }}></Text>
           ),
         }}
       /> */}
@@ -173,6 +209,7 @@ export default function App() {
 
   useEffect(() => {
     initializeRevenueCat();
+    requestNotificationPermissions();
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);

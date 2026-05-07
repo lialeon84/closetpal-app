@@ -6,7 +6,7 @@ export default function PetCompanionScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.icon}>🐾</Text>
+        <Text style={styles.icon}></Text>
         <Text style={styles.title}>Pet Companion</Text>
         <Text style={styles.subtitle}>Your virtual style companion will appear here</Text>
       </View>

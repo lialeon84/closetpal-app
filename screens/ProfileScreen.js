@@ -118,7 +118,7 @@ export default function ProfileScreen({ navigation }) {
       <View style={styles.brandHeaderContainer}>
         <SafeAreaView edges={['top']}>
           <View style={styles.brandHeader}>
-            <Text style={styles.brandSymbol}>ClosetPal 🐾</Text>
+            <Text style={styles.brandSymbol}>ClosetPal </Text>
           </View>
         </SafeAreaView>
       </View>
