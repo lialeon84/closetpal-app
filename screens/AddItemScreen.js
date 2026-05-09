@@ -18,6 +18,8 @@ import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system/legacy';
 import { Picker } from '@react-native-picker/picker';
 import { supabase } from '../lib/supabase';
+import { useSubscription } from '../hooks/useSubscription';
+import { usageLimits } from '../hooks/usageLimits';
 
 const REMOVE_BG_API_KEY = 'cxoCqM6GMUgspjtjgQzKwRr7';
 const REMOVE_BG_URL = 'https://api.remove.bg/v1.0/removebg';
@@ -84,6 +86,9 @@ function arrayBufferToBase64(buffer) {
 }
 
 export default function AddItemScreen({ navigation }) {
+  const { isPaid } = useSubscription();
+  const { checkAiDetection, incrementAiDetection, checkWardrobe } = usageLimits(isPaid);
+
   const [photo, setPhoto] = useState(null);
   const [processingBg, setProcessingBg] = useState(false);
   const [analyzingAI, setAnalyzingAI] = useState(false);
@@ -169,6 +174,8 @@ export default function AddItemScreen({ navigation }) {
       console.log('[AI] No EXPO_PUBLIC_ANTHROPIC_API_KEY set — skipping analysis');
       return;
     }
+    const ok = await checkAiDetection();
+    if (!ok) return;
     setAnalyzingAI(true);
     try {
       const base64 = await FileSystem.readAsStringAsync(imageUri, {
@@ -234,6 +241,7 @@ export default function AddItemScreen({ navigation }) {
       }
 
       if (SEASONS.includes(result.season)) setSeason(result.season);
+      await incrementAiDetection();
       setAiAutoFilled(true);
     } catch (err) {
       console.log('[AI] Analysis failed:', err.message);
@@ -327,6 +335,9 @@ export default function AddItemScreen({ navigation }) {
       Alert.alert('Missing color', 'Please select or enter a color.');
       return;
     }
+
+    const ok = await checkWardrobe();
+    if (!ok) return;
 
     try {
       setSaving(true);

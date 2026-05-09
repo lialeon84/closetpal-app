@@ -5,7 +5,13 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { supabase } from './lib/supabase';
-import { initializeRevenueCat, loginRevenueCat, logoutRevenueCat } from './lib/revenuecat';
+import {
+  initializeRevenueCat,
+  loginRevenueCat,
+  logoutRevenueCat,
+  syncSubscriptionStatus,
+  addCustomerInfoListener,
+} from './lib/revenuecat';
 import { requestNotificationPermissions } from './lib/notifications';
 
 import WelcomeScreen from './screens/WelcomeScreen';
@@ -29,6 +35,7 @@ import ExportDataScreen from './screens/ExportDataScreen';
 import TripsScreen from './screens/TripsScreen';
 import NewTripScreen from './screens/NewTripScreen';
 import TripDetailScreen from './screens/TripDetailScreen';
+import { Ionicons } from '@expo/vector-icons';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -104,7 +111,7 @@ function MainTabs() {
         component={HomeScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <Text style={{ fontSize: 24 }}>{focused ? '🏠' : '🏠'}</Text>
+            <Ionicons name={focused ? 'home' : 'home-outline'} size={24} color={focused ? '#7B4F9E' : '#9B9B9B'} />
           ),
         }}
       />
@@ -113,9 +120,9 @@ function MainTabs() {
         component={WardrobeScreen}
         listeners={{ tabPress: checkOverdueItems }}
         options={{
-          tabBarIcon: () => (
+          tabBarIcon: ({ focused }) => (
             <View>
-              <Text style={{ fontSize: 24 }}>👗</Text>
+              <Ionicons name={focused ? 'shirt' : 'shirt-outline'} size={24} color={focused ? '#7B4F9E' : '#9B9B9B'} />
               {hasOverdueItems && (
                 <View style={{
                   position: 'absolute',
@@ -137,8 +144,8 @@ function MainTabs() {
         name="Stylist"
         component={StylistScreen}
         options={{
-          tabBarIcon: () => (
-            <Text style={{ fontSize: 24 }}>✨</Text>
+          tabBarIcon: ({ focused }) => (
+            <Ionicons name={focused ? 'sparkles' : 'sparkles-outline'} size={24} color={focused ? '#7B4F9E' : '#9B9B9B'} />
           ),
         }}
       />
@@ -146,8 +153,8 @@ function MainTabs() {
         name="Trips"
         component={TripsScreen}
         options={{
-          tabBarIcon: () => (
-            <Text style={{ fontSize: 24 }}>✈️</Text>
+          tabBarIcon: ({ focused }) => (
+            <Ionicons name={focused ? 'airplane' : 'airplane-outline'} size={24} color={focused ? '#7B4F9E' : '#9B9B9B'} />
           ),
         }}
       />
@@ -211,10 +218,18 @@ export default function App() {
     initializeRevenueCat();
     requestNotificationPermissions();
 
+    // Sync Supabase subscription_tier whenever RevenueCat customer info changes
+    // (covers mid-session purchases, renewals, and cancellations)
+    const purchaseListener = addCustomerInfoListener(async () => {
+      try { await syncSubscriptionStatus(); } catch (_) {}
+    });
+
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       if (session) {
         await loginRevenueCat(session.user.id);
+        // Sync subscription on launch — also catches expired subscriptions
+        await syncSubscriptionStatus().catch(() => {});
         checkProfile(session.user.id);
       } else {
         setLoading(false);
@@ -225,6 +240,7 @@ export default function App() {
       setSession(session);
       if (session) {
         await loginRevenueCat(session.user.id);
+        await syncSubscriptionStatus().catch(() => {});
         checkProfile(session.user.id);
       } else {
         await logoutRevenueCat();
@@ -233,7 +249,10 @@ export default function App() {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      purchaseListener.remove();
+    };
   }, []);
 
   const checkProfile = async (userId) => {

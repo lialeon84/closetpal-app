@@ -15,6 +15,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Location from 'expo-location';
 import { supabase } from '../lib/supabase';
 import { formatDateForDisplay, formatDateForDB } from '../lib/constants';
+import { useSubscription } from '../hooks/useSubscription';
+import { usageLimits } from '../hooks/usageLimits';
 
 const ANTHROPIC_API_KEY = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
 const OPENWEATHER_API_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY;
@@ -23,6 +25,9 @@ const TRIP_PURPOSES = ['Business', 'Vacation', 'Wedding', 'Beach', 'City Trip', 
 const WEATHER_VIBES = ['Warm', 'Cold', 'Mixed', 'Tropical', 'Snow'];
 
 export default function NewTripScreen({ navigation }) {
+  const { isPaid } = useSubscription();
+  const { checkTrips, incrementTrips } = usageLimits(isPaid);
+
   const [destination, setDestination] = useState('');
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
@@ -105,30 +110,8 @@ export default function NewTripScreen({ navigation }) {
     try {
       const { data: { user } } = await supabase.auth.getUser();
 
-      // Tier check — free users get 1 trip per calendar month
-      const now = new Date();
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-      const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
-      const [{ data: profile }, { count: tripCount }] = await Promise.all([
-        supabase.from('profiles').select('subscription_tier').eq('id', user.id).single(),
-        supabase.from('trips')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-          .gte('created_at', monthStart)
-          .lt('created_at', monthEnd),
-      ]);
-
-      if ((profile?.subscription_tier ?? 'free') === 'free' && tripCount >= 1) {
-        Alert.alert(
-          'Trip Limit Reached',
-          "You've used your free trip this month. Upgrade for unlimited trips.",
-          [
-            { text: 'Not Now', style: 'cancel' },
-            { text: 'Upgrade', onPress: () => navigation.navigate('Paywall') },
-          ]
-        );
-        return;
-      }
+      const tripsOk = await checkTrips();
+      if (!tripsOk) return;
 
       // Wardrobe check — need at least 5 items to generate a meaningful list
       const { data: wardrobe } = await supabase
@@ -231,6 +214,7 @@ Rules: Pick 8-15 items depending on trip length. Use exact item IDs from the war
 
       if (saveError) throw saveError;
 
+      await incrementTrips();
       navigation.replace('TripDetail', { trip: newTrip });
     } catch (err) {
       console.error('[NewTrip]', err);

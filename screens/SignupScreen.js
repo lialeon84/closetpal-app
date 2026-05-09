@@ -63,7 +63,7 @@ export default function SignupScreen({ navigation }) {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.content}>
-            <Text style={styles.title}>Join ClosetPal </Text>
+            <Text style={styles.title}>Join Ari's Closet </Text>
             <Text style={styles.subtitle}>Create your account and meet your companion</Text>
 
             <View style={styles.form}>

@@ -1,0 +1,88 @@
+env: load .env
+env: export EXPO_PUBLIC_ANTHROPIC_API_KEY EXPO_PUBLIC_CLOSETPAL_SUPABASE_ANON_KEY EXPO_PUBLIC_OPENWEATHER_API_KEY REMOVE_BG__API_KEY_HERE
+Could not find a shared URI scheme for the dev client between the local /ios and /android directories. App launches (QR code, interstitial, terminal keys) may not work as expected. You can configure a custom scheme using the --scheme option, or by running npx expo prebuild to regenerate the native directories with URI schemes.
+Starting project at /Users/rose/Developer/closetpal-mobile
+Starting Metro Bundler
+
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+iOS ./index.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+iOS Bundled 431ms index.js (2823 modules)
+ WARN  [RevenueCat] ⚠️ Using a Test Store API key.
+The Test Store is for development only. Never use a Test Store API key in production. Test Store purchases are simulated, do not use StoreKit, and generate no revenue. Apps submitted with a Test Store API key will be rejected during App Review.
+ DEBUG  [RevenueCat] ℹ️ Configuring SDK using RevenueCat's UserDefaults suite.
+ LOG  [RevenueCat] DeviceCache.init: DeviceCache (0x000000012e842c30)
+ DEBUG  [RevenueCat] 👤 Identifying App User ID
+ LOG  [RevenueCat] Initializing FeatureEventStore: file:///var/mobile/Containers/Data/Application/3162CEFC-8E55-409A-A314-EDEA3DF6071C/Library/Application%20Support/revenuecat/paywall_event_store
+ LOG  [RevenueCat] Creating FileHandler for: file:///var/mobile/Containers/Data/Application/3162CEFC-8E55-409A-A314-EDEA3DF6071C/Library/Application%20Support/revenuecat/paywall_event_store
+ LOG  [RevenueCat] Initializing AdEventStore: file:///var/mobile/Containers/Data/Application/3162CEFC-8E55-409A-A314-EDEA3DF6071C/Library/Application%20Support/revenuecat/ad_event_store
+ LOG  [RevenueCat] Creating FileHandler for: file:///var/mobile/Containers/Data/Application/3162CEFC-8E55-409A-A314-EDEA3DF6071C/Library/Application%20Support/revenuecat/ad_event_store
+ LOG  [RevenueCat] EventsManager initialized
+ LOG  [RevenueCat] PurchasesOrchestrator.init: PurchasesOrchestrator (0x000000012efac000)
+ DEBUG  [RevenueCat] ℹ️ Observing StoreKit.Transaction.updates
+ DEBUG  [RevenueCat] ℹ️ Debug logging enabled
+ DEBUG  [RevenueCat] ℹ️ SDK Version - 5.67.1
+ DEBUG  [RevenueCat] ℹ️ Bundle ID - com.anonymous.closetpal-mobile
+ DEBUG  [RevenueCat] ℹ️ System Version - Version 26.4.2 (Build 23E261)
+ DEBUG  [RevenueCat] ℹ️ Not using a simulator.
+ DEBUG  [RevenueCat] 👤 No initial App User ID
+ DEBUG  [RevenueCat] ℹ️ Purchases is configured with response verification disabled
+ DEBUG  [RevenueCat] ℹ️ Purchases is configured with StoreKit version 2
+ LOG  [RevenueCat] Purchases.init: created new Purchases instance: Purchases (0x0000000122c27200)
+StoreKit Wrapper: right(<RevenueCat.PaymentQueueWrapper: 0x122f5c420>)
+ DEBUG  [RevenueCat] ℹ️ Observing StoreKit.PurchaseIntent.intents
+ DEBUG  [RevenueCat] ℹ️ Delegate set
+ LOG  [RevenueCat] Updating all caches
+ DEBUG  [RevenueCat] ℹ️ Offerings cache is stale, updating from network in foreground
+ LOG  [RevenueCat] Enqueing network operation 'GetOfferingsOperation' with cache key: 'GetOfferingsOperation 5c3c3558-4b66-4da5-8349-738a96c39cdd'
+ DEBUG  [RevenueCat] ℹ️ GetOfferingsOperation: Started
+ LOG  [RevenueCat] Enqueing network operation 'HealthReportAvailabilityOperation' with cache key: 'HealthReportAvailabilityOperation '
+ DEBUG  [RevenueCat] ℹ️ There are no requests currently running, starting request GET /v1/subscribers/5c3c3558-4b66-4da5-8349-738a96c39cdd/offerings
+ LOG  [RevenueCat] Using etag 'e210a2f45f5eab48' for request to 'https://api.revenuecat.com/v1/subscribers/5c3c3558-4b66-4da5-8349-738a96c39cdd/offerings'. Validation time: 2026-05-09 23:37:18 +0000
+ DEBUG  [RevenueCat] ℹ️ API request started: GET '/v1/subscribers/5c3c3558-4b66-4da5-8349-738a96c39cdd/offerings'
+ LOG  [RevenueCat] Enqueing network operation 'GetCustomerInfoOperation' with cache key: 'GetCustomerInfoOperation 5c3c3558-4b66-4da5-8349-738a96c39cdd'
+ DEBUG  [RevenueCat] ℹ️ setting reserved attribute: $attConsentStatus
+ DEBUG  [RevenueCat] ℹ️ setting reserved attribute: $attConsentStatus
+ WARN  [RevenueCat] ⚠️ The appUserID passed to logIn is the same as the one already cached. No action will be taken.
+ DEBUG  [RevenueCat] ℹ️ CustomerInfo cache is stale, updating from network in foreground.
+ DEBUG  [RevenueCat] ℹ️ Vending CustomerInfo from cache.
+ WARN  [RevenueCat] ⚠️ The appUserID passed to logIn is the same as the one already cached. No action will be taken.
+ DEBUG  [RevenueCat] ℹ️ CustomerInfo cache is stale, updating from network in foreground.
+ DEBUG  [RevenueCat] ℹ️ CustomerInfo cache is stale, updating from network in foreground.
+ DEBUG  [RevenueCat] ℹ️ Network operation 'GetOfferingsOperation' found with the same cache key 'GetOfferingsOperation 5c3c3558-4b66-4da5-8349-738a96c39cdd'. Skipping request.
+ DEBUG  [RevenueCat] ℹ️ CustomerInfo cache is stale, updating from network in foreground.
+ DEBUG  [RevenueCat] ℹ️ Network operation 'GetCustomerInfoOperation' found with the same cache key 'GetCustomerInfoOperation 5c3c3558-4b66-4da5-8349-738a96c39cdd'. Skipping request.
+ DEBUG  [RevenueCat] ℹ️ Network operation 'GetCustomerInfoOperation' found with the same cache key 'GetCustomerInfoOperation 5c3c3558-4b66-4da5-8349-738a96c39cdd'. Skipping request.
+ DEBUG  [RevenueCat] ℹ️ Network operation 'GetCustomerInfoOperation' found with the same cache key 'GetCustomerInfoOperation 5c3c3558-4b66-4da5-8349-738a96c39cdd'. Skipping request.
+ DEBUG  [RevenueCat] ℹ️ Network operation 'GetCustomerInfoOperation' found with the same cache key 'GetCustomerInfoOperation 5c3c3558-4b66-4da5-8349-738a96c39cdd'. Skipping request.
+ LOG  [RevenueCat] No cached transaction metadata to sync
+ DEBUG  [RevenueCat] ℹ️ Finished syncing all cached transaction metadata
+ DEBUG  [RevenueCat] ℹ️ API request failed: GET '/v1/subscribers/5c3c3558-4b66-4da5-8349-738a96c39cdd/offerings' (<>): The request timed out.
+ DEBUG  [RevenueCat] ℹ️ Retrying request using fallback host: GET /v1/subscribers/5c3c3558-4b66-4da5-8349-738a96c39cdd/offerings
+ DEBUG  [RevenueCat] ℹ️ Serial request done: GET /v1/subscribers/5c3c3558-4b66-4da5-8349-738a96c39cdd/offerings, 1 requests left in the queue
+ DEBUG  [RevenueCat] ℹ️ Starting the next request in the queue, <Request: httpMethod=GET
+path=/v1/subscribers/5c3c3558-4b66-4da5-8349-738a96c39cdd/offerings
+headers=["X-Client-Bundle-ID": "com.anonymous.closetpal-mobile", "X-Is-Debug-Build": "true", "X-Client-Build-Version": "1", "X-Platform-Flavor-Version": "9.15.2", "X-StoreKit2-Enabled": "true", "X-Platform-Device": "iPhone17,1", "X-Installation-Method": "cocoapods", "content-type": "application/json", "X-Preferred-Locales": "en_US,es_US,nb_US", "X-StoreKit-Version": "2", "X-Is-Backgrounded": "false", "X-Is-Sandbox": "true", "X-Version": "5.67.1", "X-Platform": "iOS", "X-Observer-Mode-Enabled": "false", "X-Retry-Count": "0", "X-Apple-Device-Identifier": "A74F7F12-9533-42EE-899F-E2358B48B78E", "Authorization": "Bearer test_wyWzlqzsdVZqheiZypmLtFkwFJp", "X-Client-Version": "1.0.0", "X-Platform-Version": "Version 26.4.2 (Build 23E261)", "X-Storefront": "USA", "X-Platform-Flavor": "react-native"]
+retried=false
+>
+ LOG  [RevenueCat] Found no etag for request to 'https://api-production.8-lives-cat.io/v1/offerings'
+ DEBUG  [RevenueCat] ℹ️ API request started: GET '/v1/subscribers/5c3c3558-4b66-4da5-8349-738a96c39cdd/offerings'
+ DEBUG  [RevenueCat] ℹ️ API request failed: GET '/v1/subscribers/5c3c3558-4b66-4da5-8349-738a96c39cdd/offerings' (<>): The request timed out.
+ DEBUG  [RevenueCat] ℹ️ UIConfig custom_variables - key present in JSON: true, decoded count: 0, keys: []
+ DEBUG  [RevenueCat] ℹ️ No existing products cached, starting store products request for: ["ariscloset__yearly__3999", "yearly", "monthly", "ariscloset_monthly_499"]
+ LOG  [RevenueCat] Enqueing network operation 'GetWebBillingProductsOperation' with cache key: 'GetWebBillingProductsOperation 5c3c3558-4b66-4da5-8349-738a96c39cdd
+ariscloset__yearly__3999
+ariscloset_monthly_499
+monthly
+yearly'
+ DEBUG  [RevenueCat] ℹ️ UIConfig custom_variables - key present in JSON: true, decoded count: 0, keys: []
+ DEBUG  [RevenueCat] ℹ️ Found an existing request for products: ["ariscloset_monthly_499", "monthly", "ariscloset__yearly__3999", "yearly"], appending to completion
+ DEBUG  [RevenueCat] ℹ️ GetOfferingsOperation: Finished
+ DEBUG  [RevenueCat] ℹ️ Serial request done: GET /v1/subscribers/5c3c3558-4b66-4da5-8349-738a96c39cdd/offerings, 0 requests left in the queue
+ DEBUG  [RevenueCat] ℹ️ HealthReportAvailabilityOperation: Started
+ DEBUG  [RevenueCat] ℹ️ There are no requests currently running, starting request GET /v1/subscribers/5c3c3558-4b66-4da5-8349-738a96c39cdd/health_report_availability
+ DEBUG  [RevenueCat] ℹ️ API request started: GET '/v1/subscribers/5c3c3558-4b66-4da5-8349-738a96c39cdd/health_report_availability'
+ DEBUG  [RevenueCat] ℹ️ Background task started: com.revenuecat.flushAllEvents
+ DEBUG  [RevenueCat] ℹ️ setting reserved attribute: $attConsentStatus
+ LOG  [RevenueCat] Paywall event flushing requested with empty store.
+ LOG  [RevenueCat] Ad event flush with empty store

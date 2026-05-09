@@ -10,7 +10,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import RevenueCatUI, { PAYWALL_RESULT } from 'react-native-purchases-ui';
 import { supabase } from '../lib/supabase';
+import { useSubscription } from '../hooks/useSubscription';
+import { syncSubscriptionStatus } from '../lib/revenuecat';
 
 var ANTHROPIC_API_KEY = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
 var CACHE_KEY_PREFIX = 'stylist_suggestions_';
@@ -23,7 +26,46 @@ var PRIORITY_CONFIG = {
 
 var PRIORITY_ORDER = { high: 0, medium: 1, low: 2 };
 
+function LockedStylistView() {
+  const handleUpgrade = async () => {
+    try {
+      console.log('[Purchase] Presenting paywall...');
+      const result = await RevenueCatUI.presentPaywall();
+      console.log('[Purchase] Paywall result:', result);
+      if (result === PAYWALL_RESULT.PURCHASED || result === PAYWALL_RESULT.RESTORED) {
+        console.log('[Purchase] Purchase/restore confirmed — calling syncSubscriptionStatus');
+        await syncSubscriptionStatus();
+        console.log('[Purchase] syncSubscriptionStatus complete');
+      } else {
+        console.log('[Purchase] No purchase made (cancelled or dismissed)');
+      }
+    } catch (err) {
+      console.error('[Purchase] handleUpgrade error:', err);
+    }
+  };
+
+  return (
+    <View style={styles.lockedContainer}>
+      <Text style={styles.lockedIcon}>🔒</Text>
+      <Text style={styles.lockedTitle}>AI Stylist</Text>
+      <Text style={styles.lockedSub}>
+        Get personalized wardrobe gap analysis and smart styling suggestions — Premium only.
+      </Text>
+      <TouchableOpacity style={styles.upgradeBtn} onPress={handleUpgrade} activeOpacity={0.85}>
+        <Text style={styles.upgradeBtnText}>Upgrade to Premium ✨</Text>
+      </TouchableOpacity>
+      <View style={styles.lockedFeatures}>
+        <Text style={styles.lockedFeatureItem}>✓  Wardrobe gap analysis</Text>
+        <Text style={styles.lockedFeatureItem}>✓  Personalized styling tips</Text>
+        <Text style={styles.lockedFeatureItem}>✓  Priority item suggestions</Text>
+      </View>
+    </View>
+  );
+}
+
 export default function StylistScreen() {
+  const { isPaid, isLoading: subLoading } = useSubscription();
+
   var [suggestions, setSuggestions] = useState(null);
   var [summary, setSummary] = useState('');
   var [loading, setLoading] = useState(true);
@@ -31,8 +73,8 @@ export default function StylistScreen() {
   var [error, setError] = useState(null);
 
   useEffect(() => {
-    load(false);
-  }, []);
+    if (isPaid) load(false);
+  }, [isPaid]);
 
   var load = useCallback(async (forceRefresh) => {
     setError(null);
@@ -136,6 +178,22 @@ Aim for 4-6 suggestions. Vary priority levels based on how significant the gap i
     load(true);
   }, [load]);
 
+  if (subLoading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <ActivityIndicator style={{ flex: 1 }} size="large" color="#9b59b6" />
+      </SafeAreaView>
+    );
+  }
+
+  if (!isPaid) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <LockedStylistView />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
@@ -217,12 +275,12 @@ function SuggestionCard({ suggestion }) {
   return (
     <View style={styles.card}>
       <View style={styles.cardHeader}>
-        <Text style={styles.cardCategory}>{category}</Text>
+        <Text style={styles.cardCategory}>{category ?? ''}</Text>
         <View style={[styles.priorityBadge, { backgroundColor: cfg.bg }]}>
           <Text style={[styles.priorityText, { color: cfg.color }]}>{cfg.label}</Text>
         </View>
       </View>
-      <Text style={styles.cardReason}>{reason}</Text>
+      <Text style={styles.cardReason}>{reason ?? ''}</Text>
       {pairs_with?.length > 0 && (
         <View style={styles.pairsRow}>
           <Text style={styles.pairsLabel}>Pairs with: </Text>
@@ -374,5 +432,57 @@ var styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 11,
     color: '#9CA3AF',
+  },
+
+  lockedContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+    paddingBottom: 40,
+  },
+  lockedIcon: {
+    fontSize: 56,
+    marginBottom: 20,
+  },
+  lockedTitle: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#1C1C1C',
+    marginBottom: 12,
+    letterSpacing: -0.3,
+  },
+  lockedSub: {
+    fontSize: 15,
+    color: '#6B7280',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 28,
+  },
+  upgradeBtn: {
+    backgroundColor: '#9b59b6',
+    paddingVertical: 15,
+    paddingHorizontal: 36,
+    borderRadius: 14,
+    marginBottom: 28,
+    shadowColor: '#9b59b6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  upgradeBtnText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  lockedFeatures: {
+    gap: 10,
+    alignItems: 'flex-start',
+  },
+  lockedFeatureItem: {
+    fontSize: 14,
+    color: '#374151',
+    fontWeight: '500',
   },
 });

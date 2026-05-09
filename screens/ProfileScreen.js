@@ -118,7 +118,7 @@ export default function ProfileScreen({ navigation }) {
       <View style={styles.brandHeaderContainer}>
         <SafeAreaView edges={['top']}>
           <View style={styles.brandHeader}>
-            <Text style={styles.brandSymbol}>ClosetPal </Text>
+            <Text style={styles.brandSymbol}>Ari's Closet </Text>
           </View>
         </SafeAreaView>
       </View>
@@ -148,7 +148,7 @@ export default function ProfileScreen({ navigation }) {
           ) : (
             <View style={styles.profileImagePlaceholder}>
               <Text style={styles.profileImageText}>
-                {profile.username.charAt(0).toUpperCase()}
+                {(profile.username ?? 'U').charAt(0).toUpperCase()}
               </Text>
             </View>
           )}
@@ -207,6 +207,26 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View> */}
 
+        {/* Subscription banner — upgrades free users, shows status for premium */}
+        {userTier !== 'Premium' ? (
+          <Pressable
+            style={styles.premiumBanner}
+            onPress={() => navigation.navigate('Subscription')}
+          >
+            <Text style={styles.premiumBannerTitle}>✨ Upgrade to Premium</Text>
+            <Text style={styles.premiumBannerSub}>
+              Unlimited outfits · Unlimited trips · AI stylist
+            </Text>
+          </Pressable>
+        ) : (
+          <Pressable
+            style={styles.premiumBadge}
+            onPress={() => navigation.navigate('Subscription')}
+          >
+            <Text style={styles.premiumBadgeText}>✨ Premium Member</Text>
+          </Pressable>
+        )}
+
         <View style={styles.favSection}>
           <View style={styles.favSectionHeader}>
             <Text style={styles.favSectionTitle}>Favorite Outfits</Text>
@@ -242,7 +262,7 @@ export default function ProfileScreen({ navigation }) {
 }
 
 function FavoriteOutfitCard({ favorite, wardrobeMap, onUnfavorite }) {
-  var images = favorite.clothing_item_ids.slice(0, 4).map(id => wardrobeMap[id] ?? null);
+  var images = (favorite.clothing_item_ids ?? []).slice(0, 4).map(id => wardrobeMap[id] ?? null);
   return (
     <View style={styles.favCard}>
       <View style={styles.favImageGrid}>
@@ -413,6 +433,42 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 100,
+  },
+
+  premiumBanner: {
+    marginHorizontal: 15,
+    marginBottom: 15,
+    backgroundColor: '#9b59b6',
+    borderRadius: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  premiumBannerTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  premiumBannerSub: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.85)',
+  },
+  premiumBadge: {
+    marginHorizontal: 15,
+    marginBottom: 15,
+    backgroundColor: '#F3E8FF',
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#D8B4FE',
+  },
+  premiumBadgeText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#7C3AED',
   },
 
   favSection: {

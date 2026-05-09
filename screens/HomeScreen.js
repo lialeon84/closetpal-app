@@ -13,9 +13,12 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import { Heart } from 'lucide-react-native';
 import { supabase } from '../lib/supabase';
+import { useSubscription } from '../hooks/useSubscription';
+import { usageLimits } from '../hooks/usageLimits';
 
 var ANTHROPIC_API_KEY = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
 var OCCASIONS = ['Casual', 'Work', 'Date Night', 'Active', 'Formal'];
@@ -56,6 +59,10 @@ function decodeWeather(code) {
 }
 
 export default function HomeScreen() {
+  var navigation = useNavigation();
+  var { isPaid } = useSubscription();
+  var { checkFavorites, checkOutfitRecs, incrementOutfitRecs } = usageLimits(isPaid);
+
   var [outfits, setOutfits]         = useState([]);
   var [weather, setWeather]         = useState(null);
   var [occasion, setOccasion]       = useState(null);
@@ -63,7 +70,6 @@ export default function HomeScreen() {
   var [error, setError]             = useState(null);
   var [showPicker, setShowPicker]   = useState(false);
   var [favorites, setFavorites]     = useState([]);
-  var [userTier, setUserTier]       = useState('free');
   var [togglingKey, setTogglingKey] = useState(null);
 
   var handleGetOutfits = () => {
@@ -75,6 +81,8 @@ export default function HomeScreen() {
   var handleSelectOccasion = async (selected) => {
     setOccasion(selected);
     setShowPicker(false);
+    const ok = await checkOutfitRecs();
+    if (!ok) return;
     await generateOutfits(selected);
   };
 
@@ -83,18 +91,13 @@ export default function HomeScreen() {
   var findFavorite = (outfit) =>
     favorites.find(f => [...f.clothing_item_ids].sort().join(',') === outfitKey(outfit));
 
-  var getFavoriteLimit = (tier) => (tier && tier !== 'free') ? null : 5;
-
-  var loadFavoritesAndTier = async (userId) => {
-    var [{ data: favData }, { data: profileData }] = await Promise.all([
-      supabase.from('favorite_outfits')
-        .select('id, clothing_item_ids, created_at')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: true }),
-      supabase.from('profiles').select('subscription_tier').eq('id', userId).single(),
-    ]);
+  var loadFavorites = async (userId) => {
+    var { data: favData } = await supabase
+      .from('favorite_outfits')
+      .select('id, clothing_item_ids, created_at')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: true });
     if (favData) setFavorites(favData);
-    if (profileData) setUserTier(profileData.subscription_tier ?? 'free');
   };
 
   var toggleFavorite = async (outfit) => {
@@ -111,58 +114,25 @@ export default function HomeScreen() {
         return;
       }
 
-      var limit = getFavoriteLimit(userTier);
-
-      var doInsert = async () => {
-        var { data: inserted } = await supabase
-          .from('favorite_outfits')
-          .insert({
-            user_id: user.id,
-            clothing_item_ids: outfit.items.map(i => i.id),
-            styling_note: outfit.styling_note ?? null,
-          })
-          .select()
-          .single();
-        if (inserted) setFavorites(prev => [...prev, inserted]);
-      };
-
-      // Paid users: safety valve at 1,000
-      if (limit === null && favorites.length >= 1000) {
-        Alert.alert('Limit Reached', 'You have too many saved favorites. Please remove some before adding more.');
+      // Safety valve for paid users
+      if (isPaid && favorites.length >= 1000) {
+        Alert.alert('Limit Reached', 'You have too many saved favorites. Please remove some.');
         return;
       }
 
-      // Free users over limit due to downgrade: block without auto-delete
-      if (limit !== null && favorites.length > limit) {
-        Alert.alert(
-          'Favorites Limit Reached',
-          `You have ${favorites.length} saved favorites but your free plan allows ${limit}. Remove some to add new ones.`
-        );
-        return;
-      }
+      const ok = await checkFavorites(favorites.length);
+      if (!ok) return;
 
-      // Free users exactly at limit: offer to replace oldest
-      if (limit !== null && favorites.length === limit) {
-        Alert.alert(
-          'Favorites Limit Reached',
-          `You've reached your free favorites limit (${limit}). Replace your oldest favorite with this one?`,
-          [
-            { text: 'Cancel', style: 'cancel' },
-            {
-              text: 'Replace',
-              onPress: async () => {
-                var oldest = favorites[0];
-                await supabase.from('favorite_outfits').delete().eq('id', oldest.id);
-                setFavorites(prev => prev.filter(f => f.id !== oldest.id));
-                await doInsert();
-              },
-            },
-          ]
-        );
-        return;
-      }
-
-      await doInsert();
+      var { data: inserted } = await supabase
+        .from('favorite_outfits')
+        .insert({
+          user_id: user.id,
+          clothing_item_ids: outfit.items.map(i => i.id),
+          styling_note: outfit.styling_note ?? null,
+        })
+        .select()
+        .single();
+      if (inserted) setFavorites(prev => [...prev, inserted]);
     } finally {
       setTogglingKey(null);
     }
@@ -209,7 +179,7 @@ export default function HomeScreen() {
 
       // 4. Call Anthropic
       var wardrobeList = wardrobe
-        .map(i => `id:${i.id} | name:${i.name} | category:${i.category} | color:${i.color} | season:${i.season}`)
+        .map(i => `id:${i.id} | name:${i.name ?? 'unnamed'} | category:${i.category ?? 'uncategorized'} | color:${i.color ?? 'unspecified'} | season:${i.season ?? 'all'}`)
         .join('\n');
 
       var userPrompt =
@@ -258,7 +228,8 @@ export default function HomeScreen() {
       }));
 
       setOutfits(enriched);
-      await loadFavoritesAndTier(user.id);
+      await loadFavorites(user.id);
+      incrementOutfitRecs().catch(() => {});
     } catch (err) {
       console.error('[OutfitRec]', err.message);
       setError('generic');
@@ -274,7 +245,7 @@ export default function HomeScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
         <View style={styles.header}>
-          <Text style={styles.title}>ClosetPal</Text>
+          <Text style={styles.title}>Ari's Closet</Text>
           <Text style={styles.subtitle}>Your personal stylist</Text>
         </View>
 
@@ -395,7 +366,7 @@ function OutfitCard({ outfit, weather, occasion, isFavorited, isToggling, onTogg
             </Text>
           </View>
         )}
-        <Text style={styles.outfitLabel}>Outfit {outfit.outfit_number}</Text>
+        <Text style={styles.outfitLabel}>Outfit {outfit.outfit_number ?? ''}</Text>
         <TouchableOpacity
           onPress={onToggleFavorite}
           disabled={isToggling}
@@ -427,7 +398,7 @@ function OutfitCard({ outfit, weather, occasion, isFavorited, isToggling, onTogg
       {/* Item names */}
       <View style={styles.itemList}>
         {outfit.items.map((item, idx) => (
-          <Text key={item.id ?? idx} style={styles.itemName}>• {item.name}</Text>
+          <Text key={item.id ?? idx} style={styles.itemName}>• {item.name ?? ''}</Text>
         ))}
       </View>
 

@@ -48,7 +48,7 @@ export default function ExportDataScreen({ navigation }) {
 
       await Sharing.shareAsync(filePath, {
         mimeType: 'application/json',
-        dialogTitle: 'Save your ClosetPal data',
+        dialogTitle: "Save your Ari's Closet data",
       });
     } catch (err) {
       Alert.alert('Export failed', err.message);

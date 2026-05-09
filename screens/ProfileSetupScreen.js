@@ -72,7 +72,7 @@ export default function ProfileSetupScreen() {
         Alert.alert('Error', error.message);
       }
     } else {
-      Alert.alert('Welcome!', `Your ClosetPal is ready, ${firstName}! `);
+      Alert.alert('Welcome!', `Ari's Closet is ready, ${firstName}! `);
       await supabase.auth.refreshSession();
     }
   };

@@ -1,18 +1,29 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import RevenueCatUI from 'react-native-purchases-ui';
-import { syncSubscriptionStatus } from '../lib/revenuecat';
+import { syncSubscriptionStatus, ENTITLEMENT_ID } from '../lib/revenuecat';
 
 export default function PaywallScreen({ navigation }) {
   const handlePurchaseCompleted = async () => {
     await syncSubscriptionStatus();
-    navigation.goBack();
+    Alert.alert(
+      'Welcome to Premium! ✨',
+      "You now have full access to all Ari's Closet features.",
+      [{ text: 'Continue', onPress: () => navigation.goBack() }]
+    );
   };
 
-  const handleRestoreCompleted = async () => {
+  const handleRestoreCompleted = async ({ customerInfo }) => {
     await syncSubscriptionStatus();
-    navigation.goBack();
+    const restored = !!customerInfo?.entitlements?.active[ENTITLEMENT_ID];
+    Alert.alert(
+      restored ? 'Purchases Restored ✨' : 'Nothing to Restore',
+      restored
+        ? 'Your premium subscription is active again.'
+        : 'No previous purchases were found for this account.',
+      [{ text: 'OK', onPress: () => navigation.goBack() }]
+    );
   };
 
   return (
