@@ -85,12 +85,6 @@ export default function ProfileScreen({ navigation }) {
     extrapolate: 'clamp',
   });
 
-  const usernameSize = scrollY.interpolate({
-    inputRange: [0, HEADER_SCROLL_DISTANCE],
-    outputRange: [22, 16],
-    extrapolate: 'clamp',
-  });
-
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -122,44 +116,52 @@ export default function ProfileScreen({ navigation }) {
         <SafeAreaView edges={['top']}>
           <View style={styles.brandHeader}>
             <Text style={styles.brandSymbol}>Profile </Text>
+            <Pressable
+              onPress={() => navigation.navigate('Settings')}
+              style={styles.settingsButtonInHeader}
+            >
+              <Ionicons name="settings-outline" size={20} color="#1C1C1C" />
+            </Pressable>
           </View>
         </SafeAreaView>
       </View>
 
       <Animated.View style={[styles.header, { height: headerHeight }]}>
-        <Pressable
-          onPress={() => navigation.navigate('Settings')}
-          style={styles.settingsButtonInHeader}
-        >
-          <Text style={styles.settingsIconSmall}>&#9881;</Text>
-        </Pressable>
-
-        <Animated.View
-          style={[
-            styles.profileImageContainer,
-            {
-              transform: [{ scale: profileImageScale }],
-              opacity: profileImageOpacity,
-            },
-          ]}
-        >
-          {profile.profile_picture_url ? (
-            <Image
-              source={{ uri: profile.profile_picture_url }}
-              style={styles.profileImage}
-            />
-          ) : (
-            <View style={styles.profileImagePlaceholder}>
-              <Text style={styles.profileImageText}>
-                {(profile.username ?? 'U').charAt(0).toUpperCase()}
-              </Text>
-            </View>
-          )}
-        </Animated.View>
-
-        <Animated.Text style={[styles.username, { fontSize: usernameSize }]}>
-          {profile.first_name}
-        </Animated.Text>
+        <View style={styles.profileRow}>
+          <Animated.View
+            style={[
+              styles.profileImageContainer,
+              {
+                transform: [{ scale: profileImageScale }],
+                opacity: profileImageOpacity,
+              },
+            ]}
+          >
+            {profile.profile_picture_url ? (
+              <Image
+                source={{ uri: profile.profile_picture_url }}
+                style={styles.profileImage}
+              />
+            ) : (
+              <View style={styles.profileImagePlaceholder}>
+                <Text style={styles.profileImageText}>
+                  {(profile.username ?? 'U').charAt(0).toUpperCase()}
+                </Text>
+              </View>
+            )}
+          </Animated.View>
+          <Animated.Text
+            style={[
+              styles.profileFirstName,
+              {
+                opacity: profileImageOpacity,
+                transform: [{ scale: profileImageScale }],
+              },
+            ]}
+          >
+            {profile.first_name}
+          </Animated.Text>
+        </View>
       </Animated.View>
 
       <Animated.ScrollView
@@ -310,6 +312,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     alignItems: 'center',
     flexDirection: 'row',
+    // justifyContent: 'space-between',
     justifyContent: 'center',
   },
   brandSymbol: {
@@ -337,8 +340,8 @@ const styles = StyleSheet.create({
   },
   header: {
     // backgroundColor: '#EDEAE4',
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
     marginHorizontal: 15,
@@ -347,7 +350,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   settingsButtonInHeader: {
-    position: 'absolute',
+     position: 'absolute',
     top: 15,
     right: 15,
     padding: 5,
@@ -357,7 +360,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   profileImageContainer: {
-    marginBottom: 10,
+    marginRight: 14,
   },
   profileImage: {
     width: 80,
@@ -381,6 +384,18 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontFamily: FONTS.bodyBold,
+  },
+  profileRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  profileFirstName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    fontFamily: FONTS.heading,
+    color: '#1C1C1C',
   },
   username: {
     fontWeight: 'bold',
