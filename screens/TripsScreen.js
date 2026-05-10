@@ -83,7 +83,7 @@ export default function TripsScreen({ navigation }) {
       <View style={styles.headerContainer}>
         <SafeAreaView edges={['top']}>
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>✈️  My Trips</Text>
+            <Text style={styles.headerTitle}> My Trips</Text>
           </View>
         </SafeAreaView>
       </View>

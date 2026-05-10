@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import { Heart } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
+import RevenueCatUI from 'react-native-purchases-ui';
 import { supabase } from '../lib/supabase';
 import { useSubscription } from '../hooks/useSubscription';
 import { usageLimits } from '../hooks/usageLimits';
@@ -61,7 +63,13 @@ function decodeWeather(code) {
 export default function HomeScreen() {
   var navigation = useNavigation();
   var { isPaid } = useSubscription();
-  var { checkFavorites, checkOutfitRecs, incrementOutfitRecs } = usageLimits(isPaid);
+  var { checkFavorites, checkOutfitRecs, incrementOutfitRecs, isOutfitRecsLocked } = usageLimits(isPaid);
+  var [isLocked, setIsLocked] = useState(false);
+
+  useEffect(() => {
+    if (isPaid) return;
+    isOutfitRecsLocked().then(setIsLocked).catch(() => {});
+  }, [isPaid]);
 
   var [outfits, setOutfits]         = useState([]);
   var [weather, setWeather]         = useState(null);
@@ -72,7 +80,11 @@ export default function HomeScreen() {
   var [favorites, setFavorites]     = useState([]);
   var [togglingKey, setTogglingKey] = useState(null);
 
-  var handleGetOutfits = () => {
+  var handleGetOutfits = async () => {
+    if (!isPaid && isLocked) {
+      await RevenueCatUI.presentPaywall();
+      return;
+    }
     setOutfits([]);
     setError(null);
     setShowPicker(true);
@@ -229,7 +241,9 @@ export default function HomeScreen() {
 
       setOutfits(enriched);
       await loadFavorites(user.id);
-      incrementOutfitRecs().catch(() => {});
+      incrementOutfitRecs()
+        .then(() => { if (!isPaid) setIsLocked(true); })
+        .catch(() => {});
     } catch (err) {
       console.error('[OutfitRec]', err.message);
       setError('generic');
@@ -253,7 +267,12 @@ export default function HomeScreen() {
         {!hasContent && (
           <TouchableOpacity style={styles.ctaCard} onPress={handleGetOutfits} activeOpacity={0.85}>
             <Text style={styles.ctaEmoji}>✨</Text>
-            <Text style={styles.ctaTitle}>Get Today's Outfits</Text>
+            <View style={styles.ctaTitleRow}>
+              {!isPaid && isLocked && (
+                <Ionicons name="lock-closed-outline" size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
+              )}
+              <Text style={styles.ctaTitle}>Get Today's Outfits</Text>
+            </View>
             <Text style={styles.ctaSub}>AI picks based on your wardrobe & weather</Text>
           </TouchableOpacity>
         )}
@@ -459,11 +478,15 @@ var styles = StyleSheet.create({
     fontSize: 40,
     marginBottom: 12,
   },
+  ctaTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
   ctaTitle: {
     fontSize: 22,
     fontWeight: '700',
     color: '#FFFFFF',
-    marginBottom: 6,
   },
   ctaSub: {
     fontSize: 14,

@@ -102,7 +102,7 @@ export default function WardrobeScreen({ navigation }) {
       <View style={styles.brandHeaderContainer}>
         <SafeAreaView edges={['top']}>
           <View style={styles.brandHeader}>
-            <Text style={styles.brandSymbol}>👗</Text>
+            <Text style={styles.brandSymbol}></Text>
             <Text style={styles.brandText}>My Wardrobe</Text>
           </View>
         </SafeAreaView>

@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 export default function WelcomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Blossom 🌸</Text>
+      <Text style={styles.title}>Ari's Closet 🌸</Text>
       <Text style={styles.subtitle}>Your AI Wardrobe Stylist</Text>
 
       <Pressable

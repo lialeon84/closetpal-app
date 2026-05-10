@@ -86,6 +86,21 @@ export function usageLimits(isPaid) {
     return showPaywall();
   };
 
+  const isOutfitRecsLocked = async () => {
+    if (isPaid) return false;
+    try {
+      const uid = await getUserId();
+      if (!uid) return false;
+      const usage = await getUsage(uid);
+      const count = usage.outfit_recs_date === todayStr()
+        ? (usage.outfit_recs_count ?? 0)
+        : 0;
+      return count >= FREE_LIMITS.outfitRecs;
+    } catch (_) {
+      return false;
+    }
+  };
+
   const incrementOutfitRecs = async () => {
     try {
       const uid = await getUserId();
@@ -180,6 +195,7 @@ export function usageLimits(isPaid) {
     checkFavorites,
     checkWardrobe,
     checkOutfitRecs,
+    isOutfitRecsLocked,
     checkAiDetection,
     checkTrips,
     incrementOutfitRecs,
