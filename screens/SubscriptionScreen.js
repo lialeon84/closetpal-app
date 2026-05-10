@@ -182,7 +182,7 @@ export default function SubscriptionScreen({ navigation }) {
           <View style={styles.supportCard}>
             <Text style={styles.supportTitle}>Need Help?</Text>
             <Text style={styles.supportText}>
-              Contact us at support@closetpal.app for any subscription-related questions.
+              Contact us at support@ariscloset.app for any subscription-related questions.
             </Text>
           </View>
 

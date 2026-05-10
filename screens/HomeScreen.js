@@ -11,6 +11,7 @@ import {
   Pressable,
   Dimensions,
   Alert,
+  AppState,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -71,6 +72,15 @@ export default function HomeScreen() {
   useEffect(() => {
     if (isPaid) return;
     isOutfitRecsLocked().then(setIsLocked).catch(() => {});
+  }, [isPaid]);
+
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', nextState => {
+      if (nextState === 'active' && !isPaid) {
+        isOutfitRecsLocked().then(setIsLocked).catch(() => {});
+      }
+    });
+    return () => sub.remove();
   }, [isPaid]);
 
   var [outfits, setOutfits]         = useState([]);

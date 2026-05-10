@@ -1,3 +1,4 @@
+import Purchases from 'react-native-purchases';
 import RevenueCatUI, { PAYWALL_RESULT } from 'react-native-purchases-ui';
 import { supabase } from '../lib/supabase';
 
@@ -38,8 +39,12 @@ async function getUsage(userId) {
 async function showPaywall() {
   try {
     const result = await RevenueCatUI.presentPaywall();
+    Purchases.getCustomerInfo().catch(e =>
+      console.warn('[usageLimits] post-paywall getCustomerInfo error:', e.message)
+    );
     return result === PAYWALL_RESULT.PURCHASED || result === PAYWALL_RESULT.RESTORED;
-  } catch (_) {
+  } catch (e) {
+    console.error('[usageLimits] showPaywall error:', e.message);
     return false;
   }
 }
