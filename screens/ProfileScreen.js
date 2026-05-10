@@ -15,6 +15,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Heart } from 'lucide-react-native';
 import { supabase } from '../lib/supabase';
 import { PRIMARY, SECONDARY, CARD_BG } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 
 export default function ProfileScreen({ navigation }) {
   const [profile, setProfile]       = useState(null);
@@ -168,7 +169,7 @@ export default function ProfileScreen({ navigation }) {
           { useNativeDriver: false }
         )}
       >
-       
+
         {/* Display name */}
         {/* {(profile.first_name || profile.last_name) ? (
           <View style={[styles.section, { marginTop: 40 }]}>
@@ -311,6 +312,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#1C1C1C',
+    fontFamily: FONTS.heading,
   },
   container: {
     flex: 1,
@@ -370,11 +372,13 @@ const styles = StyleSheet.create({
     fontSize: 36,
     color: '#fff',
     fontWeight: 'bold',
+    fontFamily: FONTS.bodyBold,
   },
   username: {
     fontWeight: 'bold',
     color: '#1C1C1C',
     marginBottom: 5,
+    fontFamily: FONTS.heading,
   },
   statsContainer: {
     flexDirection: 'row',
@@ -394,10 +398,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: PRIMARY,
     marginBottom: 5,
+    fontFamily: FONTS.bodyBold,
   },
   statLabel: {
     fontSize: 12,
     color: '#6B7280',
+    fontFamily: FONTS.body,
   },
   section: {
     backgroundColor: '#EDEAE4',
@@ -411,6 +417,7 @@ const styles = StyleSheet.create({
     color: '#1C1C1C',
     fontWeight: '600',
     textAlign: 'center',
+    fontFamily: FONTS.bodyMedium,
   },
   subscriptionRow: {
     flexDirection: 'row',
@@ -420,17 +427,20 @@ const styles = StyleSheet.create({
   subscriptionLabel: {
     fontSize: 16,
     color: '#6B7280',
+    fontFamily: FONTS.body,
   },
   subscriptionValue: {
     fontSize: 16,
     color: PRIMARY,
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
   errorText: {
     fontSize: 16,
     color: '#ff6b6b',
     textAlign: 'center',
     marginTop: 40,
+    fontFamily: FONTS.body,
   },
   bottomSpacer: {
     height: 100,
@@ -450,10 +460,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: 4,
+    fontFamily: FONTS.bodyBold,
   },
   premiumBannerSub: {
     fontSize: 13,
     color: 'rgba(255,255,255,0.85)',
+    fontFamily: FONTS.body,
   },
   premiumBadge: {
     marginHorizontal: 15,
@@ -470,6 +482,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: '#FFFFFF',
+    fontFamily: FONTS.bodyMedium,
   },
 
   favSection: {
@@ -486,10 +499,12 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '700',
     color: '#1C1C1C',
+    fontFamily: FONTS.heading,
   },
   favCount: {
     fontSize: 13,
     color: '#6B7280',
+    fontFamily: FONTS.body,
   },
   favEmpty: {
     fontSize: 14,
@@ -499,6 +514,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#EDEAE4',
     borderRadius: 15,
     paddingHorizontal: 20,
+    fontFamily: FONTS.body,
   },
   favCard: {
     backgroundColor: CARD_BG,
@@ -530,12 +546,14 @@ const styles = StyleSheet.create({
   favImagePlaceholderText: {
     fontSize: 22,
     color: '#9CA3AF',
+    fontFamily: FONTS.body,
   },
   favNote: {
     fontSize: 13,
     color: '#374151',
     lineHeight: 19,
     marginBottom: 10,
+    fontFamily: FONTS.body,
   },
   favUnfavBtn: {
     flexDirection: 'row',
@@ -553,5 +571,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#E53935',
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
 });

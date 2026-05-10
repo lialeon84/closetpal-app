@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { PRIMARY } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -43,13 +44,12 @@ export default function LoginScreen({ navigation }) {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+      style={{ flex: 1 }}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps="handled"
-        >
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+      >
           <View style={styles.content}>
             <Text style={styles.title}>Welcome Back </Text>
             <Text style={styles.subtitle}>Sign in to your account</Text>
@@ -74,7 +74,8 @@ export default function LoginScreen({ navigation }) {
                 onChangeText={setPassword}
                 secureTextEntry
                 returnKeyType="done"
-                onSubmitEditing={handleLogin}
+                blurOnSubmit={true}
+                onSubmitEditing={() => Keyboard.dismiss()}
               />
 
               <Pressable
@@ -95,8 +96,7 @@ export default function LoginScreen({ navigation }) {
               </Pressable>
             </View>
           </View>
-        </ScrollView>
-      </TouchableWithoutFeedback>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -108,6 +108,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
+    backgroundColor: '#F7F5F0',
   },
   content: {
     flex: 1,
@@ -120,12 +121,14 @@ const styles = StyleSheet.create({
     color: '#1C1C1C',
     textAlign: 'center',
     marginBottom: 10,
+    fontFamily: FONTS.heading,
   },
   subtitle: {
     fontSize: 16,
     color: PRIMARY,
     textAlign: 'center',
     marginBottom: 40,
+    fontFamily: FONTS.headingRegular,
   },
   form: {
     width: '100%',
@@ -139,6 +142,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderWidth: 1,
     borderColor: '#D9D5CE',
+    fontFamily: FONTS.bodyMedium,
   },
   button: {
     backgroundColor: PRIMARY,
@@ -154,15 +158,18 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: FONTS.bodyBold,
   },
   linkText: {
     color: '#6B7280',
     textAlign: 'center',
     marginTop: 20,
     fontSize: 14,
+    fontFamily: FONTS.body,
   },
   linkBold: {
     color: PRIMARY,
     fontWeight: 'bold',
+    fontFamily: FONTS.bodyBold,
   },
 });

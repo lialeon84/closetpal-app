@@ -13,6 +13,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '../lib/supabase';
 import { parseDateFromDB, formatDateForDisplay } from '../lib/constants';
 import { PRIMARY, SECONDARY } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 
 export default function TripsScreen({ navigation }) {
   const [trips, setTrips] = useState([]);
@@ -136,6 +137,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#1C1C1C',
+    fontFamily: FONTS.heading,
   },
   centered: {
     flex: 1,
@@ -151,10 +153,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#1C1C1C',
     marginBottom: 8,
+    fontFamily: FONTS.headingRegular,
   },
   emptySubtitle: {
     fontSize: 14,
     color: '#6B7280',
+    fontFamily: FONTS.body,
   },
   list: {
     padding: 15,
@@ -182,6 +186,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1C1C1C',
     flex: 1,
+    fontFamily: FONTS.heading,
   },
   vibeBadge: {
     backgroundColor: SECONDARY,
@@ -194,11 +199,13 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#FFFFFF',
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
   cardDates: {
     fontSize: 13,
     color: '#6B7280',
     marginBottom: 8,
+    fontFamily: FONTS.body,
   },
   progressRow: {
     flexDirection: 'row',
@@ -223,11 +230,13 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     fontWeight: '500',
     minWidth: 60,
+    fontFamily: FONTS.bodyMedium,
   },
   cardPurpose: {
     fontSize: 12,
     color: PRIMARY,
     fontWeight: '500',
+    fontFamily: FONTS.bodyMedium,
   },
   fab: {
     position: 'absolute',
@@ -250,5 +259,6 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: '300',
     lineHeight: 34,
+    fontFamily: FONTS.body,
   },
 });

@@ -21,6 +21,7 @@ import { scheduleLentNotifications, cancelLentNotifications } from '../lib/notif
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { formatDateForDisplay, formatDateForDB, parseDateFromDB } from '../lib/constants';
 import { PRIMARY } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 
 const CATEGORIES = ['Tops', 'Bottoms', 'Shoes', 'Outerwear', 'Accessories', 'Dresses'];
 const SEASONS = ['Spring', 'Summer', 'Fall', 'Winter', 'All Season'];
@@ -705,6 +706,7 @@ const styles = StyleSheet.create({
     color: PRIMARY,
     fontWeight: 'bold',
     width: 44,
+    fontFamily: FONTS.bodyBold,
   },
   headerTitle: {
     fontSize: 18,
@@ -713,6 +715,7 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
     marginHorizontal: 8,
+    fontFamily: FONTS.heading,
   },
   headerAction: {
     fontSize: 16,
@@ -720,6 +723,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     width: 44,
     textAlign: 'right',
+    fontFamily: FONTS.bodyMedium,
   },
   headerActionDisabled: {
     opacity: 0.4,
@@ -757,6 +761,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1C1C1C',
     marginBottom: 16,
+    fontFamily: FONTS.heading,
   },
   detailRow: {
     flexDirection: 'row',
@@ -770,11 +775,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6B7280',
     fontWeight: '500',
+    fontFamily: FONTS.bodyMedium,
   },
   detailValue: {
     fontSize: 14,
     color: '#1C1C1C',
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
   deleteButton: {
     backgroundColor: '#e74c3c',
@@ -791,6 +798,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
   // ── Edit mode ──
   photoSection: {
@@ -822,6 +830,7 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     fontSize: 16,
     fontWeight: '500',
+    fontFamily: FONTS.bodyMedium,
   },
   changePhotoButton: {
     marginTop: 12,
@@ -830,6 +839,7 @@ const styles = StyleSheet.create({
     color: PRIMARY,
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
   form: {
     padding: 20,
@@ -840,6 +850,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 8,
     marginTop: 15,
+    fontFamily: FONTS.bodyMedium,
   },
   input: {
     backgroundColor: '#EDEAE4',
@@ -849,6 +860,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#D9D5CE',
+    fontFamily: FONTS.bodyMedium,
   },
   pickerContainer: {
     backgroundColor: '#EDEAE4',
@@ -882,6 +894,7 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     fontSize: 14,
     fontWeight: '500',
+    fontFamily: FONTS.bodyMedium,
   },
   chipTextSelected: {
     color: '#fff',
@@ -912,11 +925,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#92400E',
     marginBottom: 2,
+    fontFamily: FONTS.bodyBold,
   },
   lentBannerSub: {
     fontSize: 13,
     color: '#B45309',
     lineHeight: 18,
+    fontFamily: FONTS.body,
   },
   lentBannerOverdueBadge: {
     position: 'absolute',
@@ -934,6 +949,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '800',
     lineHeight: 16,
+    fontFamily: FONTS.bodyBold,
   },
   returnedButton: {
     backgroundColor: '#F59E0B',
@@ -945,6 +961,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '700',
     fontSize: 14,
+    fontFamily: FONTS.bodyBold,
   },
   // ── Lend (edit mode) ──
   lendToggleRow: {
@@ -971,6 +988,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 13,
     fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
   },
   lendToggleLabel: {
     fontSize: 15,
@@ -990,6 +1008,7 @@ const styles = StyleSheet.create({
   dateButtonText: {
     fontSize: 16,
     color: '#1C1C1C',
+    fontFamily: FONTS.bodyMedium,
   },
   labelOptional: {
     fontWeight: '400',
@@ -1000,6 +1019,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 6,
     fontWeight: '500',
+    fontFamily: FONTS.bodyMedium,
   },
   lentToggleActions: {
     flexDirection: 'row',
@@ -1015,6 +1035,7 @@ const styles = StyleSheet.create({
     color: PRIMARY,
     fontSize: 13,
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
   lentSection: {
     marginTop: 12,
@@ -1025,6 +1046,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 6,
     marginTop: 12,
+    fontFamily: FONTS.bodyMedium,
   },
   lentInput: {
     backgroundColor: '#F7F5F0',
@@ -1034,6 +1056,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     borderWidth: 1,
     borderColor: '#D9D5CE',
+    fontFamily: FONTS.bodyMedium,
   },
   lentFormActions: {
     flexDirection: 'row',
@@ -1053,6 +1076,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 15,
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
   lentSavedText: {
     color: PRIMARY,
@@ -1060,5 +1084,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
     marginTop: 8,
+    fontFamily: FONTS.bodyMedium,
   },
 });

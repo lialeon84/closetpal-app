@@ -12,6 +12,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import { supabase } from '../lib/supabase';
 import { PRIMARY } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 
 export default function ExportDataScreen({ navigation }) {
   const [exporting, setExporting] = useState(false);
@@ -114,11 +115,13 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: PRIMARY,
     fontWeight: 'bold',
+    fontFamily: FONTS.bodyBold,
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: '#1C1C1C',
+    fontFamily: FONTS.heading,
   },
   headerSpacer: {
     width: 28,
@@ -142,6 +145,7 @@ const styles = StyleSheet.create({
     color: '#1C1C1C',
     marginBottom: 12,
     textAlign: 'center',
+    fontFamily: FONTS.heading,
   },
   body: {
     fontSize: 15,
@@ -150,6 +154,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginBottom: 36,
     paddingHorizontal: 8,
+    fontFamily: FONTS.body,
   },
   exportButton: {
     width: '100%',
@@ -165,10 +170,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
   },
   loadingNote: {
     marginTop: 16,
     fontSize: 13,
     color: '#6B7280',
+    fontFamily: FONTS.body,
   },
 });

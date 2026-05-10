@@ -18,6 +18,7 @@ import { formatDateForDisplay, formatDateForDB } from '../lib/constants';
 import { useSubscription } from '../hooks/useSubscription';
 import { usageLimits } from '../hooks/usageLimits';
 import { PRIMARY, SECONDARY } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 
 const ANTHROPIC_API_KEY = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
 const OPENWEATHER_API_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY;
@@ -395,11 +396,13 @@ const styles = StyleSheet.create({
     color: PRIMARY,
     fontSize: 15,
     fontWeight: '500',
+    fontFamily: FONTS.bodyMedium,
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: '#1C1C1C',
+    fontFamily: FONTS.heading,
   },
   content: {
     padding: 20,
@@ -411,6 +414,7 @@ const styles = StyleSheet.create({
     color: '#1C1C1C',
     marginBottom: 8,
     marginTop: 20,
+    fontFamily: FONTS.bodyMedium,
   },
   optional: {
     fontWeight: '400',
@@ -424,6 +428,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#D9D5CE',
+    fontFamily: FONTS.bodyMedium,
   },
   dateBtn: {
     backgroundColor: '#EDEAE4',
@@ -438,6 +443,7 @@ const styles = StyleSheet.create({
   dateBtnText: {
     fontSize: 16,
     color: '#1C1C1C',
+    fontFamily: FONTS.bodyMedium,
   },
   chipsContent: {
     gap: 8,
@@ -460,6 +466,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: '#6B7280',
+    fontFamily: FONTS.bodyMedium,
   },
   chipTextSelected: {
     color: '#fff',
@@ -485,6 +492,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: '#6B7280',
+    fontFamily: FONTS.bodyMedium,
   },
   toggleTextActive: {
     color: '#FFFFFF',
@@ -496,6 +504,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontStyle: 'italic',
     lineHeight: 18,
+    fontFamily: FONTS.body,
   },
   generateBtn: {
     marginTop: 36,
@@ -516,5 +525,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
   },
 });

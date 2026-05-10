@@ -16,6 +16,7 @@ import {
   presentCustomerCenter,
 } from '../lib/revenuecat';
 import { PRIMARY } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 
 export default function SubscriptionScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
@@ -219,6 +220,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: PRIMARY,
     fontWeight: 'bold',
+    fontFamily: FONTS.bodyBold,
   },
   brandSymbol: {
     fontSize: 24,
@@ -227,6 +229,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#1C1C1C',
+    fontFamily: FONTS.heading,
   },
   placeholder: {
     width: 28,
@@ -253,6 +256,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1C1C1C',
     marginBottom: 16,
+    fontFamily: FONTS.heading,
   },
   statusContainer: {
     marginBottom: 12,
@@ -272,10 +276,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
   renewalText: {
     fontSize: 14,
     color: '#555555',
+    fontFamily: FONTS.body,
   },
   featuresCard: {
     backgroundColor: '#EDEAE4',
@@ -290,6 +296,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1C1C1C',
     marginBottom: 16,
+    fontFamily: FONTS.heading,
   },
   feature: {
     flexDirection: 'row',
@@ -301,10 +308,12 @@ const styles = StyleSheet.create({
     color: PRIMARY,
     marginRight: 12,
     fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
   },
   featureText: {
     fontSize: 16,
     color: '#1C1C1C',
+    fontFamily: FONTS.body,
   },
   manageButton: {
     backgroundColor: '#F7F5F0',
@@ -319,6 +328,7 @@ const styles = StyleSheet.create({
     color: PRIMARY,
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
   noSubscriptionCard: {
     backgroundColor: '#EDEAE4',
@@ -338,12 +348,14 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1C1C1C',
     marginBottom: 12,
+    fontFamily: FONTS.heading,
   },
   noSubText: {
     fontSize: 16,
     color: '#555555',
     textAlign: 'center',
     lineHeight: 24,
+    fontFamily: FONTS.body,
   },
   subscribeButton: {
     backgroundColor: PRIMARY,
@@ -356,6 +368,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
   },
   restoreButton: {
     padding: 16,
@@ -366,6 +379,7 @@ const styles = StyleSheet.create({
     color: PRIMARY,
     fontSize: 14,
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
   supportCard: {
     backgroundColor: '#EDEAE4',
@@ -379,11 +393,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#1C1C1C',
     marginBottom: 8,
+    fontFamily: FONTS.bodyMedium,
   },
   supportText: {
     fontSize: 14,
     color: '#555555',
     lineHeight: 20,
+    fontFamily: FONTS.body,
   },
   bottomSpacer: {
     height: 40,

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { PRIMARY } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 
 export default function WelcomeScreen({ navigation }) {
   return (
@@ -37,12 +38,14 @@ const styles = StyleSheet.create({
     fontSize: 40,
     color: '#1C1C1C',
     marginBottom: 10,
+    fontFamily: FONTS.heading,
   },
   subtitle: {
     fontSize: 18,
     color: PRIMARY,
     marginBottom: 50,
     textAlign: 'center',
+    fontFamily: FONTS.headingRegular,
   },
   button: {
     backgroundColor: PRIMARY,
@@ -56,6 +59,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 18,
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
   secondaryButton: {
     backgroundColor: 'transparent',

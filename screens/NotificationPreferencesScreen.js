@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '../lib/supabase';
 import { PRIMARY } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 
 const DEFAULTS = {
   outfit_reminders: false,
@@ -139,11 +140,13 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: PRIMARY,
     fontWeight: 'bold',
+    fontFamily: FONTS.bodyBold,
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: '#1C1C1C',
+    fontFamily: FONTS.heading,
   },
   headerSpacer: {
     width: 28,
@@ -162,6 +165,7 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     margin: 15,
     marginBottom: 8,
+    fontFamily: FONTS.body,
   },
   section: {
     backgroundColor: '#EDEAE4',
@@ -189,10 +193,12 @@ const styles = StyleSheet.create({
     color: '#1C1C1C',
     fontWeight: '500',
     marginBottom: 2,
+    fontFamily: FONTS.bodyMedium,
   },
   rowDesc: {
     fontSize: 12,
     color: '#6B7280',
+    fontFamily: FONTS.body,
   },
   bottomSpacer: {
     height: 40,

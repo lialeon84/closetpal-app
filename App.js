@@ -4,6 +4,16 @@ import { useFocusEffect } from '@react-navigation/native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useFonts } from 'expo-font';
+import {
+  PlayfairDisplay_700Bold,
+  PlayfairDisplay_400Regular,
+} from '@expo-google-fonts/playfair-display';
+import {
+  DMSans_400Regular,
+  DMSans_500Medium,
+  DMSans_700Bold,
+} from '@expo-google-fonts/dm-sans';
 import { supabase } from './lib/supabase';
 import {
   initializeRevenueCat,
@@ -14,6 +24,7 @@ import {
 } from './lib/revenuecat';
 import { requestNotificationPermissions } from './lib/notifications';
 import { PRIMARY } from './constants/colors';
+import { FONTS } from './constants/fonts';
 
 import WelcomeScreen from './screens/WelcomeScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -199,7 +210,7 @@ function MainTabs() {
                   borderColor: focused ? '#e1bee7' : '#BBBBBB',
                 }}
               >
-                <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>
+                <Text style={{ color: '#fff', fontSize: 14, fontFamily: FONTS.bodyBold }}>
                   {userInitial}
                 </Text>
               </View>
@@ -214,6 +225,14 @@ export default function App() {
   const [session, setSession] = useState(null);
   const [hasProfile, setHasProfile] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  const [fontsLoaded] = useFonts({
+    PlayfairDisplay_700Bold,
+    PlayfairDisplay_400Regular,
+    DMSans_400Regular,
+    DMSans_500Medium,
+    DMSans_700Bold,
+  });
 
   useEffect(() => {
     initializeRevenueCat();
@@ -251,8 +270,12 @@ export default function App() {
     });
 
     return () => {
-      subscription.unsubscribe();
-      purchaseListener.remove();
+      if (subscription && subscription.unsubscribe) {
+        subscription.unsubscribe();
+      }
+      if (purchaseListener && purchaseListener.remove) {
+        purchaseListener.remove();
+      }
     };
   }, []);
 
@@ -268,11 +291,11 @@ export default function App() {
     setLoading(false);
   };
 
-  if (loading) {
+  if (!fontsLoaded || loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F7F5F0' }}>
         <ActivityIndicator size="large" color={PRIMARY} />
-        <Text style={{ color: '#1C1C1C', marginTop: 10 }}>Loading...</Text>
+        <Text style={{ color: '#1C1C1C', marginTop: 10, fontFamily: FONTS.body }}>Loading...</Text>
       </View>
     );
   }

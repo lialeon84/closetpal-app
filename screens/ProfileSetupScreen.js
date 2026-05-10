@@ -20,6 +20,7 @@ import {
   formatDateForDB,
 } from '../lib/constants';
 import { PRIMARY } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 
 export default function ProfileSetupScreen() {
   const [username, setUsername] = useState('');
@@ -209,10 +210,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1C1C1C',
     marginBottom: 10,
+    fontFamily: FONTS.heading,
   },
   subtitle: {
     fontSize: 16,
     color: PRIMARY,
+    fontFamily: FONTS.headingRegular,
   },
   form: {
     width: '100%',
@@ -223,6 +226,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 8,
     marginTop: 15,
+    fontFamily: FONTS.bodyMedium,
   },
   input: {
     backgroundColor: '#EDEAE4',
@@ -232,6 +236,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#D9D5CE',
+    fontFamily: FONTS.bodyMedium,
   },
   pickerContainer: {
     backgroundColor: '#EDEAE4',
@@ -254,6 +259,7 @@ const styles = StyleSheet.create({
   dateButtonText: {
     color: '#1C1C1C',
     fontSize: 16,
+    fontFamily: FONTS.bodyMedium,
   },
   button: {
     backgroundColor: PRIMARY,
@@ -269,6 +275,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: FONTS.bodyBold,
   },
   note: {
     color: '#6B7280',
@@ -277,5 +284,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 40,
     fontStyle: 'italic',
+    fontFamily: FONTS.body,
   },
 });

@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '../lib/supabase';
 import { PRIMARY } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 
 const CATEGORIES = ['All', 'Tops', 'Bottoms', 'Shoes', 'Outerwear', 'Accessories', 'Dresses', 'Lent'];
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -190,6 +191,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#1C1C1C',
+    fontFamily: FONTS.heading,
   },
   filterBar: {
     maxHeight: 52,
@@ -221,6 +223,7 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     fontSize: 14,
     fontWeight: '500',
+    fontFamily: FONTS.bodyMedium,
   },
   filterChipTextSelected: {
     color: '#fff',
@@ -239,10 +242,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#1C1C1C',
     marginBottom: 8,
+    fontFamily: FONTS.headingRegular,
   },
   emptySubtitle: {
     fontSize: 14,
     color: '#6B7280',
+    fontFamily: FONTS.body,
   },
   grid: {
     padding: 15,
@@ -280,10 +285,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#1C1C1C',
     marginBottom: 2,
+    fontFamily: FONTS.bodyMedium,
   },
   cardCategory: {
     fontSize: 12,
     color: '#6B7280',
+    fontFamily: FONTS.body,
   },
   cardLent: {
     opacity: 0.6,
@@ -301,6 +308,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 11,
     fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
   },
   overdueBadge: {
     position: 'absolute',
@@ -320,6 +328,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '800',
     lineHeight: 16,
+    fontFamily: FONTS.bodyBold,
   },
   fab: {
     position: 'absolute',
@@ -342,5 +351,6 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: '300',
     lineHeight: 34,
+    fontFamily: FONTS.body,
   },
 });

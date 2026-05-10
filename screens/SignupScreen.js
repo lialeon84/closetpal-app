@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { PRIMARY } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 
 export default function SignupScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -143,12 +144,14 @@ const styles = StyleSheet.create({
     color: '#1C1C1C',
     textAlign: 'center',
     marginBottom: 10,
+    fontFamily: FONTS.heading,
   },
   subtitle: {
     fontSize: 16,
     color: PRIMARY,
     textAlign: 'center',
     marginBottom: 40,
+    fontFamily: FONTS.headingRegular,
   },
   form: {
     width: '100%',
@@ -162,6 +165,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderWidth: 1,
     borderColor: '#D9D5CE',
+    fontFamily: FONTS.bodyMedium,
   },
   button: {
     backgroundColor: PRIMARY,
@@ -177,15 +181,18 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: FONTS.bodyBold,
   },
   linkText: {
     color: '#6B7280',
     textAlign: 'center',
     marginTop: 20,
     fontSize: 14,
+    fontFamily: FONTS.body,
   },
   linkBold: {
     color: PRIMARY,
     fontWeight: 'bold',
+    fontFamily: FONTS.bodyBold,
   },
 });

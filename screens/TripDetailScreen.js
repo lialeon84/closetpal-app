@@ -14,6 +14,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '../lib/supabase';
 import { parseDateFromDB, formatDateForDisplay } from '../lib/constants';
 import { PRIMARY, SECONDARY, CARD_BG } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 
 const VIBE_EMOJI = { Warm: '☀️', Cold: '❄️', Mixed: '🌤️', Tropical: '🌴', Snow: '🌨️' };
 
@@ -257,6 +258,7 @@ const styles = StyleSheet.create({
     color: PRIMARY,
     fontSize: 15,
     fontWeight: '500',
+    fontFamily: FONTS.bodyMedium,
   },
   headerTitle: {
     fontSize: 17,
@@ -265,6 +267,7 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
     marginHorizontal: 8,
+    fontFamily: FONTS.heading,
   },
   deleteBtn: {
     width: 60,
@@ -274,6 +277,7 @@ const styles = StyleSheet.create({
     color: '#E53935',
     fontSize: 14,
     fontWeight: '500',
+    fontFamily: FONTS.bodyMedium,
   },
   content: {
     padding: 16,
@@ -292,11 +296,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1C1C1C',
     marginBottom: 4,
+    fontFamily: FONTS.heading,
   },
   dates: {
     fontSize: 14,
     color: '#6B7280',
     marginBottom: 10,
+    fontFamily: FONTS.body,
   },
   tagsRow: {
     flexDirection: 'row',
@@ -314,6 +320,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#FFFFFF',
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
   notesBox: {
     backgroundColor: '#F9F5FF',
@@ -327,11 +334,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: PRIMARY,
     marginBottom: 4,
+    fontFamily: FONTS.bodyMedium,
   },
   notesText: {
     fontSize: 13,
     color: '#374151',
     lineHeight: 19,
+    fontFamily: FONTS.body,
   },
 
   // ── Progress ─────────────────────────────────────────────────────────────────
@@ -350,11 +359,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#1C1C1C',
+    fontFamily: FONTS.bodyMedium,
   },
   progressCount: {
     fontSize: 14,
     color: PRIMARY,
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
   progressBg: {
     height: 8,
@@ -374,6 +385,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1C1C1C',
     marginBottom: 12,
+    fontFamily: FONTS.heading,
   },
   emptyList: {
     alignItems: 'center',
@@ -382,6 +394,7 @@ const styles = StyleSheet.create({
   emptyListText: {
     color: '#6B7280',
     fontSize: 14,
+    fontFamily: FONTS.body,
   },
   listItem: {
     flexDirection: 'row',
@@ -426,6 +439,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#1C1C1C',
     marginBottom: 2,
+    fontFamily: FONTS.bodyMedium,
   },
   itemNamePacked: {
     textDecorationLine: 'line-through',
@@ -435,17 +449,20 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#6B7280',
     marginBottom: 3,
+    fontFamily: FONTS.body,
   },
   itemRemoved: {
     fontSize: 13,
     color: '#9CA3AF',
     fontStyle: 'italic',
+    fontFamily: FONTS.body,
   },
   itemReason: {
     fontSize: 12,
     color: '#6B7280',
     lineHeight: 16,
     marginTop: 2,
+    fontFamily: FONTS.body,
   },
   checkbox: {
     width: 26,
@@ -464,5 +481,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
   },
 });

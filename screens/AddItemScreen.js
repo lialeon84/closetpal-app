@@ -21,6 +21,7 @@ import { supabase } from '../lib/supabase';
 import { useSubscription } from '../hooks/useSubscription';
 import { usageLimits } from '../hooks/usageLimits';
 import { PRIMARY, SECONDARY } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 
 const REMOVE_BG_API_KEY = 'cxoCqM6GMUgspjtjgQzKwRr7';
 const REMOVE_BG_URL = 'https://api.remove.bg/v1.0/removebg';
@@ -628,6 +629,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: PRIMARY,
     fontWeight: 'bold',
+    fontFamily: FONTS.bodyBold,
   },
   disabledText: {
     opacity: 0.3,
@@ -639,6 +641,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#1C1C1C',
+    fontFamily: FONTS.heading,
   },
   placeholder: {
     width: 28,
@@ -680,6 +683,7 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     fontSize: 16,
     fontWeight: '500',
+    fontFamily: FONTS.bodyMedium,
   },
   processingOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -692,6 +696,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 13,
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
   changePhotoButton: {
     marginTop: 12,
@@ -700,11 +705,13 @@ const styles = StyleSheet.create({
     color: PRIMARY,
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
   processingSubtext: {
     marginTop: 10,
     color: '#6B7280',
     fontSize: 13,
+    fontFamily: FONTS.body,
   },
   aiBadge: {
     marginHorizontal: 20,
@@ -719,11 +726,13 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
   aiBadgeSubtext: {
     color: PRIMARY,
     fontSize: 12,
     marginTop: 2,
+    fontFamily: FONTS.body,
   },
   form: {
     padding: 20,
@@ -734,6 +743,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 8,
     marginTop: 15,
+    fontFamily: FONTS.bodyMedium,
   },
   input: {
     backgroundColor: '#EDEAE4',
@@ -743,6 +753,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#D9D5CE',
+    fontFamily: FONTS.bodyMedium,
   },
   pickerContainer: {
     backgroundColor: '#EDEAE4',
@@ -789,12 +800,14 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     letterSpacing: 2,
     lineHeight: 16,
+    fontFamily: FONTS.body,
   },
   swatchLabel: {
     fontSize: 9,
     color: '#6B7280',
     marginTop: 4,
     textAlign: 'center',
+    fontFamily: FONTS.body,
   },
   swatchLabelSelected: {
     color: PRIMARY,
@@ -824,6 +837,7 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     fontSize: 14,
     fontWeight: '500',
+    fontFamily: FONTS.bodyMedium,
   },
   chipTextSelected: {
     color: '#fff',
@@ -842,5 +856,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
 });

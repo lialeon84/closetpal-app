@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '../lib/supabase';
 import { PRIMARY } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 import * as WebBrowser from 'expo-web-browser';
 
 const PRIVACY_URL = 'https://closetpal.app/privacy';
@@ -213,6 +214,7 @@ const styles = StyleSheet.create({
     color: PRIMARY,
     marginRight: 15,
     fontWeight: 'bold',
+    fontFamily: FONTS.bodyBold,
   },
   brandSymbol: {
     fontSize: 24,
@@ -222,6 +224,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#1C1C1C',
+    fontFamily: FONTS.heading,
   },
   section: {
     backgroundColor: '#EDEAE4',
@@ -234,6 +237,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1C1C1C',
     marginBottom: 15,
+    fontFamily: FONTS.heading,
   },
   settingButton: {
     flexDirection: 'row',
@@ -246,11 +250,13 @@ const styles = StyleSheet.create({
   settingButtonText: {
     fontSize: 16,
     color: '#1C1C1C',
+    fontFamily: FONTS.body,
   },
   settingButtonArrow: {
     fontSize: 18,
     color: PRIMARY,
     fontWeight: 'bold',
+    fontFamily: FONTS.bodyBold,
   },
   dangerText: {
     color: '#E53935',

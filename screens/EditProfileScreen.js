@@ -25,6 +25,7 @@ import {
   parseDateFromDB,
 } from '../lib/constants';
 import { PRIMARY } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 
 export default function EditProfileScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
@@ -356,6 +357,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: PRIMARY,
     fontWeight: 'bold',
+    fontFamily: FONTS.bodyBold,
   },
   brandSymbol: {
     fontSize: 24,
@@ -364,6 +366,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#1C1C1C',
+    fontFamily: FONTS.heading,
   },
   placeholder: {
     width: 28,
@@ -401,6 +404,7 @@ const styles = StyleSheet.create({
     fontSize: 48,
     color: '#fff',
     fontWeight: 'bold',
+    fontFamily: FONTS.bodyBold,
   },
   uploadingOverlay: {
     position: 'absolute',
@@ -420,6 +424,7 @@ const styles = StyleSheet.create({
     color: PRIMARY,
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
   form: {
     padding: 20,
@@ -430,6 +435,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 8,
     marginTop: 15,
+    fontFamily: FONTS.bodyMedium,
   },
   input: {
     backgroundColor: '#EDEAE4',
@@ -439,6 +445,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#D9D5CE',
+    fontFamily: FONTS.bodyMedium,
   },
   pickerContainer: {
     backgroundColor: '#EDEAE4',
@@ -461,6 +468,7 @@ const styles = StyleSheet.create({
   dateButtonText: {
     color: '#1C1C1C',
     fontSize: 16,
+    fontFamily: FONTS.bodyMedium,
   },
   saveButton: {
     backgroundColor: PRIMARY,
@@ -476,5 +484,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
 });

@@ -29,7 +29,9 @@ export function useSubscription() {
 
     return () => {
       mounted = false;
-      listener.remove();
+      if (listener && listener.remove) {
+        listener.remove();
+      }
     };
   }, []);
 

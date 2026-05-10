@@ -13,6 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import RevenueCatUI, { PAYWALL_RESULT } from 'react-native-purchases-ui';
 import { supabase } from '../lib/supabase';
 import { PRIMARY, SECONDARY, CARD_BG } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 import { useSubscription } from '../hooks/useSubscription';
 import { syncSubscriptionStatus } from '../lib/revenuecat';
 
@@ -306,11 +307,13 @@ var styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1C1C1C',
     letterSpacing: -0.5,
+    fontFamily: FONTS.heading,
   },
   subtitle: {
     fontSize: 15,
     color: '#6B7280',
     marginTop: 2,
+    fontFamily: FONTS.body,
   },
 
   stateBox: {
@@ -326,12 +329,14 @@ var styles = StyleSheet.create({
     color: '#1C1C1C',
     marginBottom: 8,
     textAlign: 'center',
+    fontFamily: FONTS.headingRegular,
   },
   stateSub: {
     fontSize: 14,
     color: '#6B7280',
     textAlign: 'center',
     lineHeight: 20,
+    fontFamily: FONTS.body,
   },
   retryBtn: {
     marginTop: 20,
@@ -340,7 +345,7 @@ var styles = StyleSheet.create({
     paddingHorizontal: 28,
     borderRadius: 12,
   },
-  retryBtnText: { color: '#FFFFFF', fontWeight: '600', fontSize: 15 },
+  retryBtnText: { color: '#FFFFFF', fontWeight: '600', fontSize: 15, fontFamily: FONTS.bodyMedium },
 
   summaryBox: {
     marginHorizontal: 16,
@@ -356,11 +361,13 @@ var styles = StyleSheet.create({
     fontWeight: '600',
     color: PRIMARY,
     marginBottom: 6,
+    fontFamily: FONTS.bodyMedium,
   },
   summaryText: {
     fontSize: 14,
     color: '#374151',
     lineHeight: 21,
+    fontFamily: FONTS.body,
   },
 
   sectionLabel: {
@@ -372,6 +379,7 @@ var styles = StyleSheet.create({
     color: '#6B7280',
     textTransform: 'uppercase',
     letterSpacing: 0.8,
+    fontFamily: FONTS.bodyMedium,
   },
 
   card: {
@@ -398,18 +406,20 @@ var styles = StyleSheet.create({
     color: '#1C1C1C',
     flex: 1,
     marginRight: 8,
+    fontFamily: FONTS.heading,
   },
   priorityBadge: {
     borderRadius: 20,
     paddingVertical: 3,
     paddingHorizontal: 10,
   },
-  priorityText: { fontSize: 11, fontWeight: '600' },
+  priorityText: { fontSize: 11, fontWeight: '600', fontFamily: FONTS.bodyMedium },
   cardReason: {
     fontSize: 14,
     color: '#374151',
     lineHeight: 20,
     marginBottom: 8,
+    fontFamily: FONTS.body,
   },
   pairsRow: {
     flexDirection: 'row',
@@ -420,11 +430,13 @@ var styles = StyleSheet.create({
     fontSize: 12,
     color: PRIMARY,
     fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
   pairsItems: {
     fontSize: 12,
     color: '#6B7280',
     flex: 1,
+    fontFamily: FONTS.body,
   },
 
   disclaimer: {
@@ -433,6 +445,7 @@ var styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 11,
     color: '#9CA3AF',
+    fontFamily: FONTS.body,
   },
 
   lockedContainer: {
@@ -452,6 +465,7 @@ var styles = StyleSheet.create({
     color: '#1C1C1C',
     marginBottom: 12,
     letterSpacing: -0.3,
+    fontFamily: FONTS.heading,
   },
   lockedSub: {
     fontSize: 15,
@@ -459,6 +473,7 @@ var styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 22,
     marginBottom: 28,
+    fontFamily: FONTS.body,
   },
   upgradeBtn: {
     backgroundColor: PRIMARY,
@@ -476,6 +491,7 @@ var styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
   },
   lockedFeatures: {
     gap: 10,
@@ -485,5 +501,6 @@ var styles = StyleSheet.create({
     fontSize: 14,
     color: '#374151',
     fontWeight: '500',
+    fontFamily: FONTS.bodyMedium,
   },
 });

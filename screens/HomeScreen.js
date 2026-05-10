@@ -20,6 +20,7 @@ import { Ionicons } from '@expo/vector-icons';
 import RevenueCatUI from 'react-native-purchases-ui';
 import { supabase } from '../lib/supabase';
 import { PRIMARY, SECONDARY, CARD_BG } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 import { useSubscription } from '../hooks/useSubscription';
 import { usageLimits } from '../hooks/usageLimits';
 
@@ -453,11 +454,13 @@ var styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1C1C1C',
     letterSpacing: -0.5,
+    fontFamily: FONTS.heading,
   },
   subtitle: {
     fontSize: 15,
     color: '#6B7280',
     marginTop: 2,
+    fontFamily: FONTS.body,
   },
 
   // ── CTA card ────────────────────────────────────────────────────────────────
@@ -488,11 +491,13 @@ var styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     color: '#FFFFFF',
+    fontFamily: FONTS.heading,
   },
   ctaSub: {
     fontSize: 14,
     color: 'rgba(255,255,255,0.8)',
     textAlign: 'center',
+    fontFamily: FONTS.body,
   },
 
   // ── State boxes (loading / errors) ─────────────────────────────────────────
@@ -512,12 +517,14 @@ var styles = StyleSheet.create({
     color: '#1C1C1C',
     marginBottom: 8,
     textAlign: 'center',
+    fontFamily: FONTS.headingRegular,
   },
   stateSub: {
     fontSize: 14,
     color: '#6B7280',
     textAlign: 'center',
     lineHeight: 20,
+    fontFamily: FONTS.body,
   },
   retryBtn: {
     marginTop: 20,
@@ -530,6 +537,7 @@ var styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '600',
     fontSize: 15,
+    fontFamily: FONTS.bodyMedium,
   },
 
   // ── Outfit card ─────────────────────────────────────────────────────────────
@@ -561,12 +569,14 @@ var styles = StyleSheet.create({
     fontSize: 12,
     color: '#FFFFFF',
     fontWeight: '500',
+    fontFamily: FONTS.bodyMedium,
   },
   outfitLabel: {
     fontSize: 13,
     color: '#6B7280',
     fontWeight: '500',
     textAlign: 'center',
+    fontFamily: FONTS.bodyMedium,
   },
   heartBtn: {
     padding: 4,
@@ -597,6 +607,7 @@ var styles = StyleSheet.create({
   noPhotosText: {
     color: '#6B7280',
     fontSize: 13,
+    fontFamily: FONTS.body,
   },
 
   // ── Item list ───────────────────────────────────────────────────────────────
@@ -607,6 +618,7 @@ var styles = StyleSheet.create({
     fontSize: 13,
     color: '#374151',
     lineHeight: 20,
+    fontFamily: FONTS.body,
   },
 
   // ── Styling note ────────────────────────────────────────────────────────────
@@ -622,11 +634,13 @@ var styles = StyleSheet.create({
     fontWeight: '600',
     color: PRIMARY,
     marginBottom: 4,
+    fontFamily: FONTS.bodyMedium,
   },
   noteText: {
     fontSize: 13,
     color: '#374151',
     lineHeight: 19,
+    fontFamily: FONTS.body,
   },
 
   // ── Regenerate button ───────────────────────────────────────────────────────
@@ -643,6 +657,7 @@ var styles = StyleSheet.create({
     color: PRIMARY,
     fontWeight: '600',
     fontSize: 15,
+    fontFamily: FONTS.bodyMedium,
   },
 
   // ── Occasion picker modal ───────────────────────────────────────────────────
@@ -673,6 +688,7 @@ var styles = StyleSheet.create({
     color: '#1C1C1C',
     marginBottom: 16,
     textAlign: 'center',
+    fontFamily: FONTS.heading,
   },
   occasionRow: {
     paddingVertical: 16,
@@ -683,5 +699,6 @@ var styles = StyleSheet.create({
     fontSize: 16,
     color: '#1C1C1C',
     textAlign: 'center',
+    fontFamily: FONTS.body,
   },
 });

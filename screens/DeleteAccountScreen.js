@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '../lib/supabase';
 import { PRIMARY } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 
 export default function DeleteAccountScreen({ navigation }) {
   const [confirmText, setConfirmText] = useState('');
@@ -147,11 +148,13 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: PRIMARY,
     fontWeight: 'bold',
+    fontFamily: FONTS.bodyBold,
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: '#1C1C1C',
+    fontFamily: FONTS.heading,
   },
   headerSpacer: {
     width: 28,
@@ -174,6 +177,7 @@ const styles = StyleSheet.create({
     color: '#1C1C1C',
     marginBottom: 16,
     textAlign: 'center',
+    fontFamily: FONTS.heading,
   },
   body: {
     fontSize: 15,
@@ -182,6 +186,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginBottom: 32,
     paddingHorizontal: 8,
+    fontFamily: FONTS.body,
   },
   confirmBox: {
     width: '100%',
@@ -193,6 +198,7 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     marginBottom: 8,
     textAlign: 'center',
+    fontFamily: FONTS.bodyMedium,
   },
   input: {
     backgroundColor: '#EDEAE4',
@@ -205,6 +211,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     letterSpacing: 2,
     fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
   },
   deleteButton: {
     width: '100%',
@@ -221,6 +228,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
   },
   cancelButton: {
     width: '100%',
@@ -231,5 +239,6 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     fontSize: 15,
     fontWeight: '500',
+    fontFamily: FONTS.bodyMedium,
   },
 });
