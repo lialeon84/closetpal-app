@@ -19,6 +19,7 @@ import { Heart } from 'lucide-react-native';
 import { Ionicons } from '@expo/vector-icons';
 import RevenueCatUI from 'react-native-purchases-ui';
 import { supabase } from '../lib/supabase';
+import { PRIMARY, SECONDARY, CARD_BG } from '../constants/colors';
 import { useSubscription } from '../hooks/useSubscription';
 import { usageLimits } from '../hooks/usageLimits';
 
@@ -280,7 +281,7 @@ export default function HomeScreen() {
         {/* Loading */}
         {loading && (
           <View style={styles.stateBox}>
-            <ActivityIndicator size="large" color="#9b59b6" style={{ marginBottom: 16 }} />
+            <ActivityIndicator size="large" color={PRIMARY} style={{ marginBottom: 16 }} />
             <Text style={styles.stateTitle}>Styling your outfits…</Text>
             <Text style={styles.stateSub}>Checking your wardrobe & weather</Text>
           </View>
@@ -392,7 +393,7 @@ function OutfitCard({ outfit, weather, occasion, isFavorited, isToggling, onTogg
           style={styles.heartBtn}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Heart size={20} color="#E53935" fill={isFavorited ? '#E53935' : 'transparent'} />
+          <Heart size={20} color={PRIMARY} fill={isFavorited ? PRIMARY : 'transparent'} />
         </TouchableOpacity>
       </View>
 
@@ -463,7 +464,7 @@ var styles = StyleSheet.create({
   ctaCard: {
     marginHorizontal: 16,
     marginTop: 24,
-    backgroundColor: '#D8C3F9',
+    backgroundColor: PRIMARY,
     borderRadius: 20,
     paddingVertical: 36,
     paddingHorizontal: 24,
@@ -520,7 +521,7 @@ var styles = StyleSheet.create({
   },
   retryBtn: {
     marginTop: 20,
-    backgroundColor: '#9b59b6',
+    backgroundColor: PRIMARY,
     paddingVertical: 12,
     paddingHorizontal: 28,
     borderRadius: 12,
@@ -535,7 +536,7 @@ var styles = StyleSheet.create({
   card: {
     marginHorizontal: 16,
     marginTop: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: CARD_BG,
     borderRadius: 20,
     padding: 16,
     shadowColor: '#000',
@@ -551,14 +552,14 @@ var styles = StyleSheet.create({
     marginBottom: 12,
   },
   cardTag: {
-    backgroundColor: '#F3E8FF',
+    backgroundColor: SECONDARY,
     borderRadius: 20,
     paddingVertical: 4,
     paddingHorizontal: 10,
   },
   cardTagText: {
     fontSize: 12,
-    color: '#7C3AED',
+    color: '#FFFFFF',
     fontWeight: '500',
   },
   outfitLabel: {
@@ -614,12 +615,12 @@ var styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     borderLeftWidth: 3,
-    borderLeftColor: '#9b59b6',
+    borderLeftColor: PRIMARY,
   },
   noteLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#9b59b6',
+    color: PRIMARY,
     marginBottom: 4,
   },
   noteText: {
@@ -633,13 +634,13 @@ var styles = StyleSheet.create({
     marginHorizontal: 16,
     marginTop: 20,
     borderWidth: 1.5,
-    borderColor: '#9b59b6',
+    borderColor: PRIMARY,
     borderRadius: 14,
     paddingVertical: 13,
     alignItems: 'center',
   },
   refreshBtnText: {
-    color: '#9b59b6',
+    color: PRIMARY,
     fontWeight: '600',
     fontSize: 15,
   },

@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '../lib/supabase';
+import { PRIMARY } from '../constants/colors';
 
 export default function DeleteAccountScreen({ navigation }) {
   const [confirmText, setConfirmText] = useState('');
@@ -144,7 +145,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     fontSize: 28,
-    color: '#9b59b6',
+    color: PRIMARY,
     fontWeight: 'bold',
   },
   headerTitle: {

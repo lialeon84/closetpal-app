@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RevenueCatUI, { PAYWALL_RESULT } from 'react-native-purchases-ui';
 import { supabase } from '../lib/supabase';
+import { PRIMARY, SECONDARY, CARD_BG } from '../constants/colors';
 import { useSubscription } from '../hooks/useSubscription';
 import { syncSubscriptionStatus } from '../lib/revenuecat';
 
@@ -19,7 +20,7 @@ var ANTHROPIC_API_KEY = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
 var CACHE_KEY_PREFIX = 'stylist_suggestions_';
 
 var PRIORITY_CONFIG = {
-  high:   { label: 'High Priority',   color: '#7C3AED', bg: '#F3E8FF' },
+  high:   { label: 'High Priority',   color: '#FFFFFF', bg: SECONDARY },
   medium: { label: 'Medium Priority', color: '#D97706', bg: '#FEF3C7' },
   low:    { label: 'Low Priority',    color: '#059669', bg: '#D1FAE5' },
 };
@@ -181,7 +182,7 @@ Aim for 4-6 suggestions. Vary priority levels based on how significant the gap i
   if (subLoading) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <ActivityIndicator style={{ flex: 1 }} size="large" color="#9b59b6" />
+        <ActivityIndicator style={{ flex: 1 }} size="large" color={PRIMARY} />
       </SafeAreaView>
     );
   }
@@ -203,7 +204,7 @@ Aim for 4-6 suggestions. Vary priority levels based on how significant the gap i
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            tintColor="#9b59b6"
+            tintColor={PRIMARY}
           />
         }
       >
@@ -353,7 +354,7 @@ var styles = StyleSheet.create({
   summaryLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#9b59b6',
+    color: PRIMARY,
     marginBottom: 6,
   },
   summaryText: {
@@ -376,7 +377,7 @@ var styles = StyleSheet.create({
   card: {
     marginHorizontal: 16,
     marginTop: 12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: CARD_BG,
     borderRadius: 16,
     padding: 16,
     shadowColor: '#000',
@@ -417,7 +418,7 @@ var styles = StyleSheet.create({
   },
   pairsLabel: {
     fontSize: 12,
-    color: '#9b59b6',
+    color: PRIMARY,
     fontWeight: '600',
   },
   pairsItems: {
@@ -460,12 +461,12 @@ var styles = StyleSheet.create({
     marginBottom: 28,
   },
   upgradeBtn: {
-    backgroundColor: '#9b59b6',
+    backgroundColor: PRIMARY,
     paddingVertical: 15,
     paddingHorizontal: 36,
     borderRadius: 14,
     marginBottom: 28,
-    shadowColor: '#9b59b6',
+    shadowColor: PRIMARY,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

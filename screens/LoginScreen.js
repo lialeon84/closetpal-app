@@ -13,6 +13,7 @@ import {
   Keyboard,
 } from 'react-native';
 import { supabase } from '../lib/supabase';
+import { PRIMARY } from '../constants/colors';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -122,7 +123,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#9b59b6',
+    color: PRIMARY,
     textAlign: 'center',
     marginBottom: 40,
   },
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
     borderColor: '#D9D5CE',
   },
   button: {
-    backgroundColor: '#9b59b6',
+    backgroundColor: PRIMARY,
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -161,7 +162,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   linkBold: {
-    color: '#9b59b6',
+    color: PRIMARY,
     fontWeight: 'bold',
   },
 });

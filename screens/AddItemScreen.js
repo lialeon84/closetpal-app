@@ -20,6 +20,7 @@ import { Picker } from '@react-native-picker/picker';
 import { supabase } from '../lib/supabase';
 import { useSubscription } from '../hooks/useSubscription';
 import { usageLimits } from '../hooks/usageLimits';
+import { PRIMARY, SECONDARY } from '../constants/colors';
 
 const REMOVE_BG_API_KEY = 'cxoCqM6GMUgspjtjgQzKwRr7';
 const REMOVE_BG_URL = 'https://api.remove.bg/v1.0/removebg';
@@ -463,7 +464,7 @@ export default function AddItemScreen({ navigation }) {
                 selectedValue={category}
                 onValueChange={handleCategoryChange}
                 style={styles.picker}
-                dropdownIconColor="#9b59b6"
+                dropdownIconColor={PRIMARY}
               >
                 {CATEGORIES.map((cat) => (
                   <Picker.Item key={cat} label={cat} value={cat} color="#1C1C1C" />
@@ -477,7 +478,7 @@ export default function AddItemScreen({ navigation }) {
                 selectedValue={subcategory}
                 onValueChange={setSubcategory}
                 style={styles.picker}
-                dropdownIconColor="#9b59b6"
+                dropdownIconColor={PRIMARY}
               >
                 {SUBCATEGORIES[category].map((sub) => (
                   <Picker.Item key={sub} label={sub} value={sub} color="#1C1C1C" />
@@ -613,7 +614,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderBottomWidth: 2,
-    borderBottomColor: '#9b59b6',
+    borderBottomColor: PRIMARY,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -625,7 +626,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     fontSize: 28,
-    color: '#9b59b6',
+    color: PRIMARY,
     fontWeight: 'bold',
   },
   disabledText: {
@@ -696,7 +697,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   changePhotoText: {
-    color: '#9b59b6',
+    color: PRIMARY,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -708,19 +709,19 @@ const styles = StyleSheet.create({
   aiBadge: {
     marginHorizontal: 20,
     marginBottom: 4,
-    backgroundColor: '#F3E8FF',
+    backgroundColor: SECONDARY,
     borderRadius: 10,
     padding: 12,
     borderWidth: 1,
     borderColor: '#D8B4FE',
   },
   aiBadgeText: {
-    color: '#7C3AED',
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
   },
   aiBadgeSubtext: {
-    color: '#9b59b6',
+    color: PRIMARY,
     fontSize: 12,
     marginTop: 2,
   },
@@ -728,7 +729,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   label: {
-    color: '#9b59b6',
+    color: PRIMARY,
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 8,
@@ -777,7 +778,7 @@ const styles = StyleSheet.create({
   },
   swatchSelected: {
     borderWidth: 3,
-    borderColor: '#9b59b6',
+    borderColor: PRIMARY,
   },
   swatchEmoji: {
     fontSize: 18,
@@ -796,7 +797,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   swatchLabelSelected: {
-    color: '#9b59b6',
+    color: PRIMARY,
     fontWeight: '600',
   },
   colorOtherInput: {
@@ -816,8 +817,8 @@ const styles = StyleSheet.create({
     borderColor: '#D9D5CE',
   },
   chipSelected: {
-    backgroundColor: '#9b59b6',
-    borderColor: '#9b59b6',
+    backgroundColor: PRIMARY,
+    borderColor: PRIMARY,
   },
   chipText: {
     color: '#6B7280',
@@ -828,7 +829,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   saveButton: {
-    backgroundColor: '#9b59b6',
+    backgroundColor: PRIMARY,
     margin: 20,
     padding: 16,
     borderRadius: 10,

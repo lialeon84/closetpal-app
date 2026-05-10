@@ -13,6 +13,7 @@ import {
   addCustomerInfoListener,
 } from './lib/revenuecat';
 import { requestNotificationPermissions } from './lib/notifications';
+import { PRIMARY } from './constants/colors';
 
 import WelcomeScreen from './screens/WelcomeScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -95,13 +96,13 @@ function MainTabs() {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: '#EDEAE4',
-          borderTopColor: '#9b59b6',
+          borderTopColor: PRIMARY,
           borderTopWidth: 1,
           height: 70,
           paddingBottom: 10,
           paddingTop: 8,
         },
-        tabBarActiveTintColor: '#9b59b6',
+        tabBarActiveTintColor: PRIMARY,
         tabBarInactiveTintColor: '#AAAAAA',
         tabBarShowLabel: false,
       }}
@@ -111,7 +112,7 @@ function MainTabs() {
         component={HomeScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <Ionicons name={focused ? 'home' : 'home-outline'} size={24} color={focused ? '#7B4F9E' : '#9B9B9B'} />
+            <Ionicons name={focused ? 'home' : 'home-outline'} size={24} color={focused ? PRIMARY : '#9B9B9B'} />
           ),
         }}
       />
@@ -122,7 +123,7 @@ function MainTabs() {
         options={{
           tabBarIcon: ({ focused }) => (
             <View>
-              <Ionicons name={focused ? 'shirt' : 'shirt-outline'} size={24} color={focused ? '#7B4F9E' : '#9B9B9B'} />
+              <Ionicons name={focused ? 'shirt' : 'shirt-outline'} size={24} color={focused ? PRIMARY : '#9B9B9B'} />
               {hasOverdueItems && (
                 <View style={{
                   position: 'absolute',
@@ -145,7 +146,7 @@ function MainTabs() {
         component={StylistScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <Ionicons name={focused ? 'sparkles' : 'sparkles-outline'} size={24} color={focused ? '#7B4F9E' : '#9B9B9B'} />
+            <Ionicons name={focused ? 'sparkles' : 'sparkles-outline'} size={24} color={focused ? PRIMARY : '#9B9B9B'} />
           ),
         }}
       />
@@ -154,7 +155,7 @@ function MainTabs() {
         component={TripsScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <Ionicons name={focused ? 'airplane' : 'airplane-outline'} size={24} color={focused ? '#7B4F9E' : '#9B9B9B'} />
+            <Ionicons name={focused ? 'airplane' : 'airplane-outline'} size={24} color={focused ? PRIMARY : '#9B9B9B'} />
           ),
         }}
       />
@@ -182,7 +183,7 @@ function MainTabs() {
                   height: 32,
                   borderRadius: 16,
                   borderWidth: 2,
-                  borderColor: focused ? '#9b59b6' : '#666',
+                  borderColor: focused ? PRIMARY : '#666',
                 }}
               />
             ) : (
@@ -191,7 +192,7 @@ function MainTabs() {
                   width: 32,
                   height: 32,
                   borderRadius: 16,
-                  backgroundColor: focused ? '#9b59b6' : '#CCCCCC',
+                  backgroundColor: focused ? PRIMARY : '#CCCCCC',
                   justifyContent: 'center',
                   alignItems: 'center',
                   borderWidth: 2,
@@ -270,7 +271,7 @@ export default function App() {
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F7F5F0' }}>
-        <ActivityIndicator size="large" color="#9b59b6" />
+        <ActivityIndicator size="large" color={PRIMARY} />
         <Text style={{ color: '#1C1C1C', marginTop: 10 }}>Loading...</Text>
       </View>
     );

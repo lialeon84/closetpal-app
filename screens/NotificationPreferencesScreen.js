@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '../lib/supabase';
+import { PRIMARY } from '../constants/colors';
 
 const DEFAULTS = {
   outfit_reminders: false,
@@ -83,7 +84,7 @@ export default function NotificationPreferencesScreen({ navigation }) {
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#9b59b6" />
+          <ActivityIndicator size="large" color={PRIMARY} />
         </View>
       ) : (
         <ScrollView style={styles.container}>
@@ -106,7 +107,7 @@ export default function NotificationPreferencesScreen({ navigation }) {
                   onValueChange={() => togglePref(key)}
                   disabled={saving}
                   trackColor={{ false: '#D1D5DB', true: '#C084FC' }}
-                  thumbColor={prefs[key] ? '#9b59b6' : '#F3F4F6'}
+                  thumbColor={prefs[key] ? PRIMARY : '#F3F4F6'}
                 />
               </View>
             ))}
@@ -129,14 +130,14 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderBottomWidth: 2,
-    borderBottomColor: '#9b59b6',
+    borderBottomColor: PRIMARY,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   backButton: {
     fontSize: 28,
-    color: '#9b59b6',
+    color: PRIMARY,
     fontWeight: 'bold',
   },
   headerTitle: {

@@ -15,6 +15,7 @@ import {
   restorePurchases,
   presentCustomerCenter,
 } from '../lib/revenuecat';
+import { PRIMARY } from '../constants/colors';
 
 export default function SubscriptionScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
@@ -77,7 +78,7 @@ export default function SubscriptionScreen({ navigation }) {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#9b59b6" />
+        <ActivityIndicator size="large" color={PRIMARY} />
       </View>
     );
   }
@@ -204,7 +205,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderBottomWidth: 2,
-    borderBottomColor: '#9b59b6',
+    borderBottomColor: PRIMARY,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -216,7 +217,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     fontSize: 24,
-    color: '#9b59b6',
+    color: PRIMARY,
     fontWeight: 'bold',
   },
   brandSymbol: {
@@ -240,7 +241,7 @@ const styles = StyleSheet.create({
     padding: 32,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#9b59b6',
+    borderColor: PRIMARY,
     marginBottom: 20,
   },
   tierIcon: {
@@ -297,7 +298,7 @@ const styles = StyleSheet.create({
   },
   featureBullet: {
     fontSize: 18,
-    color: '#9b59b6',
+    color: PRIMARY,
     marginRight: 12,
     fontWeight: '700',
   },
@@ -312,10 +313,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#9b59b6',
+    borderColor: PRIMARY,
   },
   manageButtonText: {
-    color: '#9b59b6',
+    color: PRIMARY,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -345,7 +346,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   subscribeButton: {
-    backgroundColor: '#9b59b6',
+    backgroundColor: PRIMARY,
     padding: 18,
     borderRadius: 12,
     alignItems: 'center',
@@ -362,7 +363,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   restoreButtonText: {
-    color: '#9b59b6',
+    color: PRIMARY,
     fontSize: 14,
     fontWeight: '600',
   },

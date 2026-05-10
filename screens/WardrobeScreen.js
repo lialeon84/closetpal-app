@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '../lib/supabase';
+import { PRIMARY } from '../constants/colors';
 
 const CATEGORIES = ['All', 'Tops', 'Bottoms', 'Shoes', 'Outerwear', 'Accessories', 'Dresses', 'Lent'];
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -135,7 +136,7 @@ export default function WardrobeScreen({ navigation }) {
       <View style={styles.gridContainer}>
         {loading ? (
           <View style={styles.centered}>
-            <ActivityIndicator size="large" color="#9b59b6" />
+            <ActivityIndicator size="large" color={PRIMARY} />
           </View>
         ) : filteredItems.length === 0 ? (
           <View style={styles.centered}>
@@ -213,8 +214,8 @@ const styles = StyleSheet.create({
     borderColor: '#D9D5CE',
   },
   filterChipSelected: {
-    backgroundColor: '#9b59b6',
-    borderColor: '#9b59b6',
+    backgroundColor: PRIMARY,
+    borderColor: PRIMARY,
   },
   filterChipText: {
     color: '#6B7280',
@@ -327,7 +328,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#9b59b6',
+    backgroundColor: PRIMARY,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',

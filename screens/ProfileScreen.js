@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { Heart } from 'lucide-react-native';
 import { supabase } from '../lib/supabase';
+import { PRIMARY, SECONDARY, CARD_BG } from '../constants/colors';
 
 export default function ProfileScreen({ navigation }) {
   const [profile, setProfile]       = useState(null);
@@ -91,7 +92,7 @@ export default function ProfileScreen({ navigation }) {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#9b59b6" />
+        <ActivityIndicator size="large" color={PRIMARY} />
       </View>
     );
   }
@@ -280,7 +281,7 @@ function FavoriteOutfitCard({ favorite, wardrobeMap, onUnfavorite }) {
         <Text style={styles.favNote} numberOfLines={3}>{favorite.styling_note}</Text>
       ) : null}
       <TouchableOpacity onPress={onUnfavorite} style={styles.favUnfavBtn}>
-        <Heart size={14} color="#E53935" fill="#E53935" />
+        <Heart size={14} color={PRIMARY} fill={PRIMARY} />
         <Text style={styles.favUnfavText}>Remove</Text>
       </TouchableOpacity>
     </View>
@@ -359,7 +360,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#9b59b6',
+    backgroundColor: PRIMARY,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 3,
@@ -391,7 +392,7 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#9b59b6',
+    color: PRIMARY,
     marginBottom: 5,
   },
   statLabel: {
@@ -422,7 +423,7 @@ const styles = StyleSheet.create({
   },
   subscriptionValue: {
     fontSize: 16,
-    color: '#9b59b6',
+    color: PRIMARY,
     fontWeight: '600',
   },
   errorText: {
@@ -438,7 +439,7 @@ const styles = StyleSheet.create({
   premiumBanner: {
     marginHorizontal: 15,
     marginBottom: 15,
-    backgroundColor: '#9b59b6',
+    backgroundColor: PRIMARY,
     borderRadius: 14,
     paddingVertical: 16,
     paddingHorizontal: 20,
@@ -457,7 +458,7 @@ const styles = StyleSheet.create({
   premiumBadge: {
     marginHorizontal: 15,
     marginBottom: 15,
-    backgroundColor: '#F3E8FF',
+    backgroundColor: SECONDARY,
     borderRadius: 14,
     paddingVertical: 12,
     paddingHorizontal: 20,
@@ -468,7 +469,7 @@ const styles = StyleSheet.create({
   premiumBadgeText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#7C3AED',
+    color: '#FFFFFF',
   },
 
   favSection: {
@@ -500,7 +501,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   favCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: CARD_BG,
     borderRadius: 15,
     padding: 14,
     marginBottom: 12,

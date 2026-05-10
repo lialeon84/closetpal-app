@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '../lib/supabase';
 import { parseDateFromDB, formatDateForDisplay } from '../lib/constants';
+import { PRIMARY, SECONDARY } from '../constants/colors';
 
 export default function TripsScreen({ navigation }) {
   const [trips, setTrips] = useState([]);
@@ -90,7 +91,7 @@ export default function TripsScreen({ navigation }) {
 
       {loading ? (
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#9b59b6" />
+          <ActivityIndicator size="large" color={PRIMARY} />
         </View>
       ) : trips.length === 0 ? (
         <View style={styles.centered}>
@@ -183,7 +184,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   vibeBadge: {
-    backgroundColor: '#F3E8FF',
+    backgroundColor: SECONDARY,
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 3,
@@ -191,7 +192,7 @@ const styles = StyleSheet.create({
   },
   vibeBadgeText: {
     fontSize: 11,
-    color: '#7C3AED',
+    color: '#FFFFFF',
     fontWeight: '600',
   },
   cardDates: {
@@ -214,7 +215,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: 6,
-    backgroundColor: '#9b59b6',
+    backgroundColor: PRIMARY,
     borderRadius: 3,
   },
   progressLabel: {
@@ -225,7 +226,7 @@ const styles = StyleSheet.create({
   },
   cardPurpose: {
     fontSize: 12,
-    color: '#9b59b6',
+    color: PRIMARY,
     fontWeight: '500',
   },
   fab: {
@@ -235,7 +236,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#9b59b6',
+    backgroundColor: PRIMARY,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',

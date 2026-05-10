@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '../lib/supabase';
 import { parseDateFromDB, formatDateForDisplay } from '../lib/constants';
+import { PRIMARY, SECONDARY, CARD_BG } from '../constants/colors';
 
 const VIBE_EMOJI = { Warm: '☀️', Cold: '❄️', Mixed: '🌤️', Tropical: '🌴', Snow: '🌨️' };
 
@@ -166,7 +167,7 @@ export default function TripDetailScreen({ route, navigation }) {
         <Text style={styles.sectionTitle}>Packing List</Text>
 
         {loading ? (
-          <ActivityIndicator size="large" color="#9b59b6" style={{ marginTop: 24 }} />
+          <ActivityIndicator size="large" color={PRIMARY} style={{ marginTop: 24 }} />
         ) : totalCount === 0 ? (
           <View style={styles.emptyList}>
             <Text style={styles.emptyListText}>No items in this packing list.</Text>
@@ -221,7 +222,7 @@ export default function TripDetailScreen({ route, navigation }) {
 
                 <View style={[styles.checkbox, isPacked && styles.checkboxChecked]}>
                   {isSaving ? (
-                    <ActivityIndicator size="small" color={isPacked ? '#fff' : '#9b59b6'} />
+                    <ActivityIndicator size="small" color={isPacked ? '#fff' : PRIMARY} />
                   ) : isPacked ? (
                     <Text style={styles.checkmark}>✓</Text>
                   ) : null}
@@ -253,7 +254,7 @@ const styles = StyleSheet.create({
     width: 60,
   },
   backText: {
-    color: '#9b59b6',
+    color: PRIMARY,
     fontSize: 15,
     fontWeight: '500',
   },
@@ -304,14 +305,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   tag: {
-    backgroundColor: '#F3E8FF',
+    backgroundColor: SECONDARY,
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 4,
   },
   tagText: {
     fontSize: 13,
-    color: '#7C3AED',
+    color: '#FFFFFF',
     fontWeight: '600',
   },
   notesBox: {
@@ -319,12 +320,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 12,
     borderLeftWidth: 3,
-    borderLeftColor: '#9b59b6',
+    borderLeftColor: PRIMARY,
   },
   notesLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#9b59b6',
+    color: PRIMARY,
     marginBottom: 4,
   },
   notesText: {
@@ -352,7 +353,7 @@ const styles = StyleSheet.create({
   },
   progressCount: {
     fontSize: 14,
-    color: '#9b59b6',
+    color: PRIMARY,
     fontWeight: '600',
   },
   progressBg: {
@@ -363,7 +364,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: 8,
-    backgroundColor: '#9b59b6',
+    backgroundColor: PRIMARY,
     borderRadius: 4,
   },
 
@@ -385,7 +386,7 @@ const styles = StyleSheet.create({
   listItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: CARD_BG,
     borderRadius: 12,
     padding: 12,
     marginBottom: 8,
@@ -456,8 +457,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   checkboxChecked: {
-    backgroundColor: '#9b59b6',
-    borderColor: '#9b59b6',
+    backgroundColor: PRIMARY,
+    borderColor: PRIMARY,
   },
   checkmark: {
     color: '#fff',

@@ -19,6 +19,7 @@ import {
   formatDateForDisplay,
   formatDateForDB,
 } from '../lib/constants';
+import { PRIMARY } from '../constants/colors';
 
 export default function ProfileSetupScreen() {
   const [username, setUsername] = useState('');
@@ -129,7 +130,7 @@ export default function ProfileSetupScreen() {
               selectedValue={state}
               onValueChange={setState}
               style={styles.picker}
-              dropdownIconColor="#9b59b6"
+              dropdownIconColor={PRIMARY}
             >
               {US_STATES.map((s) => (
                 <Picker.Item key={s.value} label={s.label} value={s.value} color="#1C1C1C" />
@@ -143,7 +144,7 @@ export default function ProfileSetupScreen() {
               selectedValue={gender}
               onValueChange={setGender}
               style={styles.picker}
-              dropdownIconColor="#9b59b6"
+              dropdownIconColor={PRIMARY}
             >
               {GENDERS.map((g) => (
                 <Picker.Item key={g.value} label={g.label} value={g.value} color="#1C1C1C" />
@@ -211,13 +212,13 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#9b59b6',
+    color: PRIMARY,
   },
   form: {
     width: '100%',
   },
   label: {
-    color: '#9b59b6',
+    color: PRIMARY,
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 8,
@@ -255,7 +256,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#9b59b6',
+    backgroundColor: PRIMARY,
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',

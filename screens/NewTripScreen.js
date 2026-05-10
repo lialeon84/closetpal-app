@@ -17,6 +17,7 @@ import { supabase } from '../lib/supabase';
 import { formatDateForDisplay, formatDateForDB } from '../lib/constants';
 import { useSubscription } from '../hooks/useSubscription';
 import { usageLimits } from '../hooks/usageLimits';
+import { PRIMARY, SECONDARY } from '../constants/colors';
 
 const ANTHROPIC_API_KEY = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
 const OPENWEATHER_API_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY;
@@ -391,7 +392,7 @@ const styles = StyleSheet.create({
     width: 60,
   },
   backText: {
-    color: '#9b59b6',
+    color: PRIMARY,
     fontSize: 15,
     fontWeight: '500',
   },
@@ -452,8 +453,8 @@ const styles = StyleSheet.create({
     borderColor: '#D9D5CE',
   },
   chipSelected: {
-    backgroundColor: '#9b59b6',
-    borderColor: '#9b59b6',
+    backgroundColor: PRIMARY,
+    borderColor: PRIMARY,
   },
   chipText: {
     fontSize: 14,
@@ -477,8 +478,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#EDEAE4',
   },
   toggleActive: {
-    borderColor: '#9b59b6',
-    backgroundColor: '#F3E8FF',
+    borderColor: PRIMARY,
+    backgroundColor: SECONDARY,
   },
   toggleText: {
     fontSize: 14,
@@ -486,7 +487,7 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   toggleTextActive: {
-    color: '#7C3AED',
+    color: '#FFFFFF',
     fontWeight: '600',
   },
   hint: {
@@ -498,7 +499,7 @@ const styles = StyleSheet.create({
   },
   generateBtn: {
     marginTop: 36,
-    backgroundColor: '#9b59b6',
+    backgroundColor: PRIMARY,
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: 'center',

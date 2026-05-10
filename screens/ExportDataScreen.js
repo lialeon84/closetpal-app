@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import { supabase } from '../lib/supabase';
+import { PRIMARY } from '../constants/colors';
 
 export default function ExportDataScreen({ navigation }) {
   const [exporting, setExporting] = useState(false);
@@ -104,14 +105,14 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderBottomWidth: 2,
-    borderBottomColor: '#9b59b6',
+    borderBottomColor: PRIMARY,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   backButton: {
     fontSize: 28,
-    color: '#9b59b6',
+    color: PRIMARY,
     fontWeight: 'bold',
   },
   headerTitle: {
@@ -152,7 +153,7 @@ const styles = StyleSheet.create({
   },
   exportButton: {
     width: '100%',
-    backgroundColor: '#9b59b6',
+    backgroundColor: PRIMARY,
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',

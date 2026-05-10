@@ -20,6 +20,7 @@ import { supabase } from '../lib/supabase';
 import { scheduleLentNotifications, cancelLentNotifications } from '../lib/notifications';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { formatDateForDisplay, formatDateForDB, parseDateFromDB } from '../lib/constants';
+import { PRIMARY } from '../constants/colors';
 
 const CATEGORIES = ['Tops', 'Bottoms', 'Shoes', 'Outerwear', 'Accessories', 'Dresses'];
 const SEASONS = ['Spring', 'Summer', 'Fall', 'Winter', 'All Season'];
@@ -403,7 +404,7 @@ export default function ItemDetailScreen({ route, navigation }) {
         {editing ? (
           <Pressable onPress={handleSave} disabled={saving}>
             {saving ? (
-              <ActivityIndicator size="small" color="#9b59b6" />
+              <ActivityIndicator size="small" color={PRIMARY} />
             ) : (
               <Text style={styles.headerAction}>Save</Text>
             )}
@@ -502,7 +503,7 @@ export default function ItemDetailScreen({ route, navigation }) {
                     <Text style={styles.detailLabel}>Lent to friend</Text>
                     <Pressable onPress={handleLentToggle} disabled={savingLent}>
                       {savingLent ? (
-                        <ActivityIndicator size="small" color="#9b59b6" />
+                        <ActivityIndicator size="small" color={PRIMARY} />
                       ) : (
                         <View style={[styles.lendCheckbox, isLent && styles.lendCheckboxChecked]}>
                           {isLent && <Text style={styles.lendCheckboxMark}>✓</Text>}
@@ -627,7 +628,7 @@ export default function ItemDetailScreen({ route, navigation }) {
                   selectedValue={category}
                   onValueChange={handleCategoryChange}
                   style={styles.picker}
-                  dropdownIconColor="#9b59b6"
+                  dropdownIconColor={PRIMARY}
                 >
                   {CATEGORIES.map((cat) => (
                     <Picker.Item key={cat} label={cat} value={cat} color="#1C1C1C" />
@@ -641,7 +642,7 @@ export default function ItemDetailScreen({ route, navigation }) {
                   selectedValue={subcategory}
                   onValueChange={setSubcategory}
                   style={styles.picker}
-                  dropdownIconColor="#9b59b6"
+                  dropdownIconColor={PRIMARY}
                 >
                   {(SUBCATEGORIES[category] || []).map((sub) => (
                     <Picker.Item key={sub} label={sub} value={sub} color="#1C1C1C" />
@@ -694,14 +695,14 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderBottomWidth: 2,
-    borderBottomColor: '#9b59b6',
+    borderBottomColor: PRIMARY,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   backButton: {
     fontSize: 28,
-    color: '#9b59b6',
+    color: PRIMARY,
     fontWeight: 'bold',
     width: 44,
   },
@@ -715,7 +716,7 @@ const styles = StyleSheet.create({
   },
   headerAction: {
     fontSize: 16,
-    color: '#9b59b6',
+    color: PRIMARY,
     fontWeight: '600',
     width: 44,
     textAlign: 'right',
@@ -826,7 +827,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   changePhotoText: {
-    color: '#9b59b6',
+    color: PRIMARY,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -834,7 +835,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   label: {
-    color: '#9b59b6',
+    color: PRIMARY,
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 8,
@@ -874,8 +875,8 @@ const styles = StyleSheet.create({
     borderColor: '#D9D5CE',
   },
   chipSelected: {
-    backgroundColor: '#9b59b6',
-    borderColor: '#9b59b6',
+    backgroundColor: PRIMARY,
+    borderColor: PRIMARY,
   },
   chipText: {
     color: '#6B7280',
@@ -963,8 +964,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   lendCheckboxChecked: {
-    backgroundColor: '#9b59b6',
-    borderColor: '#9b59b6',
+    backgroundColor: PRIMARY,
+    borderColor: PRIMARY,
   },
   lendCheckboxMark: {
     color: '#fff',
@@ -995,7 +996,7 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   clearDate: {
-    color: '#9b59b6',
+    color: PRIMARY,
     fontSize: 13,
     marginTop: 6,
     fontWeight: '500',
@@ -1011,7 +1012,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   lentEditLink: {
-    color: '#9b59b6',
+    color: PRIMARY,
     fontSize: 13,
     fontWeight: '600',
   },
@@ -1019,7 +1020,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   lentFieldLabel: {
-    color: '#9b59b6',
+    color: PRIMARY,
     fontSize: 13,
     fontWeight: '600',
     marginBottom: 6,
@@ -1042,7 +1043,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   saveLentButton: {
-    backgroundColor: '#9b59b6',
+    backgroundColor: PRIMARY,
     borderRadius: 8,
     paddingVertical: 12,
     paddingHorizontal: 36,
@@ -1054,7 +1055,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   lentSavedText: {
-    color: '#9b59b6',
+    color: PRIMARY,
     fontSize: 13,
     fontWeight: '600',
     textAlign: 'center',

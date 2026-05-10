@@ -24,6 +24,7 @@ import {
   formatDateForDB,
   parseDateFromDB,
 } from '../lib/constants';
+import { PRIMARY } from '../constants/colors';
 
 export default function EditProfileScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
@@ -173,7 +174,7 @@ export default function EditProfileScreen({ navigation }) {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#9b59b6" />
+        <ActivityIndicator size="large" color={PRIMARY} />
       </View>
     );
   }
@@ -264,7 +265,7 @@ export default function EditProfileScreen({ navigation }) {
                 selectedValue={state}
                 onValueChange={setState}
                 style={styles.picker}
-                dropdownIconColor="#9b59b6"
+                dropdownIconColor={PRIMARY}
               >
                 {US_STATES.map((s) => (
                   <Picker.Item key={s.value} label={s.label} value={s.value} color="#1C1C1C" />
@@ -278,7 +279,7 @@ export default function EditProfileScreen({ navigation }) {
                 selectedValue={gender}
                 onValueChange={setGender}
                 style={styles.picker}
-                dropdownIconColor="#9b59b6"
+                dropdownIconColor={PRIMARY}
               >
                 {GENDERS.map((g) => (
                   <Picker.Item key={g.value} label={g.label} value={g.value} color="#1C1C1C" />
@@ -341,7 +342,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderBottomWidth: 2,
-    borderBottomColor: '#9b59b6',
+    borderBottomColor: PRIMARY,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -353,7 +354,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     fontSize: 28,
-    color: '#9b59b6',
+    color: PRIMARY,
     fontWeight: 'bold',
   },
   brandSymbol: {
@@ -384,13 +385,13 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 3,
-    borderColor: '#9b59b6',
+    borderColor: PRIMARY,
   },
   profileImagePlaceholder: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#9b59b6',
+    backgroundColor: PRIMARY,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 3,
@@ -416,7 +417,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   changePhotoText: {
-    color: '#9b59b6',
+    color: PRIMARY,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -424,7 +425,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   label: {
-    color: '#9b59b6',
+    color: PRIMARY,
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 8,
@@ -462,7 +463,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   saveButton: {
-    backgroundColor: '#9b59b6',
+    backgroundColor: PRIMARY,
     margin: 20,
     padding: 16,
     borderRadius: 10,

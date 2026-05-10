@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '../lib/supabase';
+import { PRIMARY } from '../constants/colors';
 import * as WebBrowser from 'expo-web-browser';
 
 const PRIVACY_URL = 'https://closetpal.app/privacy';
@@ -65,7 +66,7 @@ export default function SettingsScreen({ navigation }) {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#9b59b6" />
+        <ActivityIndicator size="large" color={PRIMARY} />
       </View>
     );
   }
@@ -203,13 +204,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderBottomWidth: 2,
-    borderBottomColor: '#9b59b6',
+    borderBottomColor: PRIMARY,
     flexDirection: 'row',
     alignItems: 'center',
   },
   backButton: {
     fontSize: 28,
-    color: '#9b59b6',
+    color: PRIMARY,
     marginRight: 15,
     fontWeight: 'bold',
   },
@@ -248,7 +249,7 @@ const styles = StyleSheet.create({
   },
   settingButtonArrow: {
     fontSize: 18,
-    color: '#9b59b6',
+    color: PRIMARY,
     fontWeight: 'bold',
   },
   dangerText: {
