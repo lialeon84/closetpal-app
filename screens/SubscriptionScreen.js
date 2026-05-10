@@ -17,6 +17,7 @@ import {
 } from '../lib/revenuecat';
 import { PRIMARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function SubscriptionScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
@@ -102,7 +103,7 @@ export default function SubscriptionScreen({ navigation }) {
           {activeSubscription ? (
             <>
               <View style={styles.subscriptionCard}>
-                <Text style={styles.tierIcon}>✨</Text>
+                <Ionicons name="sparkles-outline" size={20} color={PRIMARY} style={styles.tierIcon} />
                 <Text style={styles.tierName}>Premium</Text>
 
                 <View style={styles.statusContainer}>
@@ -127,23 +128,23 @@ export default function SubscriptionScreen({ navigation }) {
               <View style={styles.featuresCard}>
                 <Text style={styles.featuresTitle}>Your Premium Benefits</Text>
                 <View style={styles.feature}>
-                  <Text style={styles.featureBullet}>✓</Text>
+                  <Ionicons name="checkmark" size={16} color={PRIMARY} style={styles.featureBullet} />
                   <Text style={styles.featureText}>Unlimited outfit suggestions</Text>
                 </View>
                 <View style={styles.feature}>
-                  <Text style={styles.featureBullet}>✓</Text>
+                  <Ionicons name="checkmark" size={16} color={PRIMARY} style={styles.featureBullet} />
                   <Text style={styles.featureText}>AI personal stylist</Text>
                 </View>
                 <View style={styles.feature}>
-                  <Text style={styles.featureBullet}>✓</Text>
+                  <Ionicons name="checkmark" size={16} color={PRIMARY} style={styles.featureBullet} />
                   <Text style={styles.featureText}>Virtual wardrobe sync</Text>
                 </View>
                 <View style={styles.feature}>
-                  <Text style={styles.featureBullet}>✓</Text>
+                  <Ionicons name="checkmark" size={16} color={PRIMARY} style={styles.featureBullet} />
                   <Text style={styles.featureText}>Priority pet companion features</Text>
                 </View>
                 <View style={styles.feature}>
-                  <Text style={styles.featureBullet}>✓</Text>
+                  <Ionicons name="checkmark" size={16} color={PRIMARY} style={styles.featureBullet} />
                   <Text style={styles.featureText}>Ad-free experience</Text>
                 </View>
               </View>
@@ -163,8 +164,14 @@ export default function SubscriptionScreen({ navigation }) {
               </View>
 
               <Pressable style={styles.subscribeButton} onPress={handleUpgrade}>
-                <Text style={styles.subscribeButtonText}>View Premium Plans ✨</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <Text style={styles.subscribeButtonText}>View Premium Plans</Text>
+                  <Ionicons name="sparkles-outline" size={20} color="#FFFFFF" />
+                </View>
               </Pressable>
+              <Text style={styles.autoRenewalText}>
+                Subscription automatically renews unless cancelled at least 24 hours before the end of the current period. Manage or cancel anytime in Settings → Apple ID → Subscriptions.
+              </Text>
             </>
           )}
 
@@ -399,6 +406,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#555555',
     lineHeight: 20,
+    fontFamily: FONTS.body,
+  },
+  autoRenewalText: {
+    fontSize: 11,
+    color: '#999999',
+    textAlign: 'center',
+    paddingTop: 12,
+    paddingBottom: 4,
+    paddingHorizontal: 16,
+    lineHeight: 16,
     fontFamily: FONTS.body,
   },
   bottomSpacer: {

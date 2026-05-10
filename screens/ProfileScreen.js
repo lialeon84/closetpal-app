@@ -16,6 +16,7 @@ import { Heart } from 'lucide-react-native';
 import { supabase } from '../lib/supabase';
 import { PRIMARY, SECONDARY, CARD_BG } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ProfileScreen({ navigation }) {
   const [profile, setProfile]       = useState(null);
@@ -215,7 +216,10 @@ export default function ProfileScreen({ navigation }) {
             style={styles.premiumBanner}
             onPress={() => navigation.navigate('Subscription')}
           >
-            <Text style={styles.premiumBannerTitle}>✨ Upgrade to Premium</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Ionicons name="sparkles-outline" size={20} color="#FFFFFF" />
+              <Text style={styles.premiumBannerTitle}>Upgrade to Premium</Text>
+            </View>
             <Text style={styles.premiumBannerSub}>
               Unlimited outfits · Unlimited trips · AI stylist
             </Text>
@@ -225,7 +229,10 @@ export default function ProfileScreen({ navigation }) {
             style={styles.premiumBadge}
             onPress={() => navigation.navigate('Subscription')}
           >
-            <Text style={styles.premiumBadgeText}>✨ Premium Member</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Ionicons name="sparkles-outline" size={20} color="#FFFFFF" />
+              <Text style={styles.premiumBadgeText}>Premium Member</Text>
+            </View>
           </Pressable>
         )}
 

@@ -14,6 +14,7 @@ import RevenueCatUI, { PAYWALL_RESULT } from 'react-native-purchases-ui';
 import { supabase } from '../lib/supabase';
 import { PRIMARY, SECONDARY, CARD_BG } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
+import { Ionicons } from '@expo/vector-icons';
 import { useSubscription } from '../hooks/useSubscription';
 import { syncSubscriptionStatus } from '../lib/revenuecat';
 
@@ -48,18 +49,30 @@ function LockedStylistView() {
 
   return (
     <View style={styles.lockedContainer}>
-      <Text style={styles.lockedIcon}>🔒</Text>
+      <Ionicons name="lock-closed-outline" size={20} color={PRIMARY} style={styles.lockedIcon} />
       <Text style={styles.lockedTitle}>AI Stylist</Text>
       <Text style={styles.lockedSub}>
         Get personalized wardrobe gap analysis and smart styling suggestions — Premium only.
       </Text>
       <TouchableOpacity style={styles.upgradeBtn} onPress={handleUpgrade} activeOpacity={0.85}>
-        <Text style={styles.upgradeBtnText}>Upgrade to Premium ✨</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Text style={styles.upgradeBtnText}>Upgrade to Premium</Text>
+          <Ionicons name="sparkles-outline" size={20} color="#FFFFFF" />
+        </View>
       </TouchableOpacity>
       <View style={styles.lockedFeatures}>
-        <Text style={styles.lockedFeatureItem}>✓  Wardrobe gap analysis</Text>
-        <Text style={styles.lockedFeatureItem}>✓  Personalized styling tips</Text>
-        <Text style={styles.lockedFeatureItem}>✓  Priority item suggestions</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <Ionicons name="checkmark" size={16} color={PRIMARY} />
+          <Text style={styles.lockedFeatureItem}>Wardrobe gap analysis</Text>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <Ionicons name="checkmark" size={16} color={PRIMARY} />
+          <Text style={styles.lockedFeatureItem}>Personalized styling tips</Text>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <Ionicons name="checkmark" size={16} color={PRIMARY} />
+          <Text style={styles.lockedFeatureItem}>Priority item suggestions</Text>
+        </View>
       </View>
     </View>
   );
@@ -224,7 +237,7 @@ Aim for 4-6 suggestions. Vary priority levels based on how significant the gap i
 
         {!loading && error === 'too_few' && (
           <View style={styles.stateBox}>
-            <Text style={styles.stateEmoji}>👗</Text>
+            <Ionicons name="shirt-outline" size={48} color="#9B9B9B" style={styles.stateEmoji} />
             <Text style={styles.stateTitle}>Add more clothes first</Text>
             <Text style={styles.stateSub}>
               Add at least 5 items to your wardrobe so your AI stylist can give you meaningful advice.
@@ -234,7 +247,7 @@ Aim for 4-6 suggestions. Vary priority levels based on how significant the gap i
 
         {!loading && error === 'generic' && (
           <View style={styles.stateBox}>
-            <Text style={styles.stateEmoji}>😕</Text>
+            <Ionicons name="sad-outline" size={48} color="#9B9B9B" style={styles.stateEmoji} />
             <Text style={styles.stateTitle}>Something went wrong</Text>
             <Text style={styles.stateSub}>Couldn't analyze your wardrobe. Please try again.</Text>
             <TouchableOpacity style={styles.retryBtn} onPress={() => load(true)}>
@@ -246,7 +259,10 @@ Aim for 4-6 suggestions. Vary priority levels based on how significant the gap i
         {!loading && !error && suggestions && (
           <>
             <View style={styles.summaryBox}>
-              <Text style={styles.summaryLabel}>✨ Stylist's Take</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Ionicons name="sparkles-outline" size={20} color={PRIMARY} />
+                <Text style={styles.summaryLabel}>Stylist's Take</Text>
+              </View>
               <Text style={styles.summaryText}>{summary}</Text>
             </View>
 

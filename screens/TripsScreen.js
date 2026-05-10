@@ -14,6 +14,7 @@ import { supabase } from '../lib/supabase';
 import { parseDateFromDB, formatDateForDisplay } from '../lib/constants';
 import { PRIMARY, SECONDARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function TripsScreen({ navigation }) {
   const [trips, setTrips] = useState([]);
@@ -57,7 +58,10 @@ export default function TripsScreen({ navigation }) {
         onPress={() => navigation.navigate('TripDetail', { trip: item })}
       >
         <View style={styles.cardRow}>
-          <Text style={styles.cardDestination} numberOfLines={1}>✈️  {item.destination}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1 }}>
+            <Ionicons name="airplane-outline" size={24} color={PRIMARY} />
+            <Text style={styles.cardDestination} numberOfLines={1}>{item.destination}</Text>
+          </View>
           {item.weather_vibe ? (
             <View style={styles.vibeBadge}>
               <Text style={styles.vibeBadgeText}>{item.weather_vibe}</Text>
@@ -96,7 +100,7 @@ export default function TripsScreen({ navigation }) {
         </View>
       ) : trips.length === 0 ? (
         <View style={styles.centered}>
-          <Text style={styles.emptyIcon}>🌍</Text>
+          <Ionicons name="earth-outline" size={48} color="#9B9B9B" style={styles.emptyIcon} />
           <Text style={styles.emptyTitle}>No trips yet</Text>
           <Text style={styles.emptySubtitle}>Tap + to plan your first trip</Text>
         </View>

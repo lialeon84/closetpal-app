@@ -13,6 +13,7 @@ import * as Sharing from 'expo-sharing';
 import { supabase } from '../lib/supabase';
 import { PRIMARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ExportDataScreen({ navigation }) {
   const [exporting, setExporting] = useState(false);
@@ -70,7 +71,7 @@ export default function ExportDataScreen({ navigation }) {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.icon}>📦</Text>
+        <Ionicons name="archive-outline" size={24} color={PRIMARY} style={styles.icon} />
         <Text style={styles.title}>Your data, your way</Text>
         <Text style={styles.body}>
           Export a JSON file containing your profile, all clothing items (with image URLs), and your saved favorite outfits.

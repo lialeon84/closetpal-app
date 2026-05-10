@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '../lib/supabase';
 import { PRIMARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function DeleteAccountScreen({ navigation }) {
   const [confirmText, setConfirmText] = useState('');
@@ -82,7 +83,7 @@ export default function DeleteAccountScreen({ navigation }) {
         </View>
 
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <Text style={styles.warningIcon}>⚠️</Text>
+          <Ionicons name="warning-outline" size={24} color="#FF9500" style={styles.warningIcon} />
 
           <Text style={styles.title}>Are you sure?</Text>
 

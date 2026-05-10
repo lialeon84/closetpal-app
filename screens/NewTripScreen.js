@@ -19,6 +19,7 @@ import { useSubscription } from '../hooks/useSubscription';
 import { usageLimits } from '../hooks/usageLimits';
 import { PRIMARY, SECONDARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
+import { Ionicons } from '@expo/vector-icons';
 
 const ANTHROPIC_API_KEY = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
 const OPENWEATHER_API_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY;
@@ -253,7 +254,7 @@ Rules: Pick 8-15 items depending on trip length. Use exact item IDs from the war
         <Text style={styles.label}>Start Date</Text>
         <Pressable style={styles.dateBtn} onPress={() => setShowStartPicker(true)}>
           <Text style={styles.dateBtnText}>{formatDateForDisplay(startDate)}</Text>
-          <Text>📅</Text>
+          <Ionicons name="calendar-outline" size={20} color={PRIMARY} />
         </Pressable>
         {showStartPicker && (
           <DateTimePicker
@@ -271,7 +272,7 @@ Rules: Pick 8-15 items depending on trip length. Use exact item IDs from the war
         <Text style={styles.label}>End Date</Text>
         <Pressable style={styles.dateBtn} onPress={() => setShowEndPicker(true)}>
           <Text style={styles.dateBtnText}>{formatDateForDisplay(endDate)}</Text>
-          <Text>📅</Text>
+          <Ionicons name="calendar-outline" size={20} color={PRIMARY} />
         </Pressable>
         {showEndPicker && (
           <DateTimePicker
@@ -321,9 +322,10 @@ Rules: Pick 8-15 items depending on trip length. Use exact item IDs from the war
             style={[styles.toggleBtn, weatherSource === 'manual' && styles.toggleActive]}
             onPress={() => setWeatherSource('manual')}
           >
-            <Text style={[styles.toggleText, weatherSource === 'manual' && styles.toggleTextActive]}>
-              🎛️  I'll choose
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Ionicons name="options-outline" size={24} color={PRIMARY} />
+              <Text style={[styles.toggleText, weatherSource === 'manual' && styles.toggleTextActive]}>I'll choose</Text>
+            </View>
           </Pressable>
         </View>
 
@@ -367,7 +369,10 @@ Rules: Pick 8-15 items depending on trip length. Use exact item IDs from the war
               <Text style={styles.generateBtnText}>Generating packing list…</Text>
             </View>
           ) : (
-            <Text style={styles.generateBtnText}>✈️  Generate Packing List</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Ionicons name="airplane-outline" size={24} color="#FFFFFF" />
+              <Text style={styles.generateBtnText}>Generate Packing List</Text>
+            </View>
           )}
         </Pressable>
       </ScrollView>

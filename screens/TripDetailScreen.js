@@ -15,6 +15,7 @@ import { supabase } from '../lib/supabase';
 import { parseDateFromDB, formatDateForDisplay } from '../lib/constants';
 import { PRIMARY, SECONDARY, CARD_BG } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
+import { Ionicons } from '@expo/vector-icons';
 
 const VIBE_EMOJI = { Warm: '☀️', Cold: '❄️', Mixed: '🌤️', Tropical: '🌴', Snow: '🌨️' };
 
@@ -129,7 +130,10 @@ export default function TripDetailScreen({ route, navigation }) {
       >
         {/* Trip summary card */}
         <View style={styles.infoCard}>
-          <Text style={styles.destination}>✈️  {trip.destination}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+            <Ionicons name="airplane-outline" size={24} color={PRIMARY} />
+            <Text style={[styles.destination, { marginBottom: 0 }]}>{trip.destination}</Text>
+          </View>
           <Text style={styles.dates}>{startDate} → {endDate}</Text>
           <View style={styles.tagsRow}>
             {trip.weather_vibe ? (
@@ -145,7 +149,10 @@ export default function TripDetailScreen({ route, navigation }) {
           </View>
           {trip.ai_notes ? (
             <View style={styles.notesBox}>
-              <Text style={styles.notesLabel}>✨ Stylist's Notes</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4 }}>
+                <Ionicons name="sparkles-outline" size={20} color={PRIMARY} />
+                <Text style={[styles.notesLabel, { marginBottom: 0 }]}>Stylist's Notes</Text>
+              </View>
               <Text style={styles.notesText}>{trip.ai_notes}</Text>
             </View>
           ) : null}
@@ -194,9 +201,9 @@ export default function TripDetailScreen({ route, navigation }) {
                   />
                 ) : (
                   <View style={styles.imagePlaceholder}>
-                    <Text style={styles.imagePlaceholderIcon}>
-                      {wardrobeItem ? '👗' : '🚫'}
-                    </Text>
+                    {wardrobeItem
+                      ? <Ionicons name="shirt-outline" size={48} color="#9B9B9B" />
+                      : <Ionicons name="close-circle-outline" size={48} color="#9B9B9B" />}
                   </View>
                 )}
 
@@ -225,7 +232,7 @@ export default function TripDetailScreen({ route, navigation }) {
                   {isSaving ? (
                     <ActivityIndicator size="small" color={isPacked ? '#fff' : PRIMARY} />
                   ) : isPacked ? (
-                    <Text style={styles.checkmark}>✓</Text>
+                    <Ionicons name="checkmark" size={16} color="#FFFFFF" />
                   ) : null}
                 </View>
               </Pressable>

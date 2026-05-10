@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Text, View, ActivityIndicator, Image } from 'react-native';
+import { Text, View, Image } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -25,6 +25,7 @@ import {
 import { requestNotificationPermissions } from './lib/notifications';
 import { PRIMARY } from './constants/colors';
 import { FONTS } from './constants/fonts';
+import SplashScreen from './components/SplashScreen';
 
 import WelcomeScreen from './screens/WelcomeScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -223,7 +224,7 @@ function MainTabs() {
 
 export default function App() {
   const [session, setSession] = useState(null);
-  const [hasProfile, setHasProfile] = useState(false);
+  const [hasProfile, setHasProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const [fontsLoaded] = useFonts({
@@ -259,12 +260,13 @@ export default function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       if (session) {
+        setHasProfile(null);
         await loginRevenueCat(session.user.id);
         await syncSubscriptionStatus().catch(() => {});
         checkProfile(session.user.id);
       } else {
         await logoutRevenueCat();
-        setHasProfile(false);
+        setHasProfile(null);
         setLoading(false);
       }
     });
@@ -280,7 +282,6 @@ export default function App() {
   }, []);
 
   const checkProfile = async (userId) => {
-    setLoading(true);
     const { data } = await supabase
       .from('profiles')
       .select('id')
@@ -291,14 +292,7 @@ export default function App() {
     setLoading(false);
   };
 
-  if (!fontsLoaded || loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F7F5F0' }}>
-        <ActivityIndicator size="large" color={PRIMARY} />
-        <Text style={{ color: '#1C1C1C', marginTop: 10, fontFamily: FONTS.body }}>Loading...</Text>
-      </View>
-    );
-  }
+  if (!fontsLoaded || loading || (session && hasProfile === null)) return <SplashScreen />;
 
   return (
     <NavigationContainer>

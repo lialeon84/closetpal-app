@@ -9,7 +9,6 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Platform,
-  TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
 import { supabase } from '../lib/supabase';
@@ -21,6 +20,15 @@ export default function SignupScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+
+  const validatePassword = (pass) => {
+    if (pass.length < 8) return 'At least 8 characters required';
+    if (!/[A-Z]/.test(pass)) return 'Must include at least one uppercase letter';
+    if (!/[0-9]/.test(pass)) return 'Must include at least one number';
+    if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(pass)) return 'Must include at least one special character';
+    return '';
+  };
 
   const handleSignup = async () => {
     if (!email || !password || !confirmPassword) {
@@ -33,8 +41,9 @@ export default function SignupScreen({ navigation }) {
       return;
     }
 
-    if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters');
+    const pwErr = validatePassword(password);
+    if (pwErr) {
+      setPasswordError(pwErr);
       return;
     }
 
@@ -50,20 +59,23 @@ export default function SignupScreen({ navigation }) {
     if (error) {
       Alert.alert('Error', error.message);
     } else {
-      Alert.alert('Success', 'Account created! Please check your email to verify your account.');
+      Alert.alert(
+        'Check Your Email',
+        `We sent a verification link to ${email.toLowerCase().trim()}. Please verify your email before signing in.`,
+        [{ text: 'Go to Sign In', onPress: () => navigation.navigate('Login') }]
+      );
     }
   };
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+      style={{ flex: 1 }}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps="handled"
-        >
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+      >
           <View style={styles.content}>
             <Text style={styles.title}>Join Ari's Closet </Text>
             <Text style={styles.subtitle}>Create your account and meet your companion</Text>
@@ -82,13 +94,19 @@ export default function SignupScreen({ navigation }) {
 
               <TextInput
                 style={styles.input}
-                placeholder="Password (min 6 characters)"
+                placeholder="Password"
                 placeholderTextColor="#9B9B9B"
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(text) => {
+                  setPassword(text);
+                  setPasswordError(text.length > 0 ? validatePassword(text) : '');
+                }}
                 secureTextEntry
                 returnKeyType="next"
+                blurOnSubmit={true}
+                onSubmitEditing={() => Keyboard.dismiss()}
               />
+              {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
 
               <TextInput
                 style={styles.input}
@@ -98,13 +116,14 @@ export default function SignupScreen({ navigation }) {
                 onChangeText={setConfirmPassword}
                 secureTextEntry
                 returnKeyType="done"
-                onSubmitEditing={handleSignup}
+                blurOnSubmit={true}
+                onSubmitEditing={() => Keyboard.dismiss()}
               />
 
               <Pressable
-                style={[styles.button, loading && styles.buttonDisabled]}
+                style={[styles.button, (loading || passwordError !== '') && styles.buttonDisabled]}
                 onPress={handleSignup}
-                disabled={loading}
+                disabled={loading || passwordError !== ''}
               >
                 <Text style={styles.buttonText}>
                   {loading ? 'Creating account...' : 'Sign Up'}
@@ -119,8 +138,7 @@ export default function SignupScreen({ navigation }) {
               </Pressable>
             </View>
           </View>
-        </ScrollView>
-      </TouchableWithoutFeedback>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -132,6 +150,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
+    backgroundColor: '#F7F5F0',
   },
   content: {
     flex: 1,
@@ -194,5 +213,12 @@ const styles = StyleSheet.create({
     color: PRIMARY,
     fontWeight: 'bold',
     fontFamily: FONTS.bodyBold,
+  },
+  errorText: {
+    color: '#e74c3c',
+    fontSize: 12,
+    marginTop: -10,
+    marginBottom: 10,
+    fontFamily: FONTS.body,
   },
 });

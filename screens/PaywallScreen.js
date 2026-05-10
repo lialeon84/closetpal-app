@@ -8,7 +8,7 @@ export default function PaywallScreen({ navigation }) {
   const handlePurchaseCompleted = async () => {
     await syncSubscriptionStatus();
     Alert.alert(
-      'Welcome to Premium! ✨',
+      'Welcome to Premium!',
       "You now have full access to all Ari's Closet features.",
       [{ text: 'Continue', onPress: () => navigation.goBack() }]
     );
@@ -18,7 +18,7 @@ export default function PaywallScreen({ navigation }) {
     await syncSubscriptionStatus();
     const restored = !!customerInfo?.entitlements?.active[ENTITLEMENT_ID];
     Alert.alert(
-      restored ? 'Purchases Restored ✨' : 'Nothing to Restore',
+      restored ? 'Purchases Restored' : 'Nothing to Restore',
       restored
         ? 'Your premium subscription is active again.'
         : 'No previous purchases were found for this account.',

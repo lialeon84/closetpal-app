@@ -22,6 +22,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { formatDateForDisplay, formatDateForDB, parseDateFromDB } from '../lib/constants';
 import { PRIMARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
+import { Ionicons } from '@expo/vector-icons';
 
 const CATEGORIES = ['Tops', 'Bottoms', 'Shoes', 'Outerwear', 'Accessories', 'Dresses'];
 const SEASONS = ['Spring', 'Summer', 'Fall', 'Winter', 'All Season'];
@@ -434,7 +435,7 @@ export default function ItemDetailScreen({ route, navigation }) {
                   <Image source={{ uri: displayPhoto }} style={styles.photoPreview} />
                 ) : (
                   <View style={styles.photoPlaceholder}>
-                    <Text style={styles.photoPlaceholderIcon}>📷</Text>
+                    <Ionicons name="camera-outline" size={48} color="#9B9B9B" />
                     <Text style={styles.photoPlaceholderText}>Add Photo</Text>
                   </View>
                 )}
@@ -450,7 +451,7 @@ export default function ItemDetailScreen({ route, navigation }) {
               <Image source={{ uri: currentItem.image_url }} style={styles.image} resizeMode="cover" />
             ) : (
               <View style={styles.imagePlaceholder}>
-                <Text style={styles.imagePlaceholderIcon}>👗</Text>
+                <Ionicons name="shirt-outline" size={48} color="#9B9B9B" />
               </View>
             )
           )}
@@ -470,7 +471,7 @@ export default function ItemDetailScreen({ route, navigation }) {
                       </View>
                     )}
                     <View style={styles.lentBannerRow}>
-                      <Text style={styles.lentBannerIcon}>🤝</Text>
+                      <Ionicons name="people-outline" size={20} color={PRIMARY} style={styles.lentBannerIcon} />
                       <View style={styles.lentBannerInfo}>
                         <Text style={styles.lentBannerTitle}>
                           Lent to {currentItem.lent_to_name}
@@ -507,7 +508,7 @@ export default function ItemDetailScreen({ route, navigation }) {
                         <ActivityIndicator size="small" color={PRIMARY} />
                       ) : (
                         <View style={[styles.lendCheckbox, isLent && styles.lendCheckboxChecked]}>
-                          {isLent && <Text style={styles.lendCheckboxMark}>✓</Text>}
+                          {isLent && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
                         </View>
                       )}
                     </Pressable>
@@ -534,7 +535,7 @@ export default function ItemDetailScreen({ route, navigation }) {
                     <Text style={styles.lentFieldLabel}>Date lent</Text>
                     <Pressable style={styles.dateButton} onPress={() => setShowLentDatePicker(true)}>
                       <Text style={styles.dateButtonText}>{formatDateForDisplay(lentDate)}</Text>
-                      <Text>📅</Text>
+                      <Ionicons name="calendar-outline" size={20} color={PRIMARY} />
                     </Pressable>
                     {showLentDatePicker && (
                       <DateTimePicker
@@ -556,7 +557,7 @@ export default function ItemDetailScreen({ route, navigation }) {
                       <Text style={styles.dateButtonText}>
                         {expectedReturnDate ? formatDateForDisplay(expectedReturnDate) : 'Not set'}
                       </Text>
-                      <Text>📅</Text>
+                      <Ionicons name="calendar-outline" size={20} color={PRIMARY} />
                     </Pressable>
                     {expectedReturnDate && (
                       <Pressable onPress={() => setExpectedReturnDate(null)}>
@@ -592,7 +593,12 @@ export default function ItemDetailScreen({ route, navigation }) {
                         <Text style={styles.lentEditLink}>Cancel</Text>
                       </Pressable>
                     </View>
-                    {lentSaved && <Text style={styles.lentSavedText}>Saved ✓</Text>}
+                    {lentSaved && (
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 8, gap: 4 }}>
+                        <Text style={[styles.lentSavedText, { marginTop: 0 }]}>Saved</Text>
+                        <Ionicons name="checkmark" size={16} color={PRIMARY} />
+                      </View>
+                    )}
                   </View>
                 )}
               </View>

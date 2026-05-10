@@ -22,6 +22,7 @@ import { useSubscription } from '../hooks/useSubscription';
 import { usageLimits } from '../hooks/usageLimits';
 import { PRIMARY, SECONDARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
+import { Ionicons } from '@expo/vector-icons';
 
 const REMOVE_BG_API_KEY = 'cxoCqM6GMUgspjtjgQzKwRr7';
 const REMOVE_BG_URL = 'https://api.remove.bg/v1.0/removebg';
@@ -400,7 +401,7 @@ export default function AddItemScreen({ navigation }) {
             <Text style={[styles.backButton, busy && styles.disabledText]}>←</Text>
           </Pressable>
           <View style={styles.headerCenter}>
-            <Text style={styles.brandSymbol}>👗</Text>
+            <Ionicons name="shirt-outline" size={24} color="#9B9B9B" />
             <Text style={styles.headerTitle}>Add Item</Text>
           </View>
           <View style={styles.placeholder} />
@@ -416,7 +417,7 @@ export default function AddItemScreen({ navigation }) {
                 </>
               ) : (
                 <View style={styles.photoPlaceholder}>
-                  <Text style={styles.photoPlaceholderIcon}>📷</Text>
+                  <Ionicons name="camera-outline" size={48} color="#9B9B9B" />
                   <Text style={styles.photoPlaceholderText}>Add Photo</Text>
                 </View>
               )}
@@ -444,7 +445,10 @@ export default function AddItemScreen({ navigation }) {
 
           {aiAutoFilled && !analyzingAI && (
             <View style={styles.aiBadge}>
-              <Text style={styles.aiBadgeText}>✨ Auto-filled by AI</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Ionicons name="sparkles-outline" size={20} color="#FFFFFF" />
+                <Text style={styles.aiBadgeText}>Auto-filled by AI</Text>
+              </View>
               <Text style={styles.aiBadgeSubtext}>Review and edit as needed</Text>
             </View>
           )}
@@ -508,7 +512,7 @@ export default function AddItemScreen({ navigation }) {
                           selected && styles.swatchSelected,
                         ]}
                       >
-                        <Text style={styles.swatchEmoji}>🌈</Text>
+                        <Ionicons name="color-palette-outline" size={24} color={PRIMARY} />
                       </View>
                     ) : c.name === 'Other' ? (
                       <View

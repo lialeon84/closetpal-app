@@ -16,6 +16,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '../lib/supabase';
 import { PRIMARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
+import { Ionicons } from '@expo/vector-icons';
 
 const CATEGORIES = ['All', 'Tops', 'Bottoms', 'Shoes', 'Outerwear', 'Accessories', 'Dresses', 'Lent'];
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -78,7 +79,7 @@ export default function WardrobeScreen({ navigation }) {
           <Image source={{ uri: item.image_url }} style={styles.cardImage} />
         ) : (
           <View style={styles.cardImagePlaceholder}>
-            <Text style={styles.cardImagePlaceholderIcon}>👗</Text>
+            <Ionicons name="shirt-outline" size={48} color="#9B9B9B" />
           </View>
         )}
         {item.is_lent && (
@@ -141,7 +142,7 @@ export default function WardrobeScreen({ navigation }) {
           </View>
         ) : filteredItems.length === 0 ? (
           <View style={styles.centered}>
-            <Text style={styles.emptyIcon}>👗</Text>
+            <Ionicons name="shirt-outline" size={48} color="#9B9B9B" style={styles.emptyIcon} />
             <Text style={styles.emptyTitle}>
               {selectedCategory === 'All' ? 'Your wardrobe is empty' : `No ${selectedCategory} yet`}
             </Text>

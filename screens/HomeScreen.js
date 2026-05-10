@@ -268,7 +268,7 @@ export default function HomeScreen() {
         {/* CTA card — shown when idle */}
         {!hasContent && (
           <TouchableOpacity style={styles.ctaCard} onPress={handleGetOutfits} activeOpacity={0.85}>
-            <Text style={styles.ctaEmoji}>✨</Text>
+            <Ionicons name="sparkles-outline" size={20} color="#FFFFFF" style={styles.ctaEmoji} />
             <View style={styles.ctaTitleRow}>
               {!isPaid && isLocked && (
                 <Ionicons name="lock-closed-outline" size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
@@ -291,7 +291,7 @@ export default function HomeScreen() {
         {/* Empty wardrobe */}
         {error === 'empty_wardrobe' && (
           <View style={styles.stateBox}>
-            <Text style={styles.stateEmoji}>👗</Text>
+            <Ionicons name="shirt-outline" size={48} color="#9B9B9B" style={styles.stateEmoji} />
             <Text style={styles.stateTitle}>Your wardrobe is empty</Text>
             <Text style={styles.stateSub}>Add some clothes first to get outfit ideas!</Text>
           </View>
@@ -300,7 +300,7 @@ export default function HomeScreen() {
         {/* Location denied */}
         {error === 'location_denied' && (
           <View style={styles.stateBox}>
-            <Text style={styles.stateEmoji}>📍</Text>
+            <Ionicons name="location-outline" size={24} color={PRIMARY} style={styles.stateEmoji} />
             <Text style={styles.stateTitle}>Location Access Needed</Text>
             <Text style={styles.stateSub}>
               Enable location permissions in your device settings to get weather-based outfit recommendations.
@@ -314,7 +314,7 @@ export default function HomeScreen() {
         {/* Generic error */}
         {error === 'generic' && (
           <View style={styles.stateBox}>
-            <Text style={styles.stateEmoji}>😕</Text>
+            <Ionicons name="sad-outline" size={48} color="#9B9B9B" style={styles.stateEmoji} />
             <Text style={styles.stateTitle}>Something went wrong</Text>
             <Text style={styles.stateSub}>Couldn't generate outfit recommendations. Please try again.</Text>
             <TouchableOpacity style={styles.retryBtn} onPress={handleGetOutfits}>
@@ -426,7 +426,10 @@ function OutfitCard({ outfit, weather, occasion, isFavorited, isToggling, onTogg
       {/* Styling note */}
       {outfit.styling_note ? (
         <View style={styles.noteBox}>
-          <Text style={styles.noteLabel}>✨ Stylist's Note</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <Ionicons name="sparkles-outline" size={20} color={PRIMARY} />
+            <Text style={styles.noteLabel}>Stylist's Note</Text>
+          </View>
           <Text style={styles.noteText}>{outfit.styling_note}</Text>
         </View>
       ) : null}
