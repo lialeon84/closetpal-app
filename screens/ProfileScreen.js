@@ -158,7 +158,7 @@ export default function ProfileScreen({ navigation }) {
         </Animated.View>
 
         <Animated.Text style={[styles.username, { fontSize: usernameSize }]}>
-          @{profile.username}
+          {profile.first_name}
         </Animated.Text>
       </Animated.View>
 
@@ -314,6 +314,7 @@ const styles = StyleSheet.create({
   },
   brandSymbol: {
     fontSize: 24,
+    fontFamily: FONTS.heading,
   },
   brandText: {
     fontSize: 20,
