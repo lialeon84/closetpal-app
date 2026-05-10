@@ -340,6 +340,7 @@ export default function HomeScreen() {
               <OutfitCard
                 key={idx}
                 outfit={outfit}
+                index={idx + 1}
                 weather={weather}
                 occasion={occasion}
                 isFavorited={!!findFavorite(outfit)}
@@ -383,7 +384,7 @@ export default function HomeScreen() {
   );
 }
 
-function OutfitCard({ outfit, weather, occasion, isFavorited, isToggling, onToggleFavorite }) {
+function OutfitCard({ outfit, index, weather, occasion, isFavorited, isToggling, onToggleFavorite }) {
   var displayImages = outfit.items.filter(i => i.image_url).slice(0, 4);
 
   return (
@@ -397,7 +398,7 @@ function OutfitCard({ outfit, weather, occasion, isFavorited, isToggling, onTogg
             </Text>
           </View>
         )}
-        <Text style={styles.outfitLabel}>Outfit {outfit.outfit_number ?? ''}</Text>
+        <Text style={styles.outfitLabel}>Outfit {index}</Text>
         <TouchableOpacity
           onPress={onToggleFavorite}
           disabled={isToggling}
@@ -589,6 +590,7 @@ var styles = StyleSheet.create({
     color: '#6B7280',
     fontWeight: '500',
     textAlign: 'center',
+    marginLeft: -20,
     fontFamily: FONTS.bodyMedium,
   },
   heartBtn: {

@@ -391,11 +391,11 @@ export default function ItemDetailScreen({ route, navigation }) {
       <View style={styles.header}>
         {editing ? (
           <Pressable onPress={handleEditCancel} disabled={saving}>
-            <Text style={[styles.backButton, saving && styles.headerActionDisabled]}>←</Text>
+            <Ionicons name="chevron-back-outline" size={24} color="#1C1C1C" />
           </Pressable>
         ) : (
           <Pressable onPress={() => navigation.goBack()}>
-            <Text style={styles.backButton}>←</Text>
+            <Ionicons name="chevron-back-outline" size={24} color="#1C1C1C" />
           </Pressable>
         )}
 

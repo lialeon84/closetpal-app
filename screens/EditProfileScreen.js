@@ -16,6 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
+import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../lib/supabase';
 import {
   US_STATES,
@@ -188,7 +189,7 @@ export default function EditProfileScreen({ navigation }) {
       >
         <View style={styles.header}>
           <Pressable onPress={() => navigation.goBack()}>
-            <Text style={styles.backButton}>←</Text>
+            <Ionicons name="chevron-back-outline" size={24} color="#1C1C1C" />
           </Pressable>
           <View style={styles.headerCenter}>
             <Text style={styles.brandSymbol}></Text>

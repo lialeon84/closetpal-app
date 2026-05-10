@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '../lib/supabase';
 import { PRIMARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
+import { Ionicons } from '@expo/vector-icons';
 
 const DEFAULTS = {
   outfit_reminders: false,
@@ -77,7 +78,7 @@ export default function NotificationPreferencesScreen({ navigation }) {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.header}>
         <Pressable onPress={() => navigation.goBack()}>
-          <Text style={styles.backButton}>←</Text>
+          <Ionicons name="chevron-back-outline" size={24} color="#1C1C1C" />
         </Pressable>
         <Text style={styles.headerTitle}>Notifications</Text>
         <View style={styles.headerSpacer} />

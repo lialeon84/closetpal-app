@@ -7,6 +7,8 @@ import {
   Pressable,
   ActivityIndicator,
   Alert,
+  TouchableOpacity,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -90,7 +92,7 @@ export default function SubscriptionScreen({ navigation }) {
       <View style={styles.container}>
         <View style={styles.header}>
           <Pressable onPress={() => navigation.goBack()}>
-            <Text style={styles.backButton}>←</Text>
+            <Ionicons name="chevron-back-outline" size={24} color="#1C1C1C" />
           </Pressable>
           <View style={styles.headerCenter}>
             <Text style={styles.brandSymbol}></Text>
@@ -181,9 +183,11 @@ export default function SubscriptionScreen({ navigation }) {
 
           <View style={styles.supportCard}>
             <Text style={styles.supportTitle}>Need Help?</Text>
-            <Text style={styles.supportText}>
-              Contact us at support@ariscloset.app for any subscription-related questions.
-            </Text>
+            <Text style={styles.supportText}>Contact us at</Text>
+            <TouchableOpacity onPress={() => Linking.openURL('mailto:support@ariscloset.app')}>
+              <Text style={styles.supportText}>support@ariscloset.app</Text>
+            </TouchableOpacity>
+            <Text style={styles.supportText}>for any subscription-related questions.</Text>
           </View>
 
           <View style={styles.bottomSpacer} />

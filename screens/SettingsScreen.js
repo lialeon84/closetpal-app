@@ -13,6 +13,7 @@ import { supabase } from '../lib/supabase';
 import { PRIMARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
 import * as WebBrowser from 'expo-web-browser';
+import { Ionicons } from '@expo/vector-icons';
 
 const PRIVACY_URL = 'https://closetpal.app/privacy';
 const TERMS_URL   = 'https://closetpal.app/terms';
@@ -77,7 +78,7 @@ export default function SettingsScreen({ navigation }) {
       <ScrollView style={styles.container}>
         <View style={styles.brandHeader}>
           <Pressable onPress={() => navigation.goBack()}>
-            <Text style={styles.backButton}>←</Text>
+            <Ionicons name="chevron-back-outline" size={24} color="#1C1C1C" />
           </Pressable>
           <Text style={styles.brandSymbol}></Text>
           <Text style={styles.brandText}>Settings</Text>
@@ -92,7 +93,7 @@ export default function SettingsScreen({ navigation }) {
             onPress={() => navigation.navigate('EditProfile')}
           >
             <Text style={styles.settingButtonText}>Edit Profile</Text>
-            <Text style={styles.settingButtonArrow}>→</Text>
+            <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />
           </Pressable>
 
           <Pressable
@@ -100,7 +101,7 @@ export default function SettingsScreen({ navigation }) {
             onPress={() => navigation.navigate('Subscription')}
           >
             <Text style={styles.settingButtonText}>Subscription</Text>
-            <Text style={styles.settingButtonArrow}>→</Text>
+            <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />
           </Pressable>
         </View>
 
@@ -110,14 +111,14 @@ export default function SettingsScreen({ navigation }) {
 
           <Pressable style={styles.settingButton}>
             <Text style={styles.settingButtonText}>Privacy Settings</Text>
-            <Text style={styles.settingButtonArrow}>→</Text>
+            <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />
           </Pressable>
 
           {/* Temporarily disabled — Blocked Users entry point hidden for launch.
               Re-enable by uncommenting this block.
           <Pressable style={styles.settingButton}>
             <Text style={styles.settingButtonText}>Blocked Users</Text>
-            <Text style={styles.settingButtonArrow}>→</Text>
+            <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />
           </Pressable> */}
         </View>
 
@@ -128,7 +129,7 @@ export default function SettingsScreen({ navigation }) {
 
           <Pressable style={styles.settingButton}>
             <Text style={styles.settingButtonText}>Notification Preferences</Text>
-            <Text style={styles.settingButtonArrow}>→</Text>
+            <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />
           </Pressable>
         </View> */}
 
@@ -138,7 +139,7 @@ export default function SettingsScreen({ navigation }) {
 
           <Pressable style={styles.settingButton}>
             <Text style={styles.settingButtonText}>Help & Support</Text>
-            <Text style={styles.settingButtonArrow}>→</Text>
+            <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />
           </Pressable>
         </View>
 
@@ -148,34 +149,34 @@ export default function SettingsScreen({ navigation }) {
 
           <Pressable style={styles.settingButton} onPress={() => navigation.navigate('DeleteAccount')}>
             <Text style={[styles.settingButtonText, styles.dangerText]}>Delete Account</Text>
-            <Text style={styles.settingButtonArrow}>→</Text>
+            <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />
           </Pressable>
 
           <Pressable style={styles.settingButton} onPress={() => navigation.navigate('ExportData')}>
             <Text style={styles.settingButtonText}>Export My Data</Text>
-            <Text style={styles.settingButtonArrow}>→</Text>
+            <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />
           </Pressable>
 
           <Pressable style={styles.settingButton} onPress={() => navigation.navigate('NotificationPreferences')}>
             <Text style={styles.settingButtonText}>Notification Preferences</Text>
-            <Text style={styles.settingButtonArrow}>→</Text>
+            <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />
           </Pressable>
 
           <Pressable style={styles.settingButton} onPress={() => WebBrowser.openBrowserAsync(PRIVACY_URL)}>
             <Text style={styles.settingButtonText}>Privacy Policy</Text>
-            <Text style={styles.settingButtonArrow}>→</Text>
+            <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />
           </Pressable>
 
           <Pressable style={styles.settingButton} onPress={() => WebBrowser.openBrowserAsync(TERMS_URL)}>
             <Text style={styles.settingButtonText}>Terms of Service</Text>
-            <Text style={styles.settingButtonArrow}>→</Text>
+            <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />
           </Pressable>
 
           <View style={styles.sectionDivider} />
 
           <Pressable style={styles.settingButton} onPress={handleLogout}>
             <Text style={styles.settingButtonText}>Sign Out</Text>
-            <Text style={styles.settingButtonArrow}>→</Text>
+            <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />
           </Pressable>
         </View>
 

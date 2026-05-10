@@ -64,7 +64,7 @@ export default function ExportDataScreen({ navigation }) {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.header}>
         <Pressable onPress={() => navigation.goBack()} disabled={exporting}>
-          <Text style={[styles.backButton, exporting && styles.disabled]}>←</Text>
+          <Ionicons name="chevron-back-outline" size={24} color="#1C1C1C" />
         </Pressable>
         <Text style={styles.headerTitle}>Export My Data</Text>
         <View style={styles.headerSpacer} />

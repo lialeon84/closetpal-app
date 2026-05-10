@@ -116,7 +116,7 @@ export default function TripDetailScreen({ route, navigation }) {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.header}>
         <Pressable onPress={() => navigation.goBack()} hitSlop={8} style={styles.backBtn}>
-          <Text style={styles.backText}>← Back</Text>
+          <Ionicons name="chevron-back-outline" size={24} color="#1C1C1C" />
         </Pressable>
         <Text style={styles.headerTitle} numberOfLines={1}>{trip.destination}</Text>
         <Pressable onPress={deleteTrip} style={styles.deleteBtn} hitSlop={8}>

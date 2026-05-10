@@ -398,7 +398,7 @@ export default function AddItemScreen({ navigation }) {
       >
         <View style={styles.header}>
           <Pressable onPress={() => navigation.goBack()} disabled={busy}>
-            <Text style={[styles.backButton, busy && styles.disabledText]}>←</Text>
+            <Ionicons name="chevron-back-outline" size={24} color="#1C1C1C" />
           </Pressable>
           <View style={styles.headerCenter}>
             <Ionicons name="shirt-outline" size={24} color="#9B9B9B" />
