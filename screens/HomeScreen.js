@@ -66,7 +66,7 @@ function decodeWeather(code) {
 export default function HomeScreen() {
   var navigation = useNavigation();
   var { isPaid } = useSubscription();
-  var { checkFavorites, checkOutfitRecs, incrementOutfitRecs, isOutfitRecsLocked } = usageLimits(isPaid);
+  var { checkFavorites, checkOutfitRecs, incrementOutfitRecs, isOutfitRecsLocked, canDoAISwap, incrementAISwap } = usageLimits(isPaid);
   var [isLocked, setIsLocked] = useState(false);
 
   useEffect(() => {
@@ -91,6 +91,8 @@ export default function HomeScreen() {
   var [showPicker, setShowPicker]   = useState(false);
   var [favorites, setFavorites]     = useState([]);
   var [togglingKey, setTogglingKey] = useState(null);
+  var [wardrobeItems, setWardrobeItems] = useState([]);
+  var [currentUserId, setCurrentUserId] = useState(null);
 
   var handleGetOutfits = async () => {
     if (!isPaid && isLocked) {
@@ -124,13 +126,14 @@ export default function HomeScreen() {
     if (favData) setFavorites(favData);
   };
 
-  var toggleFavorite = async (outfit) => {
-    var key = outfitKey(outfit);
+  var toggleFavorite = async (outfit, currentItems) => {
+    var items = currentItems ?? outfit.items;
+    var key = items.map(i => i.id).sort().join(',');
     if (togglingKey === key) return;
     setTogglingKey(key);
     try {
       var { data: { user } } = await supabase.auth.getUser();
-      var existing = findFavorite(outfit);
+      var existing = favorites.find(f => [...f.clothing_item_ids].sort().join(',') === key);
 
       if (existing) {
         await supabase.from('favorite_outfits').delete().eq('id', existing.id);
@@ -151,7 +154,7 @@ export default function HomeScreen() {
         .from('favorite_outfits')
         .insert({
           user_id: user.id,
-          clothing_item_ids: outfit.items.map(i => i.id),
+          clothing_item_ids: items.map(i => i.id),
           styling_note: outfit.styling_note ?? null,
         })
         .select()
@@ -168,6 +171,24 @@ export default function HomeScreen() {
     try {
       // 1. Fetch wardrobe
       var { data: { user } } = await supabase.auth.getUser();
+      setCurrentUserId(user.id);
+
+      var { data: feedbackRows, error: feedbackErr } = await supabase
+        .from('outfit_feedback')
+        .select('clothing_item_id, outfit_combo_key, feedback_type')
+        .eq('user_id', user.id);
+      if (feedbackErr) console.warn('[OutfitFeedback]', feedbackErr.message);
+      var dislikedItemIds = new Set(
+        (feedbackRows ?? [])
+          .filter(r => r.feedback_type === 'dislike_item' && r.clothing_item_id)
+          .map(r => r.clothing_item_id)
+      );
+      var dislikedComboKeys = new Set(
+        (feedbackRows ?? [])
+          .filter(r => r.feedback_type === 'dislike_outfit' && r.outfit_combo_key)
+          .map(r => r.outfit_combo_key)
+      );
+
       var { data: wardrobe, error: wErr } = await supabase
         .from('clothing_items')
         .select('id, name, category, subcategory, color, season, image_url')
@@ -180,6 +201,9 @@ export default function HomeScreen() {
         setError('empty_wardrobe');
         return;
       }
+
+      var filteredWardrobe = wardrobe.filter(item => !dislikedItemIds.has(item.id));
+      setWardrobeItems(filteredWardrobe);
 
       // 2. Get location permission + coords
       var { status } = await Location.requestForegroundPermissionsAsync();
@@ -202,7 +226,7 @@ export default function HomeScreen() {
       setWeather(weatherData);
 
       // 4. Call Anthropic
-      var wardrobeList = wardrobe
+      var wardrobeList = filteredWardrobe
         .map(i => `id:${i.id} | name:${i.name ?? 'unnamed'} | category:${i.category ?? 'uncategorized'} | color:${i.color ?? 'unspecified'} | season:${i.season ?? 'all'}`)
         .join('\n');
 
@@ -251,7 +275,10 @@ export default function HomeScreen() {
         })),
       }));
 
-      setOutfits(enriched);
+      var outfitComboKey = o => o.items.map(i => i.id).sort().join('_');
+      var filtered = enriched.filter(o => !dislikedComboKeys.has(outfitComboKey(o)));
+
+      setOutfits(filtered);
       await loadFavorites(user.id);
       incrementOutfitRecs()
         .then(() => { if (!isPaid) setIsLocked(true); })
@@ -262,6 +289,10 @@ export default function HomeScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  var handleDislikeOutfit = (outfitIdx) => {
+    setOutfits(prev => prev.filter((_, i) => i !== outfitIdx));
   };
 
   var hasContent = loading || outfits.length > 0 || error;
@@ -338,14 +369,20 @@ export default function HomeScreen() {
           <>
             {outfits.map((outfit, idx) => (
               <OutfitCard
-                key={idx}
+                key={outfitKey(outfit)}
                 outfit={outfit}
+                outfitIdx={idx}
                 index={idx + 1}
                 weather={weather}
                 occasion={occasion}
                 isFavorited={!!findFavorite(outfit)}
                 isToggling={togglingKey === outfitKey(outfit)}
-                onToggleFavorite={() => toggleFavorite(outfit)}
+                onToggleFavorite={(items) => toggleFavorite(outfit, items)}
+                wardrobe={wardrobeItems}
+                currentUserId={currentUserId}
+                onDislikeOutfit={() => handleDislikeOutfit(idx)}
+                canDoAISwap={canDoAISwap}
+                incrementAISwap={incrementAISwap}
               />
             ))}
             <TouchableOpacity style={styles.refreshBtn} onPress={handleGetOutfits} activeOpacity={0.85}>
@@ -384,12 +421,143 @@ export default function HomeScreen() {
   );
 }
 
-function OutfitCard({ outfit, index, weather, occasion, isFavorited, isToggling, onToggleFavorite }) {
-  var displayImages = outfit.items.filter(i => i.image_url).slice(0, 4);
+function OutfitCard({
+  outfit, index, weather, occasion,
+  isFavorited, isToggling, onToggleFavorite,
+  wardrobe, currentUserId, onDislikeOutfit,
+  canDoAISwap, incrementAISwap,
+}) {
+  var [displayItems, setDisplayItems] = useState(outfit.items);
+  var [swapModal, setSwapModal]       = useState(null);
+  var [swapLoading, setSwapLoading]   = useState(null);
+  var [redIconIds, setRedIconIds]     = useState(new Set());
+
+  var displayImages = displayItems.filter(i => i.image_url).slice(0, 4);
+
+  var handleDislikeWholeOutfit = async () => {
+    try {
+      var comboKey = outfit.items.map(i => i.id).sort().join('_');
+      await supabase.from('outfit_feedback').insert({
+        user_id: currentUserId,
+        outfit_combo_key: comboKey,
+        feedback_type: 'dislike_outfit',
+      });
+    } catch (err) {
+      console.error('[DislikeOutfit]', err.message);
+    }
+    onDislikeOutfit();
+  };
+
+  var handleDislikeItem = async (item) => {
+    try {
+      await supabase.from('outfit_feedback').insert({
+        user_id: currentUserId,
+        clothing_item_id: item.id,
+        feedback_type: 'dislike_item',
+      });
+    } catch (err) {
+      console.error('[DislikeItem]', err.message);
+    }
+    setRedIconIds(prev => new Set([...prev, item.id]));
+    setTimeout(() => {
+      setRedIconIds(prev => {
+        var next = new Set(prev);
+        next.delete(item.id);
+        return next;
+      });
+    }, 800);
+  };
+
+  var handleOpenSwap = (itemIdx) => {
+    setSwapModal({ itemIdx, mode: 'options' });
+  };
+
+  var handlePickFromWardrobe = () => {
+    setSwapModal(prev => ({ ...prev, mode: 'wardrobe' }));
+  };
+
+  var handleSelectReplacement = (replacement) => {
+    setDisplayItems(prev => prev.map((item, i) =>
+      i === swapModal.itemIdx ? { ...replacement } : item
+    ));
+    setSwapModal(null);
+  };
+
+  var handleAISwap = async (itemIdx) => {
+    setSwapModal(null);
+
+    var allowed = await canDoAISwap();
+    if (!allowed) {
+      await RevenueCatUI.presentPaywall();
+      return;
+    }
+
+    setSwapLoading(itemIdx);
+    try {
+      var itemBeingSwapped = displayItems[itemIdx];
+      var availableItems = wardrobe.filter(w =>
+        w.category === itemBeingSwapped.category &&
+        !displayItems.some(d => d.id === w.id)
+      );
+
+      if (availableItems.length === 0) {
+        setSwapModal({ itemIdx, mode: 'wardrobe' });
+        return;
+      }
+
+      var aiResp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: 'You are a personal stylist assistant. Return ONLY valid JSON with no markdown, no explanation.',
+          messages: [{
+            role: 'user',
+            content: `Here is a current outfit: ${JSON.stringify(displayItems)}. The item being replaced is: ${JSON.stringify(itemBeingSwapped)}. Pick the single best replacement from this wardrobe list: ${JSON.stringify(availableItems)}. Consider color coordination, occasion, and style consistency. Return ONLY: { "item_id": "<id>" }`,
+          }],
+        }),
+      });
+
+      if (!aiResp.ok) throw new Error(`AI error ${aiResp.status}`);
+
+      var aiData = await aiResp.json();
+      var rawText = aiData.content?.[0]?.text?.trim() ?? '';
+      var jsonStr = rawText.replace(/^```json?\s*/i, '').replace(/\s*```$/, '').trim();
+      var result = JSON.parse(jsonStr);
+      var found = wardrobe.find(w => w.id === result.item_id);
+
+      if (found) {
+        setDisplayItems(prev => prev.map((item, i) => i === itemIdx ? { ...found } : item));
+        await incrementAISwap();
+      } else {
+        setSwapModal({ itemIdx, mode: 'wardrobe' });
+      }
+    } catch (err) {
+      console.error('[AISwap]', err.message);
+      setSwapModal({ itemIdx, mode: 'wardrobe' });
+    } finally {
+      setSwapLoading(null);
+    }
+  };
+
+  var swapItemIdx = swapModal?.itemIdx ?? null;
+  var swapCategory = swapItemIdx != null ? displayItems[swapItemIdx]?.category : null;
+  var swapCandidates = swapCategory
+    ? wardrobe.filter(w =>
+        w.category === swapCategory &&
+        !displayItems.some(d => d.id === w.id)
+      )
+    : [];
 
   return (
     <View style={styles.card}>
-      {/* Top row: weather+occasion tag + outfit number + heart */}
+
+      {/* ── Top row ──────────────────────────────────────────────────────── */}
       <View style={styles.cardTopRow}>
         {weather && occasion && (
           <View style={styles.cardTag}>
@@ -399,22 +567,31 @@ function OutfitCard({ outfit, index, weather, occasion, isFavorited, isToggling,
           </View>
         )}
         <Text style={styles.outfitLabel}>Outfit {index}</Text>
-        <TouchableOpacity
-          onPress={onToggleFavorite}
-          disabled={isToggling}
-          style={styles.heartBtn}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Heart size={20} color={PRIMARY} fill={isFavorited ? PRIMARY : 'transparent'} />
-        </TouchableOpacity>
+        <View style={styles.cardActions}>
+          <TouchableOpacity
+            onPress={handleDislikeWholeOutfit}
+            style={styles.actionIconBtn}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Ionicons name="thumbs-down-outline" size={20} color="#6B7280" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => onToggleFavorite(displayItems)}
+            disabled={isToggling}
+            style={styles.heartBtn}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Heart size={20} color={PRIMARY} fill={isFavorited ? PRIMARY : 'transparent'} />
+          </TouchableOpacity>
+        </View>
       </View>
 
-      {/* Photo grid */}
+      {/* ── Photo grid ───────────────────────────────────────────────────── */}
       {displayImages.length > 0 ? (
         <View style={styles.photoGrid}>
-          {displayImages.map((item, idx) => (
+          {displayImages.map((item, i) => (
             <Image
-              key={item.id ?? idx}
+              key={item.id ?? i}
               source={{ uri: item.image_url }}
               style={styles.photoCell}
               resizeMode="cover"
@@ -427,14 +604,53 @@ function OutfitCard({ outfit, index, weather, occasion, isFavorited, isToggling,
         </View>
       )}
 
-      {/* Item names */}
+      {/* ── Item list with per-item dislike + swap ────────────────────────── */}
       <View style={styles.itemList}>
-        {outfit.items.map((item, idx) => (
-          <Text key={item.id ?? idx} style={styles.itemName}>• {item.name ?? ''}</Text>
+        {displayItems.map((item, i) => (
+          <View key={item.id ?? i} style={styles.itemRow}>
+            {item.image_url ? (
+              <Image
+                source={{ uri: item.image_url }}
+                style={styles.itemThumb}
+                resizeMode="cover"
+              />
+            ) : (
+              <View style={[styles.itemThumb, styles.itemThumbPlaceholder]}>
+                <Ionicons name="shirt-outline" size={14} color="#9CA3AF" />
+              </View>
+            )}
+            <Text style={styles.itemRowName} numberOfLines={1}>{item.name ?? ''}</Text>
+            <View style={styles.itemActions}>
+              {swapLoading === i ? (
+                <ActivityIndicator size="small" color={PRIMARY} />
+              ) : (
+                <>
+                  <TouchableOpacity
+                    onPress={() => handleDislikeItem(item)}
+                    hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                    style={styles.itemActionBtn}
+                  >
+                    <Ionicons
+                      name="thumbs-down-outline"
+                      size={16}
+                      color={redIconIds.has(item.id) ? '#EF4444' : '#6B7280'}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleOpenSwap(i)}
+                    hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                    style={styles.itemActionBtn}
+                  >
+                    <Ionicons name="swap-horizontal-outline" size={16} color={PRIMARY} />
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+          </View>
         ))}
       </View>
 
-      {/* Styling note */}
+      {/* ── Styling note ─────────────────────────────────────────────────── */}
       {outfit.styling_note ? (
         <View style={styles.noteBox}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
@@ -444,6 +660,99 @@ function OutfitCard({ outfit, index, weather, occasion, isFavorited, isToggling,
           <Text style={styles.noteText}>{outfit.styling_note}</Text>
         </View>
       ) : null}
+
+      {/* ── Swap options sheet ────────────────────────────────────────────── */}
+      <Modal
+        visible={swapModal?.mode === 'options'}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setSwapModal(null)}
+      >
+        <Pressable style={styles.modalOverlay} onPress={() => setSwapModal(null)}>
+          <Pressable style={styles.modalSheet} onPress={e => e.stopPropagation()}>
+            <View style={styles.modalHandle} />
+            <Text style={styles.modalTitle}>
+              Swap {swapModal != null ? (displayItems[swapModal.itemIdx]?.name ?? '') : ''}
+            </Text>
+            <TouchableOpacity
+              style={styles.swapOptionRow}
+              onPress={handlePickFromWardrobe}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="shirt-outline" size={20} color={PRIMARY} style={{ marginRight: 12 }} />
+              <Text style={styles.swapOptionText}>Pick from my wardrobe</Text>
+              <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.swapOptionRow}
+              onPress={() => handleAISwap(swapModal.itemIdx)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="sparkles-outline" size={20} color={PRIMARY} style={{ marginRight: 12 }} />
+              <Text style={styles.swapOptionText}>Let AI choose</Text>
+              <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.swapCancelBtn}
+              onPress={() => setSwapModal(null)}
+            >
+              <Text style={styles.swapCancelBtnText}>Cancel</Text>
+            </TouchableOpacity>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      {/* ── Swap wardrobe picker sheet ────────────────────────────────────── */}
+      <Modal
+        visible={swapModal?.mode === 'wardrobe'}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setSwapModal(null)}
+      >
+        <Pressable style={styles.modalOverlay} onPress={() => setSwapModal(null)}>
+          <Pressable style={styles.modalSheet} onPress={e => e.stopPropagation()}>
+            <View style={styles.modalHandle} />
+            <Text style={styles.modalTitle}>Pick a replacement</Text>
+            {swapCandidates.length === 0 ? (
+              <Text style={styles.swapEmptyText}>No other items in this category</Text>
+            ) : (
+              <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 320 }}>
+                {swapCandidates.map(w => (
+                  <TouchableOpacity
+                    key={w.id}
+                    style={styles.swapCandidateRow}
+                    onPress={() => handleSelectReplacement(w)}
+                    activeOpacity={0.7}
+                  >
+                    {w.image_url ? (
+                      <Image
+                        source={{ uri: w.image_url }}
+                        style={styles.swapCandidateThumb}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <View style={[styles.swapCandidateThumb, styles.swapCandidateThumbPlaceholder]}>
+                        <Ionicons name="shirt-outline" size={18} color="#9CA3AF" />
+                      </View>
+                    )}
+                    <Text style={styles.swapCandidateName} numberOfLines={1}>
+                      {w.name ?? 'Unnamed'}
+                    </Text>
+                    <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            )}
+            <TouchableOpacity
+              style={styles.swapCancelBtn}
+              onPress={() => setSwapModal(null)}
+            >
+              <Text style={styles.swapCancelBtnText}>Cancel</Text>
+            </TouchableOpacity>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
     </View>
   );
 }
@@ -715,5 +1024,112 @@ var styles = StyleSheet.create({
     color: '#1C1C1C',
     textAlign: 'center',
     fontFamily: FONTS.body,
+  },
+
+  // ── Card action buttons (top-right) ─────────────────────────────────────────
+  cardActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  actionIconBtn: {
+    padding: 4,
+  },
+
+  // ── Per-item rows ────────────────────────────────────────────────────────────
+  itemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 7,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E5E7EB',
+    gap: 8,
+  },
+  itemThumb: {
+    width: 36,
+    height: 36,
+    borderRadius: 6,
+    backgroundColor: '#EDEAE4',
+  },
+  itemThumbPlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  itemRowName: {
+    flex: 1,
+    fontSize: 13,
+    color: '#374151',
+    fontFamily: FONTS.body,
+  },
+  itemActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  itemActionBtn: {
+    padding: 3,
+  },
+
+  // ── Swap option sheet ────────────────────────────────────────────────────────
+  swapOptionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E5E7EB',
+  },
+  swapOptionText: {
+    flex: 1,
+    fontSize: 16,
+    color: '#1C1C1C',
+    fontFamily: FONTS.body,
+  },
+  swapEmptyText: {
+    textAlign: 'center',
+    color: '#9CA3AF',
+    fontSize: 14,
+    marginVertical: 20,
+    fontFamily: FONTS.body,
+  },
+
+  // ── Swap wardrobe picker sheet ───────────────────────────────────────────────
+  swapCandidateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 4,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E5E7EB',
+    gap: 10,
+  },
+  swapCandidateThumb: {
+    width: 44,
+    height: 44,
+    borderRadius: 8,
+    backgroundColor: '#EDEAE4',
+  },
+  swapCandidateThumbPlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  swapCandidateName: {
+    flex: 1,
+    fontSize: 14,
+    color: '#1C1C1C',
+    fontFamily: FONTS.body,
+  },
+  swapCancelBtn: {
+    marginTop: 16,
+    paddingVertical: 13,
+    borderWidth: 1.5,
+    borderColor: '#D1D5DB',
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  swapCancelBtnText: {
+    color: '#6B7280',
+    fontSize: 15,
+    fontWeight: '600',
+    fontFamily: FONTS.bodyMedium,
   },
 });

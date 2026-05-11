@@ -8,6 +8,7 @@ const FREE_LIMITS = {
   outfitRecs:   1,  // per day
   aiDetections: 3,  // per month
   trips:        2,  // per month
+  aiSwaps:      2,  // per day
 };
 
 const todayStr  = () => new Date().toISOString().split('T')[0];   // YYYY-MM-DD
@@ -196,6 +197,40 @@ export function usageLimits(isPaid) {
     }
   };
 
+  // ── AI swaps (daily) ────────────────────────────────────────────────────────
+  const canDoAISwap = async () => {
+    if (isPaid) return true;
+    try {
+      const uid = await getUserId();
+      if (!uid) return true;
+      const usage = await getUsage(uid);
+      const count = usage.ai_swaps_date === todayStr()
+        ? (usage.ai_swaps_count ?? 0)
+        : 0;
+      return count < FREE_LIMITS.aiSwaps;
+    } catch (_) {
+      return true;
+    }
+  };
+
+  const incrementAISwap = async () => {
+    try {
+      const uid = await getUserId();
+      if (!uid) return;
+      const usage = await getUsage(uid);
+      const today = todayStr();
+      const count = usage.ai_swaps_date === today
+        ? (usage.ai_swaps_count ?? 0)
+        : 0;
+      await supabase.from('usage_tracking').upsert(
+        { user_id: uid, ai_swaps_date: today, ai_swaps_count: count + 1 },
+        { onConflict: 'user_id' }
+      );
+    } catch (e) {
+      console.warn('[usageLimits] incrementAISwap error:', e.message);
+    }
+  };
+
   return {
     checkFavorites,
     checkWardrobe,
@@ -206,5 +241,7 @@ export function usageLimits(isPaid) {
     incrementOutfitRecs,
     incrementAiDetection,
     incrementTrips,
+    canDoAISwap,
+    incrementAISwap,
   };
 }

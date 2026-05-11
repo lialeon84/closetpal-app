@@ -26,6 +26,7 @@ import {
 import { requestNotificationPermissions } from './lib/notifications';
 import { PRIMARY } from './constants/colors';
 import { FONTS } from './constants/fonts';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import SplashScreen from './components/SplashScreen';
 import StylePreferencesModal from './components/StylePreferencesModal';
 
@@ -304,7 +305,7 @@ export default function App() {
   if (!fontsLoaded || loading || (session && hasProfile === null)) return <SplashScreen />;
 
   return (
-    <>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {session ? (
@@ -338,6 +339,6 @@ export default function App() {
       {showStylePrefsModal && (
         <StylePreferencesModal onDismiss={() => setShowStylePrefsModal(false)} />
       )}
-    </>
+    </GestureHandlerRootView>
   );
 }
