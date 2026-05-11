@@ -14,6 +14,7 @@ import {
   DMSans_500Medium,
   DMSans_700Bold,
 } from '@expo-google-fonts/dm-sans';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from './lib/supabase';
 import {
   initializeRevenueCat,
@@ -26,6 +27,7 @@ import { requestNotificationPermissions } from './lib/notifications';
 import { PRIMARY } from './constants/colors';
 import { FONTS } from './constants/fonts';
 import SplashScreen from './components/SplashScreen';
+import StylePreferencesModal from './components/StylePreferencesModal';
 
 import WelcomeScreen from './screens/WelcomeScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -226,6 +228,7 @@ export default function App() {
   const [session, setSession] = useState(null);
   const [hasProfile, setHasProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showStylePrefsModal, setShowStylePrefsModal] = useState(false);
 
   const [fontsLoaded] = useFonts({
     PlayfairDisplay_700Bold,
@@ -284,18 +287,25 @@ export default function App() {
   const checkProfile = async (userId) => {
     const { data } = await supabase
       .from('profiles')
-      .select('id')
+      .select('id, style_bio, created_at')
       .eq('id', userId)
       .single();
 
     setHasProfile(!!data);
+    if (data && !data.style_bio) {
+      const ageMs = Date.now() - new Date(data.created_at).getTime();
+      const isNew = ageMs < 5 * 60 * 1000;
+      const skipped = await AsyncStorage.getItem('stylePrefsSkipped');
+      if (isNew && skipped !== 'true') setShowStylePrefsModal(true);
+    }
     setLoading(false);
   };
 
   if (!fontsLoaded || loading || (session && hasProfile === null)) return <SplashScreen />;
 
   return (
-    <NavigationContainer>
+    <>
+      <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {session ? (
           hasProfile ? (
@@ -325,5 +335,9 @@ export default function App() {
         )}
       </Stack.Navigator>
     </NavigationContainer>
+      {showStylePrefsModal && (
+        <StylePreferencesModal onDismiss={() => setShowStylePrefsModal(false)} />
+      )}
+    </>
   );
 }

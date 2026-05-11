@@ -28,6 +28,77 @@ import {
 import { PRIMARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
 
+const COLOR_OPTIONS = [
+  'Black', 'White', 'Cream', 'Navy', 'Red', 'Pink',
+  'Green', 'Yellow', 'Orange', 'Purple', 'Brown', 'Gray',
+  'Neutrals', 'Bold/Brights',
+];
+const PATTERN_OPTIONS = [
+  'Solid', 'Stripes', 'Floral', 'Plaid',
+  'Animal Print', 'Geometric', 'Polka Dot', 'Abstract',
+];
+const LIFESTYLE_OPTIONS = ['Casual', 'Professional', 'Active', 'Eclectic', 'Minimalist'];
+
+function buildStyleBio(colors, patterns, lifestyle) {
+  const segments = [];
+  if (colors.length > 0) {
+    const top = colors.slice(0, 2);
+    segments.push(`I love ${top.join(' and ')} tones`);
+  }
+  if (patterns.length > 0) {
+    const top = patterns.slice(0, 2);
+    const patStr = `${top.join(' and ')} pieces`;
+    segments.length === 0
+      ? segments.push(`I love ${patStr}`)
+      : segments.push(patStr);
+  }
+  if (lifestyle) {
+    const lifStr = `a ${lifestyle.toLowerCase()} aesthetic`;
+    segments.length === 0
+      ? segments.push(`I have ${lifStr}`)
+      : segments.push(lifStr);
+  }
+  if (segments.length === 0) return '';
+  const last = segments.pop();
+  return segments.length === 0 ? `${last}.` : `${segments.join(', ')}, and ${last}.`;
+}
+
+function MultiChip({ options, selected, onToggle }) {
+  return (
+    <View style={chipStyles.grid}>
+      {options.map(opt => (
+        <Pressable
+          key={opt}
+          style={[chipStyles.chip, selected.includes(opt) && chipStyles.chipSelected]}
+          onPress={() => onToggle(opt)}
+        >
+          <Text style={[chipStyles.chipText, selected.includes(opt) && chipStyles.chipTextSelected]}>
+            {opt}
+          </Text>
+        </Pressable>
+      ))}
+    </View>
+  );
+}
+
+function SingleChip({ options, selected, onSelect }) {
+  return (
+    <View style={chipStyles.grid}>
+      {options.map(opt => (
+        <Pressable
+          key={opt}
+          style={[chipStyles.chip, selected === opt && chipStyles.chipSelected]}
+          onPress={() => onSelect(opt)}
+        >
+          <Text style={[chipStyles.chipText, selected === opt && chipStyles.chipTextSelected]}>
+            {opt}
+          </Text>
+        </Pressable>
+      ))}
+    </View>
+  );
+}
+
 export default function EditProfileScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -42,6 +113,10 @@ export default function EditProfileScreen({ navigation }) {
   const [dob, setDob] = useState(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
+  const [selectedColors, setSelectedColors] = useState([]);
+  const [selectedPatterns, setSelectedPatterns] = useState([]);
+  const [brandsText, setBrandsText] = useState('');
+  const [lifestyle, setLifestyle] = useState('');
 
   useEffect(() => {
     loadProfile();
@@ -67,6 +142,10 @@ export default function EditProfileScreen({ navigation }) {
         setGender(data.gender || '');
         setDob(data.date_of_birth ? parseDateFromDB(data.date_of_birth) : null);
         setProfileImage(data.profile_picture_url || null);
+        setSelectedColors(data.favorite_colors || []);
+        setSelectedPatterns(data.favorite_patterns || []);
+        setBrandsText((data.favorite_brands || []).join(', '));
+        setLifestyle(data.lifestyle || '');
       }
     } catch (error) {
       Alert.alert('Error', error.message);
@@ -140,6 +219,8 @@ export default function EditProfileScreen({ navigation }) {
       setSaving(true);
 
       const { data: { user } } = await supabase.auth.getUser();
+      const brands = brandsText.split(',').map(b => b.trim()).filter(Boolean);
+      const style_bio = buildStyleBio(selectedColors, selectedPatterns, lifestyle);
 
       const { error } = await supabase
         .from('profiles')
@@ -152,6 +233,11 @@ export default function EditProfileScreen({ navigation }) {
           gender,
           date_of_birth: formatDateForDB(dob),
           profile_picture_url: profileImage,
+          favorite_colors:   selectedColors.length > 0   ? selectedColors   : null,
+          favorite_patterns: selectedPatterns.length > 0  ? selectedPatterns  : null,
+          favorite_brands:   brands.length > 0            ? brands            : null,
+          lifestyle:         lifestyle || null,
+          style_bio:         style_bio || null,
         })
         .eq('id', user.id);
 
@@ -307,6 +393,44 @@ export default function EditProfileScreen({ navigation }) {
                 }}
               />
             )}
+
+            <Text style={styles.sectionLabel}>Style Preferences</Text>
+
+            <Text style={styles.label}>Favorite Colors</Text>
+            <MultiChip
+              options={COLOR_OPTIONS}
+              selected={selectedColors}
+              onToggle={c => setSelectedColors(prev =>
+                prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]
+              )}
+            />
+
+            <Text style={styles.label}>Favorite Patterns</Text>
+            <MultiChip
+              options={PATTERN_OPTIONS}
+              selected={selectedPatterns}
+              onToggle={p => setSelectedPatterns(prev =>
+                prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]
+              )}
+            />
+
+            <Text style={styles.label}>Favorite Brands</Text>
+            <TextInput
+              style={styles.input}
+              value={brandsText}
+              onChangeText={setBrandsText}
+              placeholder="e.g. Zara, ASOS, Levi's"
+              placeholderTextColor="#9B9B9B"
+              returnKeyType="done"
+              autoCapitalize="words"
+            />
+
+            <Text style={styles.label}>Lifestyle</Text>
+            <SingleChip
+              options={LIFESTYLE_OPTIONS}
+              selected={lifestyle}
+              onSelect={setLifestyle}
+            />
           </View>
 
           <Pressable
@@ -486,5 +610,45 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     fontFamily: FONTS.bodyMedium,
+  },
+  sectionLabel: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1C1C1C',
+    fontFamily: FONTS.heading,
+    marginTop: 28,
+    marginBottom: 4,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#D9D5CE',
+  },
+});
+
+const chipStyles = StyleSheet.create({
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginTop: 4,
+  },
+  chip: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: '#D9D5CE',
+    backgroundColor: '#EDEAE4',
+  },
+  chipSelected: {
+    backgroundColor: PRIMARY,
+    borderColor: PRIMARY,
+  },
+  chipText: {
+    fontSize: 13,
+    fontFamily: FONTS.body,
+    color: '#374151',
+  },
+  chipTextSelected: {
+    color: '#FFFFFF',
   },
 });

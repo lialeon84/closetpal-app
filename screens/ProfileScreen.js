@@ -150,17 +150,22 @@ export default function ProfileScreen({ navigation }) {
               </View>
             )}
           </Animated.View>
-          <Animated.Text
-            style={[
-              styles.profileFirstName,
-              {
-                opacity: profileImageOpacity,
-                transform: [{ scale: profileImageScale }],
-              },
-            ]}
-          >
-            {profile.first_name}
-          </Animated.Text>
+          <View style={styles.profileNameColumn}>
+            <Animated.Text
+              style={[
+                styles.profileFirstName,
+                {
+                  opacity: profileImageOpacity,
+                  transform: [{ scale: profileImageScale }],
+                },
+              ]}
+            >
+              {profile.first_name}
+            </Animated.Text>
+            {profile.style_bio ? (
+              <Text style={styles.styleBio}>{profile.style_bio}</Text>
+            ) : null}
+          </View>
         </View>
       </Animated.View>
 
@@ -396,6 +401,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontFamily: FONTS.heading,
     color: '#1C1C1C',
+  },
+  profileNameColumn: {
+    flexDirection: 'column',
+    flexShrink: 1,
+  },
+  styleBio: {
+    fontSize: 14,
+    color: '#666666',
+    fontFamily: FONTS.body,
+    marginTop: 4,
+    flexWrap: 'wrap',
   },
   username: {
     fontWeight: 'bold',
