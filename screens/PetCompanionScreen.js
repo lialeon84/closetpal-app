@@ -1,7 +1,10 @@
+// Placeholder screen for the upcoming Pet Companion feature. Renders a static
+// welcome message; interactive pet companion UI will replace this in a future release.
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+// Placeholder component — no logic yet.
 export default function PetCompanionScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -14,6 +17,7 @@ export default function PetCompanionScreen() {
   );
 }
 
+// Styles for PetCompanionScreen — centered container and placeholder text layout.
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,

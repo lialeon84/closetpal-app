@@ -1,3 +1,6 @@
+// User profile screen. Shows an animated collapsing header (profile photo + name),
+// a stat counter for saved outfits, a subscription upgrade/status banner, and a
+// scrollable list of favorited outfits with item thumbnails and a remove action.
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Image, TouchableOpacity } from 'react-native';
 import {
@@ -18,24 +21,33 @@ import { PRIMARY, SECONDARY, CARD_BG } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
 import { Ionicons } from '@expo/vector-icons';
 
+// Main screen component. Loads profile, favorites, and wardrobe data; drives
+// the animated collapsing header; and renders the subscription banner and favorites list.
 export default function ProfileScreen({ navigation }) {
+  // Profile data, async flags, favorite outfits, item lookup map, and subscription tier.
   const [profile, setProfile]       = useState(null);
   const [loading, setLoading]       = useState(true);
   const [favorites, setFavorites]   = useState([]);
   const [wardrobeMap, setWardrobeMap] = useState({});
   const [userTier, setUserTier]     = useState('free');
+  // Animated value tracking scroll position — drives header height and image opacity.
   const scrollY = useRef(new Animated.Value(0)).current;
 
+  // Load profile data once on initial mount.
   useEffect(() => {
     loadProfile();
   }, []);
 
+  // Re-fetch every time the screen comes into focus so that edits made in EditProfile
+  // or changes to favorites are reflected immediately on return.
   useFocusEffect(
     useCallback(() => {
       loadProfile();
     }, [])
   );
 
+  // Fetches the user's profile, saved favorite outfits, and wardrobe items in parallel.
+  // Builds wardrobeMap (id → item) for O(1) image lookups inside FavoriteOutfitCard.
   const loadProfile = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -54,6 +66,7 @@ export default function ProfileScreen({ navigation }) {
         setProfile(data);
         setUserTier(data?.subscription_tier ?? 'free');
         if (favData) setFavorites(favData);
+        // Build an id→item map for O(1) lookups inside FavoriteOutfitCard.
         if (wardrobeData) setWardrobeMap(Object.fromEntries(wardrobeData.map(i => [i.id, i])));
       }
     } catch (error) {
@@ -63,10 +76,14 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
+  // Animated header shrinks from 200 → 80 px as the user scrolls, and the profile
+  // image scales down and fades out so the content takes centre stage.
   const HEADER_MAX_HEIGHT = 200;
   const HEADER_MIN_HEIGHT = 80;
   const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 
+  // Header height collapses proportionally to scroll distance, clamped so it never
+  // goes below HEADER_MIN_HEIGHT even if the user overscrolls.
   const headerHeight = scrollY.interpolate({
     inputRange: [0, HEADER_SCROLL_DISTANCE],
     outputRange: [HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
@@ -79,6 +96,8 @@ export default function ProfileScreen({ navigation }) {
     extrapolate: 'clamp',
   });
 
+  // Opacity fades from fully visible → invisible across the scroll range, with a
+  // mid-point keyframe at half the distance to make the fade feel non-linear.
   const profileImageOpacity = scrollY.interpolate({
     inputRange: [0, HEADER_SCROLL_DISTANCE / 2, HEADER_SCROLL_DISTANCE],
     outputRange: [1, 0.5, 0],
@@ -145,6 +164,7 @@ export default function ProfileScreen({ navigation }) {
             ) : (
               <View style={styles.profileImagePlaceholder}>
                 <Text style={styles.profileImageText}>
+                  {/* Fallback initial when username is null; toUpperCase for consistent display. */}
                   {(profile.username ?? 'U').charAt(0).toUpperCase()}
                 </Text>
               </View>
@@ -247,7 +267,8 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.favSectionHeader}>
             <Text style={styles.favSectionTitle}>Favorite Outfits</Text>
             <Text style={styles.favCount}>
-              {(userTier && userTier !== 'free')
+              {/* Show the cap only for free-tier users; truthy+non-'free' covers 'Premium' from the DB. */}
+          {(userTier && userTier !== 'free')
                 ? `${favorites.length} saved`
                 : `${favorites.length} of 5 saved`}
             </Text>
@@ -277,7 +298,11 @@ export default function ProfileScreen({ navigation }) {
   );
 }
 
+// Card component for a single saved outfit. Renders up to four item thumbnails in a
+// grid, an optional styling note, and a remove button that calls onUnfavorite.
 function FavoriteOutfitCard({ favorite, wardrobeMap, onUnfavorite }) {
+  // Cap at 4 images for the 2×2 grid; wardrobeMap[id] ?? null gracefully handles
+  // items that have been deleted from the wardrobe since the outfit was saved.
   var images = (favorite.clothing_item_ids ?? []).slice(0, 4).map(id => wardrobeMap[id] ?? null);
   return (
     <View style={styles.favCard}>
@@ -303,6 +328,9 @@ function FavoriteOutfitCard({ favorite, wardrobeMap, onUnfavorite }) {
   );
 }
 
+// Styles for ProfileScreen and FavoriteOutfitCard — brand header, animated collapsing
+// header, profile image (photo and initial placeholder), stats bar, subscription
+// banners (upgrade prompt and premium badge), favorites section, and card grid.
 const styles = StyleSheet.create({
   fullScreen: {
     flex: 1,

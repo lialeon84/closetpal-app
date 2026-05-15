@@ -1,3 +1,6 @@
+// One-time profile creation screen shown to new users after email sign-up. Collects
+// username, name, location, gender, and date of birth, then inserts the profile row
+// and refreshes the session so the auth listener navigates to the main app.
 import React, { useState } from 'react';
 import {
   View,
@@ -22,7 +25,10 @@ import {
 import { PRIMARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
 
+// Main screen component. Renders a scrollable form for all required profile fields
+// and delegates submission to handleSubmit.
 export default function ProfileSetupScreen() {
+  // Form field values, date picker visibility flag, and async submission flag.
   const [username, setUsername] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -33,6 +39,9 @@ export default function ProfileSetupScreen() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Validates all required fields, inserts a new profiles row, then calls
+  // refreshSession so the auth listener detects the completed profile and navigates
+  // to the main app. Handles the 23505 unique-constraint error for taken usernames.
   const handleSubmit = async () => {
     if (!username || !firstName || !lastName || !city || !state || !gender || !dob) {
       Alert.alert('Error', 'Please fill in all required fields');
@@ -53,7 +62,7 @@ export default function ProfileSetupScreen() {
       .from('profiles')
       .insert({
         id: user.id,
-        username: username.toLowerCase().trim(),
+        username: username.toLowerCase().trim(), // normalize for case-insensitive uniqueness
         first_name: firstName.trim(),
         last_name: lastName.trim(),
         city: city.trim(),
@@ -68,14 +77,14 @@ export default function ProfileSetupScreen() {
     setLoading(false);
 
     if (error) {
-      if (error.code === '23505') {
+      if (error.code === '23505') { // Postgres unique constraint — username already taken
         Alert.alert('Error', 'Username already taken. Please choose another.');
       } else {
         Alert.alert('Error', error.message);
       }
     } else {
       Alert.alert('Welcome!', `Ari's Closet is ready, ${firstName}! `);
-      await supabase.auth.refreshSession();
+      await supabase.auth.refreshSession(); // triggers the auth listener to navigate to the main app
     }
   };
 
@@ -161,12 +170,12 @@ export default function ProfileSetupScreen() {
           </Pressable>
           {showDatePicker && (
             <DateTimePicker
-              value={dob || new Date(2000, 0, 1)}
+              value={dob || new Date(2000, 0, 1)} // DateTimePicker requires a non-null Date; default to year 2000 before the user picks
               mode="date"
               display="default"
               maximumDate={new Date()}
               onChange={(event, selectedDate) => {
-                setShowDatePicker(Platform.OS === 'ios');
+                setShowDatePicker(Platform.OS === 'ios'); // Android auto-dismisses; keep open on iOS
                 if (selectedDate) setDob(selectedDate);
               }}
             />
@@ -191,6 +200,8 @@ export default function ProfileSetupScreen() {
   );
 }
 
+// Styles for ProfileSetupScreen — scroll container, header block, form fields,
+// state/gender pickers, date button, submit button, and required-fields note.
 const styles = StyleSheet.create({
   container: {
     flex: 1,

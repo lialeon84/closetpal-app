@@ -1,3 +1,6 @@
+// Settings hub screen. Provides navigation rows for account management (edit profile,
+// subscription), privacy and data controls (delete account, export data, notification
+// prefs, legal links), and a sign-out action.
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -18,14 +21,19 @@ import { Ionicons } from '@expo/vector-icons';
 const PRIVACY_URL = 'https://closetpal.app/privacy';
 const TERMS_URL   = 'https://closetpal.app/terms';
 
+// Main screen component. Fetches the user's profile on mount and renders grouped
+// setting rows organized into Account, Privacy, About, and Privacy & Data sections.
 export default function SettingsScreen({ navigation }) {
+  // Profile data (used for display) and initial-load flag.
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Fetch profile once on mount.
   useEffect(() => {
     loadProfile();
   }, []);
 
+  // Fetches the signed-in user's profile row once on mount for display purposes.
   const loadProfile = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -47,6 +55,8 @@ export default function SettingsScreen({ navigation }) {
     }
   };
 
+  // Prompts the user before signing out. The auth listener in the root navigator
+  // detects the cleared session and redirects to the login screen automatically.
   const handleLogout = async () => {
     Alert.alert(
       'Logout',
@@ -186,6 +196,8 @@ export default function SettingsScreen({ navigation }) {
   );
 }
 
+// Styles for SettingsScreen — brand header, grouped section cards, setting rows,
+// danger text color, divider, and bottom spacer.
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
