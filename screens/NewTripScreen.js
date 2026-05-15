@@ -150,7 +150,7 @@ export default function NewTripScreen({ navigation }) {
           'Wardrobe Too Small',
           'Please add at least 5 clothing items to your wardrobe before planning a trip.',
           [
-            { text: 'Add Clothes', onPress: () => navigation.navigate('Wardrobe') },
+            { text: 'Add Clothes', onPress: () => navigation.navigate('MainApp', { screen: 'Wardrobe' }) },
             { text: 'Cancel', style: 'cancel' },
           ]
         );
