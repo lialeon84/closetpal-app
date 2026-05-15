@@ -45,7 +45,7 @@ export default function ExportDataScreen({ navigation }) {
 
       // documentDirectory persists between sessions and is included in device backups;
       // cacheDirectory would be unpredictably cleared by the OS.
-      const filePath = FileSystem.documentDirectory + 'closetpal-export.json';
+      const filePath = FileSystem.documentDirectory + 'ariscloset-export.json';
       // null replacer + indent of 2 produces a human-readable file the user can open in any text editor.
       await FileSystem.writeAsStringAsync(filePath, JSON.stringify(exportData, null, 2), {
         encoding: FileSystem.EncodingType.UTF8,

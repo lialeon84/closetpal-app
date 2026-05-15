@@ -18,8 +18,8 @@ import { FONTS } from '../constants/fonts';
 import * as WebBrowser from 'expo-web-browser';
 import { Ionicons } from '@expo/vector-icons';
 
-const PRIVACY_URL = 'https://closetpal.app/privacy';
-const TERMS_URL   = 'https://closetpal.app/terms';
+const PRIVACY_URL = 'https://ariscloset.app/privacy.html';
+const TERMS_URL   = 'https://ariscloset.app/terms.html';
 
 // Main screen component. Fetches the user's profile on mount and renders grouped
 // setting rows organized into Account, Privacy, About, and Privacy & Data sections.
