@@ -255,7 +255,7 @@ export default function App() {
         await loginRevenueCat(session.user.id);
         // Sync subscription on launch — also catches expired subscriptions
         await syncSubscriptionStatus().catch(() => {});
-        checkProfile(session.user.id);
+        await checkProfile(session.user.id); 
       } else {
         setLoading(false);
       }
@@ -267,7 +267,7 @@ export default function App() {
         setHasProfile(null);
         await loginRevenueCat(session.user.id);
         await syncSubscriptionStatus().catch(() => {});
-        checkProfile(session.user.id);
+        await checkProfile(session.user.id); 
       } else {
         await logoutRevenueCat();
         setHasProfile(null);
