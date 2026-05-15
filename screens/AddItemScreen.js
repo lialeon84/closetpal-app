@@ -27,7 +27,7 @@ import { PRIMARY, SECONDARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
 import { Ionicons } from '@expo/vector-icons';
 
-const REMOVE_BG_API_KEY = 'cxoCqM6GMUgspjtjgQzKwRr7';
+const REMOVE_BG_API_KEY = process.env.EXPO_PUBLIC_REMOVE_BG__API_KEY_HERE;
 const REMOVE_BG_URL = 'https://api.remove.bg/v1.0/removebg';
 const ANTHROPIC_API_KEY = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
 
