@@ -1,3 +1,6 @@
+// Authentication screen for returning users. Validates email and password, normalizes
+// the email before submission, and delegates sign-in to Supabase Auth. Navigation
+// after a successful login is handled by the auth state listener in the root navigator.
 import React, { useState } from 'react';
 import {
   View,
@@ -16,11 +19,15 @@ import { supabase } from '../lib/supabase';
 import { PRIMARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
 
+// Main screen component. Provides email/password fields and a link to the signup flow.
 export default function LoginScreen({ navigation }) {
+  // Form field values and async operation flag.
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Validates both fields are non-empty, then calls Supabase signInWithPassword.
+  // On success, the root navigator's auth listener detects the session change and redirects.
   const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert('Error', 'Please fill in all fields');
@@ -30,7 +37,7 @@ export default function LoginScreen({ navigation }) {
     setLoading(true);
 
     const { error } = await supabase.auth.signInWithPassword({
-      email: email.toLowerCase().trim(),
+      email: email.toLowerCase().trim(), // normalize before sending — Supabase auth is case-sensitive
       password: password,
     });
 
@@ -75,7 +82,7 @@ export default function LoginScreen({ navigation }) {
                 secureTextEntry
                 returnKeyType="done"
                 blurOnSubmit={true}
-                onSubmitEditing={() => Keyboard.dismiss()}
+                onSubmitEditing={() => Keyboard.dismiss()} // dismiss keyboard when the user taps the Done key
               />
 
               <Pressable
@@ -101,6 +108,7 @@ export default function LoginScreen({ navigation }) {
   );
 }
 
+// Styles for LoginScreen — scroll container, title, form fields, sign-in button, and signup link.
 const styles = StyleSheet.create({
   container: {
     flex: 1,

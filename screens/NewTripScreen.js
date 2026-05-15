@@ -1,3 +1,6 @@
+// Screen for creating a new trip with an AI-generated packing list. Geocodes the destination,
+// optionally fetches a real weather forecast and maps it to a "weather vibe", then calls
+// Claude to select appropriate wardrobe items. Saves the trip and navigates to TripDetail.
 import React, { useState } from 'react';
 import {
   View,
@@ -27,13 +30,16 @@ const OPENWEATHER_API_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY;
 const TRIP_PURPOSES = ['Business', 'Vacation', 'Wedding', 'Beach', 'City Trip', 'Outdoor'];
 const WEATHER_VIBES = ['Warm', 'Cold', 'Mixed', 'Tropical', 'Snow'];
 
+// Main screen component. Manages trip form state, weather source selection, and the
+// full generation pipeline triggered by the "Generate Packing List" button.
 export default function NewTripScreen({ navigation }) {
   const { isPaid } = useSubscription();
   const { checkTrips, incrementTrips } = usageLimits(isPaid);
 
+  // Trip form fields, weather source toggle, and async operation flag.
   const [destination, setDestination] = useState('');
   const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
+  const [endDate, setEndDate] = useState(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)); // default to 1 week from today
   const [tripPurpose, setTripPurpose] = useState('');
   const [weatherSource, setWeatherSource] = useState('auto');
   const [weatherVibe, setWeatherVibe] = useState('');
@@ -41,8 +47,10 @@ export default function NewTripScreen({ navigation }) {
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
 
+  // Trip length in days — 86400000 ms per day; +1 because both start and end dates are inclusive.
   const durationDays = Math.max(1, Math.ceil((endDate - startDate) / 86400000) + 1);
 
+  // Returns false and shows an alert if any required field is missing or invalid.
   const validate = () => {
     if (!destination.trim()) {
       Alert.alert('Missing Info', 'Please enter a destination.');
@@ -59,6 +67,8 @@ export default function NewTripScreen({ navigation }) {
     return true;
   };
 
+  // Converts a destination string to lat/lng using expo-location's geocoder.
+  // Returns null if permission is denied or geocoding fails — caller falls back to 'Mixed' vibe.
   const geocodeDestination = async (dest) => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -73,6 +83,8 @@ export default function NewTripScreen({ navigation }) {
     return null;
   };
 
+  // Fetches a 5-day / 40-entry OpenWeatherMap forecast for the given coordinates.
+  // Returns the average temperature (°F) and the most frequently occurring weather condition.
   const fetchWeather = async (lat, lng) => {
     try {
       const resp = await fetch(
@@ -82,12 +94,14 @@ export default function NewTripScreen({ navigation }) {
       const data = await resp.json();
       const list = data.list || [];
       if (list.length === 0) return null;
+      // Average temperature across all forecast entries for a representative reading.
       const avgTemp = Math.round(list.reduce((s, e) => s + e.main.temp, 0) / list.length);
       const freq = {};
       list.forEach(e => {
         const c = e.weather[0].main;
         freq[c] = (freq[c] || 0) + 1;
       });
+      // Pick the condition that appears most often across the forecast window.
       const dominant = Object.keys(freq).sort((a, b) => freq[b] - freq[a])[0];
       return { avgTemp, dominant };
     } catch (e) {
@@ -96,6 +110,8 @@ export default function NewTripScreen({ navigation }) {
     }
   };
 
+  // Maps average temperature (°F) and dominant condition to a WEATHER_VIBES string
+  // used as context in the Claude prompt. Falls back to 'Mixed' when weather is unavailable.
   const vibeFromWeather = (weather) => {
     if (!weather) return 'Mixed';
     const { avgTemp, dominant = '' } = weather;
@@ -107,6 +123,12 @@ export default function NewTripScreen({ navigation }) {
     return 'Warm';
   };
 
+  // Full generation pipeline triggered by the "Generate Packing List" button:
+  // 1. Validate form fields and check usage quota.
+  // 2. Fetch wardrobe; require ≥5 items.
+  // 3. Geocode destination and optionally fetch a weather forecast → resolve weather vibe.
+  // 4. Call Claude with wardrobe + trip details; parse the JSON packing list.
+  // 5. Insert the trip row into Supabase, increment the usage counter, and navigate to TripDetail.
   const handleGenerate = async () => {
     if (!validate()) return;
     setLoading(true);
@@ -188,13 +210,13 @@ Rules: Pick 8-15 items depending on trip length. Use exact item IDs from the war
       if (!aiResp.ok) throw new Error(`Claude API error ${aiResp.status}`);
       const aiData = await aiResp.json();
       let rawText = aiData.content?.[0]?.text?.trim() ?? '';
-      rawText = rawText.replace(/^```json?\s*/i, '').replace(/\s*```$/, '').trim();
+      rawText = rawText.replace(/^```json?\s*/i, '').replace(/\s*```$/, '').trim(); // strip markdown fences Claude sometimes wraps around JSON
       const parsed = JSON.parse(rawText);
 
       const packingItems = (parsed.items || []).map(item => ({
         clothing_item_id: item.clothing_item_id,
         reason: item.reason,
-        packed: false,
+        packed: false, // items start unpacked; TripDetail lets the user check them off
       }));
 
       const { data: newTrip, error: saveError } = await supabase
@@ -218,7 +240,7 @@ Rules: Pick 8-15 items depending on trip length. Use exact item IDs from the war
       if (saveError) throw saveError;
 
       await incrementTrips();
-      navigation.replace('TripDetail', { trip: newTrip });
+      navigation.replace('TripDetail', { trip: newTrip }); // replace not push so the back button skips the form
     } catch (err) {
       console.error('[NewTrip]', err);
       Alert.alert('Error', 'Failed to generate packing list. Please try again.');
@@ -263,7 +285,7 @@ Rules: Pick 8-15 items depending on trip length. Use exact item IDs from the war
             display="default"
             minimumDate={new Date()}
             onChange={(_, date) => {
-              setShowStartPicker(Platform.OS === 'ios');
+              setShowStartPicker(Platform.OS === 'ios'); // Android auto-dismisses; keep open on iOS
               if (date) setStartDate(date);
             }}
           />
@@ -281,7 +303,7 @@ Rules: Pick 8-15 items depending on trip length. Use exact item IDs from the war
             display="default"
             minimumDate={startDate}
             onChange={(_, date) => {
-              setShowEndPicker(Platform.OS === 'ios');
+              setShowEndPicker(Platform.OS === 'ios'); // Android auto-dismisses; keep open on iOS
               if (date) setEndDate(date);
             }}
           />
@@ -380,6 +402,8 @@ Rules: Pick 8-15 items depending on trip length. Use exact item IDs from the war
   );
 }
 
+// Styles for NewTripScreen — safe area, header, form fields, date buttons, chip selectors,
+// weather toggle, generate button, and loading state.
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,

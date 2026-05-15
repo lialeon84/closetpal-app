@@ -1,3 +1,6 @@
+// Screen for managing the user's notification preferences (outfit reminders, style tips,
+// new features). Reads from and writes to the notification_preferences JSONB column on
+// the profiles table. Uses optimistic updates — toggles immediately, reverts on DB failure.
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -27,15 +30,20 @@ const PREFS_META = [
   { key: 'new_features',     label: 'New Features',      desc: 'Be the first to hear about updates' },
 ];
 
+// Main screen component. Renders a toggle row for each preference defined in PREFS_META.
 export default function NotificationPreferencesScreen({ navigation }) {
+  // Current preference values, initial-load flag, and save-in-progress flag.
   const [prefs, setPrefs] = useState(DEFAULTS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  // Fetch stored preferences once on mount.
   useEffect(() => {
     loadPrefs();
   }, []);
 
+  // Fetches the user's notification_preferences JSONB from their profile row and
+  // merges with DEFAULTS so any preference keys added after the user last saved are always present.
   const loadPrefs = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -45,6 +53,7 @@ export default function NotificationPreferencesScreen({ navigation }) {
         .eq('id', user.id)
         .single();
       if (data?.notification_preferences) {
+        // Spread DEFAULTS first so keys added after the user last saved still have a value.
         setPrefs({ ...DEFAULTS, ...data.notification_preferences });
       }
     } catch {
@@ -54,8 +63,10 @@ export default function NotificationPreferencesScreen({ navigation }) {
     }
   };
 
+  // Optimistically flips the given preference key in local state, then persists to Supabase.
+  // Reverts to the previous state object if the write fails.
   const togglePref = async (key) => {
-    const updated = { ...prefs, [key]: !prefs[key] };
+    const updated = { ...prefs, [key]: !prefs[key] }; // flip only the toggled key, preserve all others
     setPrefs(updated);
     setSaving(true);
     try {
@@ -67,7 +78,7 @@ export default function NotificationPreferencesScreen({ navigation }) {
       if (error) throw error;
     } catch (err) {
       // Revert optimistic update on failure
-      setPrefs(prefs);
+      setPrefs(prefs); // roll back to the pre-toggle value captured in the closure
       Alert.alert('Could not save', err.message);
     } finally {
       setSaving(false);
