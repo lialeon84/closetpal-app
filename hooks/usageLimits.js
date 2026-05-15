@@ -1,3 +1,7 @@
+// Enforces free-tier usage caps for favorites, wardrobe size, outfit recommendations,
+// AI clothing detection, trips, and AI swaps. Each check function either returns true
+// (action allowed), prompts the RevenueCat paywall, or fails open on network error so
+// users are never unexpectedly locked out.
 import Purchases from 'react-native-purchases';
 import RevenueCatUI, { PAYWALL_RESULT } from 'react-native-purchases-ui';
 import { supabase } from '../lib/supabase';
@@ -17,6 +21,7 @@ const monthStr  = () => new Date().toISOString().slice(0, 7);     // YYYY-MM
 // Module-level userId cache — stable for the lifetime of the auth session
 let _cachedUserId = null;
 
+// Fetches the authenticated user's ID, caching it in module scope for the session lifetime.
 async function getUserId() {
   if (_cachedUserId) return _cachedUserId;
   const { data: { user } } = await supabase.auth.getUser();
@@ -24,6 +29,7 @@ async function getUserId() {
   return _cachedUserId;
 }
 
+// Retrieves the usage_tracking row for the given user. Returns an empty object if no row exists yet.
 async function getUsage(userId) {
   const { data, error } = await supabase
     .from('usage_tracking')
@@ -37,6 +43,7 @@ async function getUsage(userId) {
   return data ?? {};
 }
 
+// Presents the RevenueCat paywall and returns true if the user purchased or restored a subscription.
 async function showPaywall() {
   try {
     const result = await RevenueCatUI.presentPaywall();
@@ -50,6 +57,8 @@ async function showPaywall() {
   }
 }
 
+// Factory that returns all check/increment helpers bound to the caller's isPaid status.
+// Paid users bypass every limit; free users are subject to the caps in FREE_LIMITS.
 export function usageLimits(isPaid) {
   // ── Favorites (total count, passed in by caller) ────────────────────────────
   const checkFavorites = async (currentCount) => {
@@ -92,6 +101,8 @@ export function usageLimits(isPaid) {
     return showPaywall();
   };
 
+  // Returns true if the daily outfit rec cap has been hit — used to disable UI without
+  // showing the paywall (the paywall fires on the generate attempt, not on render).
   const isOutfitRecsLocked = async () => {
     if (isPaid) return false;
     try {
@@ -107,6 +118,7 @@ export function usageLimits(isPaid) {
     }
   };
 
+  // Increments today's outfit rec counter, resetting to 1 if the stored date is no longer today.
   const incrementOutfitRecs = async () => {
     try {
       const uid = await getUserId();
@@ -143,6 +155,7 @@ export function usageLimits(isPaid) {
     return showPaywall();
   };
 
+  // Increments this month's AI detection counter, resetting to 1 if the stored month has rolled over.
   const incrementAiDetection = async () => {
     try {
       const uid = await getUserId();
@@ -179,6 +192,7 @@ export function usageLimits(isPaid) {
     return showPaywall();
   };
 
+  // Increments this month's trip creation counter, resetting to 1 if the stored month has rolled over.
   const incrementTrips = async () => {
     try {
       const uid = await getUserId();
@@ -198,6 +212,8 @@ export function usageLimits(isPaid) {
   };
 
   // ── AI swaps (daily) ────────────────────────────────────────────────────────
+  // Returns true/false without showing the paywall — callers use this to gate the swap UI
+  // and surface their own messaging; the paywall can be raised separately if desired.
   const canDoAISwap = async () => {
     if (isPaid) return true;
     try {
@@ -213,6 +229,7 @@ export function usageLimits(isPaid) {
     }
   };
 
+  // Increments today's AI swap counter, resetting to 1 if the stored date is no longer today.
   const incrementAISwap = async () => {
     try {
       const uid = await getUserId();

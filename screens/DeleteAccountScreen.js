@@ -1,3 +1,6 @@
+// Screen that permanently deletes the user's account and all associated data.
+// The user must type "DELETE" to unlock the confirmation button. Deletion removes
+// database rows, storage files, and the auth user (via an Edge Function), then signs out.
 import React, { useState } from 'react';
 import {
   View,
@@ -17,12 +20,20 @@ import { PRIMARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
 import { Ionicons } from '@expo/vector-icons';
 
+// Full-page confirmation flow for irreversible account deletion.
 export default function DeleteAccountScreen({ navigation }) {
   const [confirmText, setConfirmText] = useState('');
   const [deleting, setDeleting] = useState(false);
 
+  // Only true when the user has typed the exact string "DELETE" — gates the delete button.
   const confirmed = confirmText === 'DELETE';
 
+  // Executes the full account deletion sequence:
+  // 1. Delete clothing_items and favorite_outfits rows in parallel.
+  // 2. Delete the profile row.
+  // 3. Remove all storage files (clothing images and profile pictures).
+  // 4. Invoke the delete-user Edge Function to remove the auth user from Supabase Auth.
+  // 5. Sign out — the auth state change listener handles navigation away from the app.
   const handleDelete = async () => {
     if (!confirmed) return;
     setDeleting(true);
@@ -130,6 +141,7 @@ export default function DeleteAccountScreen({ navigation }) {
   );
 }
 
+// Styles for DeleteAccountScreen — header, warning content, confirmation input, and action buttons.
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,

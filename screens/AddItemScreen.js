@@ -1,3 +1,6 @@
+// Screen for adding a new clothing item to the user's wardrobe. Handles photo selection
+// (camera or library), background removal via remove.bg, AI-powered metadata detection
+// via Claude, and saving the final item with its uploaded image to Supabase.
 import React, { useState } from 'react';
 import {
   View,
@@ -70,6 +73,8 @@ const COLORS = [
   { name: 'Other', hex: null },
 ];
 
+// Returns true if the given hex color is perceptually light enough to need a visible border
+// against a white background. Uses the ITU-R BT.601 luma weighting formula.
 function isLightColor(hex) {
   if (!hex) return false;
   const r = parseInt(hex.slice(1, 3), 16);
@@ -78,6 +83,8 @@ function isLightColor(hex) {
   return (r * 299 + g * 587 + b * 114) / 1000 > 190;
 }
 
+// Converts an ArrayBuffer to a base64 string. Processes in 1 KB chunks to avoid
+// the JS call-stack overflow that String.fromCharCode.apply hits on large image buffers.
 function arrayBufferToBase64(buffer) {
   const bytes = new Uint8Array(buffer);
   let binary = '';
@@ -88,10 +95,13 @@ function arrayBufferToBase64(buffer) {
   return btoa(binary);
 }
 
+// Main screen component. Orchestrates photo capture, background removal, AI analysis,
+// and form submission to add a clothing item to the authenticated user's wardrobe.
 export default function AddItemScreen({ navigation }) {
   const { isPaid } = useSubscription();
   const { checkAiDetection, incrementAiDetection, checkWardrobe } = usageLimits(isPaid);
 
+  // State for the photo URI, async operation flags, and every clothing attribute field.
   const [photo, setPhoto] = useState(null);
   const [processingBg, setProcessingBg] = useState(false);
   const [analyzingAI, setAnalyzingAI] = useState(false);
@@ -105,11 +115,13 @@ export default function AddItemScreen({ navigation }) {
   const [formality, setFormality] = useState(null);
   const [saving, setSaving] = useState(false);
 
+  // Resets subcategory to the first valid option whenever the parent category changes.
   const handleCategoryChange = (newCat) => {
     setCategory(newCat);
     setSubcategory(SUBCATEGORIES[newCat][0]);
   };
 
+  // Handles color swatch selection. Activates the free-text input when "Other" is chosen.
   const selectColor = (colorName) => {
     if (colorName === 'Other') {
       setIsOtherColor(true);
@@ -140,6 +152,7 @@ export default function AddItemScreen({ navigation }) {
     }
   };
 
+  // Requests camera permission then opens the camera. Passes the captured URI to background removal.
   const launchCamera = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
@@ -155,6 +168,7 @@ export default function AddItemScreen({ navigation }) {
     if (!result.canceled) processBackground(result.assets[0].uri);
   };
 
+  // Requests media library permission then opens the photo picker. Passes the selected URI to background removal.
   const launchLibrary = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -219,6 +233,7 @@ export default function AddItemScreen({ navigation }) {
 
       const data = await response.json();
       const rawText = data.content?.[0]?.text?.trim() ?? '';
+      // Strip markdown code fences in case the model wraps its JSON output in ```json ... ```.
       const jsonStr = rawText.replace(/^```json?\s*/i, '').replace(/\s*```$/, '').trim();
       const result = JSON.parse(jsonStr);
 
@@ -346,6 +361,8 @@ export default function AddItemScreen({ navigation }) {
       setSaving(true);
       const { data: { user } } = await supabase.auth.getUser();
 
+      // split('?')[0] strips any query-string suffix from the URI before reading the extension
+      // (temp cache URIs and some CDN URIs can carry ?t=... or similar fragments).
       const fileExt = (photo.split('.').pop().split('?')[0] || 'jpg').toLowerCase();
       const fileName = `${user.id}/${Date.now()}.${fileExt}`;
 
@@ -388,6 +405,7 @@ export default function AddItemScreen({ navigation }) {
 
   // ─── Render ───────────────────────────────────────────────────────────────
 
+  // True during any async operation — disables interactive elements and drives the save button label.
   const busy = processingBg || saving || analyzingAI;
 
   return (
@@ -605,6 +623,7 @@ export default function AddItemScreen({ navigation }) {
   );
 }
 
+// Styles for AddItemScreen — header, photo picker, AI badge, form fields, color swatches, and submit button.
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
