@@ -15,11 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '../lib/supabase';
 import { PRIMARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
-import * as WebBrowser from 'expo-web-browser';
 import { Ionicons } from '@expo/vector-icons';
-
-const PRIVACY_URL = 'https://ariscloset.app/privacy.html';
-const TERMS_URL   = 'https://ariscloset.app/terms.html';
 
 // Main screen component. Fetches the user's profile on mount and renders grouped
 // setting rows organized into Account, Privacy, About, and Privacy & Data sections.
@@ -119,7 +115,7 @@ export default function SettingsScreen({ navigation }) {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Privacy</Text>
 
-          <Pressable style={styles.settingButton}>
+          <Pressable style={styles.settingButton} onPress={() => navigation.navigate('PrivacySettings')}>
             <Text style={styles.settingButtonText}>Privacy Settings</Text>
             <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />
           </Pressable>
@@ -153,37 +149,8 @@ export default function SettingsScreen({ navigation }) {
           </Pressable>
         </View>
 
-        {/* Privacy & Data */}
+        {/* Sign Out */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Privacy & Data</Text>
-
-          <Pressable style={styles.settingButton} onPress={() => navigation.navigate('DeleteAccount')}>
-            <Text style={[styles.settingButtonText, styles.dangerText]}>Delete Account</Text>
-            <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />
-          </Pressable>
-
-          <Pressable style={styles.settingButton} onPress={() => navigation.navigate('ExportData')}>
-            <Text style={styles.settingButtonText}>Export My Data</Text>
-            <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />
-          </Pressable>
-
-          <Pressable style={styles.settingButton} onPress={() => navigation.navigate('NotificationPreferences')}>
-            <Text style={styles.settingButtonText}>Notification Preferences</Text>
-            <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />
-          </Pressable>
-
-          <Pressable style={styles.settingButton} onPress={() => WebBrowser.openBrowserAsync(PRIVACY_URL)}>
-            <Text style={styles.settingButtonText}>Privacy Policy</Text>
-            <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />
-          </Pressable>
-
-          <Pressable style={styles.settingButton} onPress={() => WebBrowser.openBrowserAsync(TERMS_URL)}>
-            <Text style={styles.settingButtonText}>Terms of Service</Text>
-            <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />
-          </Pressable>
-
-          <View style={styles.sectionDivider} />
-
           <Pressable style={styles.settingButton} onPress={handleLogout}>
             <Text style={styles.settingButtonText}>Sign Out</Text>
             <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />

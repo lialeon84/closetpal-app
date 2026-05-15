@@ -47,6 +47,7 @@ import AddItemScreen from './screens/AddItemScreen';
 import ItemDetailScreen from './screens/ItemDetailScreen';
 import DeleteAccountScreen from './screens/DeleteAccountScreen';
 import NotificationPreferencesScreen from './screens/NotificationPreferencesScreen';
+import PrivacySettingsScreen from './screens/PrivacySettingsScreen';
 import ExportDataScreen from './screens/ExportDataScreen';
 import TripsScreen from './screens/TripsScreen';
 import NewTripScreen from './screens/NewTripScreen';
@@ -332,6 +333,7 @@ export default function App() {
               <Stack.Screen name="ItemDetail" component={ItemDetailScreen} />
               <Stack.Screen name="DeleteAccount" component={DeleteAccountScreen} />
               <Stack.Screen name="NotificationPreferences" component={NotificationPreferencesScreen} />
+              <Stack.Screen name="PrivacySettings" component={PrivacySettingsScreen} />
               <Stack.Screen name="ExportData" component={ExportDataScreen} />
               <Stack.Screen name="NewTrip" component={NewTripScreen} />
               <Stack.Screen name="TripDetail" component={TripDetailScreen} />
