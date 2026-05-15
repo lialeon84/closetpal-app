@@ -1,3 +1,6 @@
+// Detail view for a single wardrobe item. Supports read-only viewing, inline editing
+// (name, category, subcategory, color, season, photo), lent-item tracking with optional
+// push-notification reminders, and deletion.
 import React, { useState } from 'react';
 import {
   View,
@@ -35,13 +38,15 @@ const SUBCATEGORIES = {
   Accessories: ['Bag', 'Belt', 'Hat', 'Scarf', 'Jewelry', 'Sunglasses'],
 };
 
+// Main screen component. Receives the item via route.params and keeps a local copy in
+// currentItem so edits and lent-state changes update the UI without a full refetch.
 export default function ItemDetailScreen({ route, navigation }) {
   const [currentItem, setCurrentItem] = useState(route.params.item);
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Lent state (view mode)
+  // Lent state — mirrors the item's lent fields and drives both the lent banner and the inline edit form.
   const [isLent, setIsLent] = useState(currentItem.is_lent ?? false);
   const [lentToName, setLentToName] = useState(currentItem.lent_to_name ?? '');
   const [lentDate, setLentDate] = useState(
@@ -56,7 +61,7 @@ export default function ItemDetailScreen({ route, navigation }) {
   const [lentSaved, setLentSaved] = useState(false);
   const [lentFormOpen, setLentFormOpen] = useState(false);
 
-  // Edit form state
+  // Edit form state — isolated from currentItem so cancellation doesn't corrupt view-mode data.
   const [newPhoto, setNewPhoto] = useState(null);
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
@@ -64,6 +69,7 @@ export default function ItemDetailScreen({ route, navigation }) {
   const [color, setColor] = useState('');
   const [season, setSeason] = useState('');
 
+  // Copies currentItem values into the edit form fields and activates edit mode.
   const enterEditMode = () => {
     setNewPhoto(null);
     setName(currentItem.name);
@@ -74,6 +80,7 @@ export default function ItemDetailScreen({ route, navigation }) {
     setEditing(true);
   };
 
+  // Resets subcategory to the first valid option whenever the parent category changes.
   const handleCategoryChange = (newCat) => {
     setCategory(newCat);
     setSubcategory(SUBCATEGORIES[newCat][0]);
@@ -99,6 +106,7 @@ export default function ItemDetailScreen({ route, navigation }) {
     }
   };
 
+  // Requests camera permission then opens the camera. Sets newPhoto on success.
   const launchCamera = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
@@ -114,6 +122,7 @@ export default function ItemDetailScreen({ route, navigation }) {
     if (!result.canceled) setNewPhoto(result.assets[0].uri);
   };
 
+  // Requests media library permission then opens the photo picker. Sets newPhoto on success.
   const launchLibrary = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -129,6 +138,7 @@ export default function ItemDetailScreen({ route, navigation }) {
     if (!result.canceled) setNewPhoto(result.assets[0].uri);
   };
 
+  // Shows a destructive confirmation before discarding any unsaved edits.
   const handleEditCancel = () => {
     Alert.alert(
       'Discard Changes?',
@@ -140,6 +150,8 @@ export default function ItemDetailScreen({ route, navigation }) {
     );
   };
 
+  // Toggles the is_lent flag. When turning off, clears all lent fields and cancels scheduled
+  // notifications. When turning on, persists is_lent:true and opens the lent details form.
   const handleLentToggle = async () => {
     const newValue = !isLent;
     setIsLent(newValue);
@@ -177,6 +189,8 @@ export default function ItemDetailScreen({ route, navigation }) {
     }
   };
 
+  // Saves lent-to name, dates, and (re)schedules push notifications for the return date.
+  // Cancels any previously scheduled notifications first to avoid duplicates.
   const handleSaveLentDetails = async () => {
     if (!lentToName.trim()) {
       Alert.alert('Missing info', 'Please enter the name of who you lent this to.');
@@ -188,6 +202,7 @@ export default function ItemDetailScreen({ route, navigation }) {
         currentItem.notification_id_before,
         currentItem.notification_id_day_of,
       );
+      // Only schedule notifications if a return date was set; otherwise store nulls.
       const notifIds = expectedReturnDate
         ? await scheduleLentNotifications(currentItem.name, lentToName.trim(), expectedReturnDate)
         : { before: null, dayOf: null };
@@ -211,7 +226,7 @@ export default function ItemDetailScreen({ route, navigation }) {
         notification_id_day_of: notifIds.dayOf,
       }));
       setLentSaved(true);
-      setTimeout(() => setLentSaved(false), 2000);
+      setTimeout(() => setLentSaved(false), 2000); // briefly flash "Saved" confirmation then hide it
       setLentFormOpen(false);
     } catch (err) {
       Alert.alert('Error', err.message);
@@ -222,6 +237,8 @@ export default function ItemDetailScreen({ route, navigation }) {
 
   // ─── Save edits ───────────────────────────────────────────────────────────
 
+  // Validates required fields. If a new photo was picked, uploads it and deletes the old one
+  // from storage. Then updates the clothing_items row and refreshes local state.
   const handleSave = async () => {
     if (!name.trim()) {
       Alert.alert('Missing name', 'Please enter a name for your item.');
@@ -303,6 +320,7 @@ export default function ItemDetailScreen({ route, navigation }) {
 
   // ─── Delete ───────────────────────────────────────────────────────────────
 
+  // Shows a destructive confirmation alert before proceeding to delete the item.
   const confirmDelete = () => {
     Alert.alert(
       'Remove Item',
@@ -314,6 +332,7 @@ export default function ItemDetailScreen({ route, navigation }) {
     );
   };
 
+  // Deletes the clothing_items row and its image from Supabase storage, then navigates back.
   const handleDelete = async () => {
     try {
       setDeleting(true);
@@ -325,6 +344,7 @@ export default function ItemDetailScreen({ route, navigation }) {
 
       if (dbError) throw dbError;
 
+      // Extract the bucket-relative path from the full public URL; remove() needs the path, not the URL.
       if (currentItem.image_url) {
         const urlParts = currentItem.image_url.split('clothing-images/');
         if (urlParts.length > 1) {
@@ -341,6 +361,7 @@ export default function ItemDetailScreen({ route, navigation }) {
 
   // ─── Mark returned ───────────────────────────────────────────────────────
 
+  // Cancels any lent notifications and clears all lent fields, effectively marking the item returned.
   const handleMarkReturned = async () => {
     try {
       await cancelLentNotifications(
@@ -372,10 +393,12 @@ export default function ItemDetailScreen({ route, navigation }) {
 
   // ─── Render ───────────────────────────────────────────────────────────────
 
+  // True if the item is lent and the expected return date has already passed.
   const isOverdue = currentItem.is_lent &&
     currentItem.expected_return_date &&
     currentItem.expected_return_date <= new Date().toISOString().split('T')[0];
 
+  // Build the label/value rows for view mode; filter(Boolean) drops the subcategory row when absent.
   const detailRows = [
     { label: 'Category', value: currentItem.category },
     currentItem.subcategory ? { label: 'Subcategory', value: currentItem.subcategory } : null,
@@ -383,6 +406,7 @@ export default function ItemDetailScreen({ route, navigation }) {
     { label: 'Season', value: currentItem.season },
   ].filter(Boolean);
 
+  // In edit mode, show the newly-picked photo immediately; fall back to the saved URL.
   const displayPhoto = newPhoto || currentItem.image_url;
 
   return (
@@ -689,6 +713,8 @@ export default function ItemDetailScreen({ route, navigation }) {
   );
 }
 
+// Styles for ItemDetailScreen — header, full-width image, detail card, lent banner,
+// lent form, edit form, and delete button.
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,

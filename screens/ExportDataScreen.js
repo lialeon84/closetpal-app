@@ -1,3 +1,5 @@
+// Screen that lets the user export all their app data (profile, clothing items, saved outfits)
+// as a formatted JSON file and share it via the native share sheet.
 import React, { useState } from 'react';
 import {
   View,
@@ -15,9 +17,12 @@ import { PRIMARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
 import { Ionicons } from '@expo/vector-icons';
 
+// Main screen component. Displays a single action button that triggers the full export flow.
 export default function ExportDataScreen({ navigation }) {
   const [exporting, setExporting] = useState(false);
 
+  // Fetches all user data in parallel, writes it as pretty-printed JSON to the device's
+  // document directory, then opens the native share sheet so the user can save or send it.
   const handleExport = async () => {
     setExporting(true);
     try {
@@ -38,11 +43,15 @@ export default function ExportDataScreen({ navigation }) {
         favorite_outfits: favoriteOutfits ?? [],
       };
 
+      // documentDirectory persists between sessions and is included in device backups;
+      // cacheDirectory would be unpredictably cleared by the OS.
       const filePath = FileSystem.documentDirectory + 'closetpal-export.json';
+      // null replacer + indent of 2 produces a human-readable file the user can open in any text editor.
       await FileSystem.writeAsStringAsync(filePath, JSON.stringify(exportData, null, 2), {
         encoding: FileSystem.EncodingType.UTF8,
       });
 
+      // Sharing is unavailable in some environments (e.g. iOS Simulator); always check before calling.
       const isAvailable = await Sharing.isAvailableAsync();
       if (!isAvailable) {
         Alert.alert('Sharing not available', 'Your device does not support file sharing.');
@@ -97,6 +106,7 @@ export default function ExportDataScreen({ navigation }) {
   );
 }
 
+// Styles for ExportDataScreen — header, centered content area, and export button.
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,

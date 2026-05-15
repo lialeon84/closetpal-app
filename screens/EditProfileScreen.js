@@ -1,3 +1,6 @@
+// Screen for editing the user's profile: name, location, gender, date of birth, profile photo,
+// and style preferences (colors, patterns, brands, lifestyle). Assembles a natural-language
+// style_bio from selections and saves all fields to the profiles table in Supabase.
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -39,6 +42,8 @@ const PATTERN_OPTIONS = [
 ];
 const LIFESTYLE_OPTIONS = ['Casual', 'Professional', 'Active', 'Eclectic', 'Minimalist'];
 
+// Assembles a natural-language style bio sentence from the user's colors, patterns, and lifestyle.
+// Used to populate the style_bio field on save (e.g. "I love Black and Navy tones, Solid pieces, and a Casual aesthetic.").
 function buildStyleBio(colors, patterns, lifestyle) {
   const segments = [];
   if (colors.length > 0) {
@@ -63,6 +68,7 @@ function buildStyleBio(colors, patterns, lifestyle) {
   return segments.length === 0 ? `${last}.` : `${segments.join(', ')}, and ${last}.`;
 }
 
+// Renders a wrapping grid of toggleable chips where multiple items can be active simultaneously.
 function MultiChip({ options, selected, onToggle }) {
   return (
     <View style={chipStyles.grid}>
@@ -81,6 +87,7 @@ function MultiChip({ options, selected, onToggle }) {
   );
 }
 
+// Renders a wrapping grid of chips where only one item can be selected at a time.
 function SingleChip({ options, selected, onSelect }) {
   return (
     <View style={chipStyles.grid}>
@@ -99,7 +106,10 @@ function SingleChip({ options, selected, onSelect }) {
   );
 }
 
+// Main screen component. Loads the current profile on mount and provides a form to edit
+// all profile fields and style preferences, then saves to Supabase on submit.
 export default function EditProfileScreen({ navigation }) {
+  // Async operation flags and all editable profile fields.
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -118,10 +128,12 @@ export default function EditProfileScreen({ navigation }) {
   const [brandsText, setBrandsText] = useState('');
   const [lifestyle, setLifestyle] = useState('');
 
+  // Fetch profile data once on mount.
   useEffect(() => {
     loadProfile();
   }, []);
 
+  // Fetches the authenticated user's profile row and populates all form state fields.
   const loadProfile = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -144,7 +156,7 @@ export default function EditProfileScreen({ navigation }) {
         setProfileImage(data.profile_picture_url || null);
         setSelectedColors(data.favorite_colors || []);
         setSelectedPatterns(data.favorite_patterns || []);
-        setBrandsText((data.favorite_brands || []).join(', '));
+        setBrandsText((data.favorite_brands || []).join(', ')); // flatten array to an editable comma-separated string
         setLifestyle(data.lifestyle || '');
       }
     } catch (error) {
@@ -154,6 +166,7 @@ export default function EditProfileScreen({ navigation }) {
     }
   };
 
+  // Requests media library permission then opens the photo picker for profile photo selection.
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -174,6 +187,8 @@ export default function EditProfileScreen({ navigation }) {
     }
   };
 
+  // Uploads the picked image to Supabase storage (profile-pictures bucket) and updates
+  // profileImage to the resulting public URL. Uses upsert:true since the path can be overwritten.
   const uploadImage = async (uri) => {
     try {
       setUploading(true);
@@ -208,6 +223,8 @@ export default function EditProfileScreen({ navigation }) {
     }
   };
 
+  // Validates all required fields, builds the brands array and style_bio, then updates the
+  // profiles row. Surfaces a user-friendly message for duplicate-username (23505) errors.
   const saveProfile = async () => {
     if (!username.trim() || !firstName.trim() || !lastName.trim() ||
         !city.trim() || !state || !gender || !dob) {
@@ -219,13 +236,14 @@ export default function EditProfileScreen({ navigation }) {
       setSaving(true);
 
       const { data: { user } } = await supabase.auth.getUser();
+      // Re-split and clean the comma-separated input; filter(Boolean) drops empty strings from trailing commas.
       const brands = brandsText.split(',').map(b => b.trim()).filter(Boolean);
       const style_bio = buildStyleBio(selectedColors, selectedPatterns, lifestyle);
 
       const { error } = await supabase
         .from('profiles')
         .update({
-          username: username.toLowerCase().trim(),
+          username: username.toLowerCase().trim(), // stored lowercase so lookups are case-insensitive
           first_name: firstName.trim(),
           last_name: lastName.trim(),
           city: city.trim(),
@@ -242,7 +260,7 @@ export default function EditProfileScreen({ navigation }) {
         .eq('id', user.id);
 
       if (error) {
-        if (error.code === '23505') {
+        if (error.code === '23505') { // Postgres unique constraint violation — username already taken
           Alert.alert('Error', 'Username already taken. Please choose another.');
         } else {
           throw error;
@@ -448,6 +466,7 @@ export default function EditProfileScreen({ navigation }) {
   );
 }
 
+// Styles for EditProfileScreen — safe area, header, profile image section, form fields, and save button.
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -624,6 +643,7 @@ const styles = StyleSheet.create({
   },
 });
 
+// Styles for MultiChip and SingleChip — shared by all preference chip grids on this screen.
 const chipStyles = StyleSheet.create({
   grid: {
     flexDirection: 'row',

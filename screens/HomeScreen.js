@@ -1,3 +1,6 @@
+// Home screen that generates AI-powered outfit recommendations from the user's wardrobe,
+// current weather (via Open-Meteo), and a selected occasion. Supports saving favorites,
+// per-item and per-outfit dislike feedback, and AI-powered item swapping.
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -30,6 +33,7 @@ var OCCASIONS = ['Casual', 'Work', 'Date Night', 'Active', 'Formal'];
 
 var { width: SCREEN_WIDTH } = Dimensions.get('window');
 // card has 16px outer margin each side + 16px inner padding each side
+// 32px outer margins + 32px inner padding + 8px gap between the two columns, divided by 2.
 var IMAGE_SIZE = (SCREEN_WIDTH - 32 - 32 - 8) / 2;
 
 var WEATHER_CODES = {
@@ -56,6 +60,8 @@ var WEATHER_CODES = {
   99: { label: 'Thunderstorm',    emoji: '⛈️'  },
 };
 
+// Maps a WMO Open-Meteo weather code to a display label and emoji. Falls back to the closest
+// known code when the exact code isn't in the map — the WMO spec can return codes not explicitly listed.
 function decodeWeather(code) {
   if (WEATHER_CODES[code]) return WEATHER_CODES[code];
   var keys = Object.keys(WEATHER_CODES).map(Number).sort((a, b) => a - b);
@@ -63,17 +69,21 @@ function decodeWeather(code) {
   return WEATHER_CODES[closest] ?? { label: 'Clear', emoji: '🌡️' };
 }
 
+// Main screen component. Manages outfit generation state, favorites, and the occasion picker modal.
 export default function HomeScreen() {
   var navigation = useNavigation();
   var { isPaid } = useSubscription();
   var { checkFavorites, checkOutfitRecs, incrementOutfitRecs, isOutfitRecsLocked, canDoAISwap, incrementAISwap } = usageLimits(isPaid);
   var [isLocked, setIsLocked] = useState(false);
 
+  // Sync the lock state whenever isPaid changes (e.g. immediately after a purchase).
   useEffect(() => {
     if (isPaid) return;
     isOutfitRecsLocked().then(setIsLocked).catch(() => {});
   }, [isPaid]);
 
+  // Re-check the lock state when the app returns to the foreground — covers purchases completed
+  // inside the paywall before the customer info listener has fired.
   useEffect(() => {
     const sub = AppState.addEventListener('change', nextState => {
       if (nextState === 'active' && !isPaid) {
@@ -83,6 +93,7 @@ export default function HomeScreen() {
     return () => sub.remove();
   }, [isPaid]);
 
+  // Outfit generation results, UI state, and per-session data.
   var [outfits, setOutfits]         = useState([]);
   var [weather, setWeather]         = useState(null);
   var [occasion, setOccasion]       = useState(null);
@@ -94,6 +105,7 @@ export default function HomeScreen() {
   var [wardrobeItems, setWardrobeItems] = useState([]);
   var [currentUserId, setCurrentUserId] = useState(null);
 
+  // Opens the occasion picker, or prompts the paywall if the free-tier daily limit has been hit.
   var handleGetOutfits = async () => {
     if (!isPaid && isLocked) {
       await RevenueCatUI.presentPaywall();
@@ -104,6 +116,7 @@ export default function HomeScreen() {
     setShowPicker(true);
   };
 
+  // Closes the picker, verifies the outfitRecs usage cap, then kicks off outfit generation.
   var handleSelectOccasion = async (selected) => {
     setOccasion(selected);
     setShowPicker(false);
@@ -112,11 +125,14 @@ export default function HomeScreen() {
     await generateOutfits(selected);
   };
 
+  // Produces a stable, order-independent string key from an outfit's item IDs for deduplication and toggling.
   var outfitKey = (outfit) => outfit.items.map(i => i.id).sort().join(',');
 
+  // Returns the saved favorite_outfits row matching this outfit, or undefined if not favorited.
   var findFavorite = (outfit) =>
     favorites.find(f => [...f.clothing_item_ids].sort().join(',') === outfitKey(outfit));
 
+  // Fetches all saved favorite outfits for the user and stores them in local state.
   var loadFavorites = async (userId) => {
     var { data: favData } = await supabase
       .from('favorite_outfits')
@@ -126,6 +142,8 @@ export default function HomeScreen() {
     if (favData) setFavorites(favData);
   };
 
+  // Adds or removes an outfit from favorites. Uses displayItems (currentItems) rather than
+  // outfit.items to capture any swaps the user made after generation. Checks the free-tier cap before inserting.
   var toggleFavorite = async (outfit, currentItems) => {
     var items = currentItems ?? outfit.items;
     var key = items.map(i => i.id).sort().join(',');
@@ -165,6 +183,11 @@ export default function HomeScreen() {
     }
   };
 
+  // Full outfit generation pipeline:
+  // 1. Fetch wardrobe and dislike feedback, filter out disliked items.
+  // 2. Get device location and fetch current weather from Open-Meteo.
+  // 3. Call Claude with the filtered wardrobe, weather, and occasion to get 3 outfit suggestions.
+  // 4. Filter out disliked combos, enrich items with image URLs, and update state.
   var generateOutfits = async (selectedOccasion) => {
     setLoading(true);
     setError(null);
@@ -178,6 +201,7 @@ export default function HomeScreen() {
         .select('clothing_item_id, outfit_combo_key, feedback_type')
         .eq('user_id', user.id);
       if (feedbackErr) console.warn('[OutfitFeedback]', feedbackErr.message);
+      // Use Sets for O(1) lookup when filtering the wardrobe and outfit combo lists.
       var dislikedItemIds = new Set(
         (feedbackRows ?? [])
           .filter(r => r.feedback_type === 'dislike_item' && r.clothing_item_id)
@@ -255,7 +279,7 @@ export default function HomeScreen() {
       var jsonStr = rawText.replace(/^```json?\s*/i, '').replace(/\s*```$/, '').trim();
       var parsed = JSON.parse(jsonStr);
 
-      // Handle if AI wrapped it in an object like { outfits: [...] }
+      // Claude sometimes wraps the array in an object — try common wrapper keys before giving up.
       if (!Array.isArray(parsed)) {
         parsed = parsed.outfits || parsed.recommendations || parsed.items || Object.values(parsed)[0];
       }
@@ -266,6 +290,7 @@ export default function HomeScreen() {
       }
 
       // Enrich items with image_url from wardrobe
+      // Build an id→item index so image_url enrichment is O(1) instead of O(n) per item.
       var wardrobeMap = Object.fromEntries(wardrobe.map(i => [i.id, i]));
       var enriched = parsed.map(outfit => ({
         ...outfit,
@@ -280,6 +305,7 @@ export default function HomeScreen() {
 
       setOutfits(filtered);
       await loadFavorites(user.id);
+      // Lock the button immediately so free users see the lock icon without a round-trip refetch.
       incrementOutfitRecs()
         .then(() => { if (!isPaid) setIsLocked(true); })
         .catch(() => {});
@@ -291,10 +317,12 @@ export default function HomeScreen() {
     }
   };
 
+  // Removes the disliked outfit card from local display (the DB feedback row is written by OutfitCard).
   var handleDislikeOutfit = (outfitIdx) => {
     setOutfits(prev => prev.filter((_, i) => i !== outfitIdx));
   };
 
+  // True whenever there is something to show in the main area — hides the idle CTA card.
   var hasContent = loading || outfits.length > 0 || error;
 
   return (
@@ -421,6 +449,8 @@ export default function HomeScreen() {
   );
 }
 
+// Renders a single outfit recommendation card with a photo grid, item list, styling note,
+// and controls for favoriting, disliking (item or whole outfit), and AI-powered item swapping.
 function OutfitCard({
   outfit, index, weather, occasion,
   isFavorited, isToggling, onToggleFavorite,
@@ -432,8 +462,10 @@ function OutfitCard({
   var [swapLoading, setSwapLoading]   = useState(null);
   var [redIconIds, setRedIconIds]     = useState(new Set());
 
+  // Only show items that have a photo; cap at 4 to keep the grid balanced in a 2×2 layout.
   var displayImages = displayItems.filter(i => i.image_url).slice(0, 4);
 
+  // Records a dislike_outfit feedback row in Supabase, then removes this card from the parent list.
   var handleDislikeWholeOutfit = async () => {
     try {
       var comboKey = outfit.items.map(i => i.id).sort().join('_');
@@ -448,6 +480,7 @@ function OutfitCard({
     onDislikeOutfit();
   };
 
+  // Records a dislike_item feedback row and briefly turns the thumbs-down icon red as confirmation.
   var handleDislikeItem = async (item) => {
     try {
       await supabase.from('outfit_feedback').insert({
@@ -459,6 +492,7 @@ function OutfitCard({
       console.error('[DislikeItem]', err.message);
     }
     setRedIconIds(prev => new Set([...prev, item.id]));
+    // Reset the icon color after 800ms. A new Set is required — React needs a new reference to trigger a re-render.
     setTimeout(() => {
       setRedIconIds(prev => {
         var next = new Set(prev);
@@ -468,14 +502,17 @@ function OutfitCard({
     }, 800);
   };
 
+  // Opens the swap options modal (AI pick or manual wardrobe browse) for the given item index.
   var handleOpenSwap = (itemIdx) => {
     setSwapModal({ itemIdx, mode: 'options' });
   };
 
+  // Switches the swap modal from the options view to the manual wardrobe picker view.
   var handlePickFromWardrobe = () => {
     setSwapModal(prev => ({ ...prev, mode: 'wardrobe' }));
   };
 
+  // Applies the manually-chosen wardrobe item as a replacement and closes the swap modal.
   var handleSelectReplacement = (replacement) => {
     setDisplayItems(prev => prev.map((item, i) =>
       i === swapModal.itemIdx ? { ...replacement } : item
@@ -483,6 +520,9 @@ function OutfitCard({
     setSwapModal(null);
   };
 
+  // Checks the AI swap daily limit, then calls Claude to pick the best same-category replacement.
+  // Falls back to the manual picker if the limit is hit, no candidates exist, or the AI returns
+  // an ID that isn't in the wardrobe.
   var handleAISwap = async (itemIdx) => {
     setSwapModal(null);
 
@@ -545,6 +585,7 @@ function OutfitCard({
     }
   };
 
+  // Derive which wardrobe items are valid swap candidates for the currently open modal.
   var swapItemIdx = swapModal?.itemIdx ?? null;
   var swapCategory = swapItemIdx != null ? displayItems[swapItemIdx]?.category : null;
   var swapCandidates = swapCategory
@@ -757,6 +798,8 @@ function OutfitCard({
   );
 }
 
+// Styles for HomeScreen and OutfitCard — header, CTA card, state boxes, outfit card, photo grid,
+// item list, styling note, swap sheets, occasion picker modal, and the regenerate button.
 var styles = StyleSheet.create({
   safeArea: {
     flex: 1,
