@@ -29,8 +29,9 @@ const VIBE_EMOJI = { Warm: '☀️', Cold: '❄️', Mixed: '🌤️', Tropical:
 export default function TripDetailScreen({ route, navigation }) {
   // Trip row (refreshed from DB on focus), packing items array, wardrobe id→item map,
   // initial-load flag, and the clothing_item_id currently being saved (null when idle).
-  const [trip, setTrip] = useState(route.params.trip);
-  const [packingItems, setPackingItems] = useState(route.params.trip.packing_items || []);
+  const tripParam = route?.params?.trip ?? null;
+  const [trip, setTrip] = useState(tripParam);
+  const [packingItems, setPackingItems] = useState(tripParam?.packing_items ?? []);
   const [wardrobeMap, setWardrobeMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(null);
@@ -127,6 +128,11 @@ export default function TripDetailScreen({ route, navigation }) {
   const packedCount = packingItems.filter(i => i.packed).length;
   const totalCount = packingItems.length;
   const progressPct = totalCount > 0 ? packedCount / totalCount : 0; // guard against NaN when list is empty
+
+  if (!trip) {
+    navigation.goBack();
+    return null;
+  }
 
   const startDate = formatDateForDisplay(parseDateFromDB(trip.start_date));
   const endDate = formatDateForDisplay(parseDateFromDB(trip.end_date));

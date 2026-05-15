@@ -43,15 +43,9 @@ function LockedStylistView() {
   // so the useSubscription hook reflects the new entitlement right away.
   const handleUpgrade = async () => {
     try {
-      console.log('[Purchase] Presenting paywall...');
       const result = await RevenueCatUI.presentPaywall();
-      console.log('[Purchase] Paywall result:', result);
       if (result === PAYWALL_RESULT.PURCHASED || result === PAYWALL_RESULT.RESTORED) {
-        console.log('[Purchase] Purchase/restore confirmed — calling syncSubscriptionStatus');
         await syncSubscriptionStatus();
-        console.log('[Purchase] syncSubscriptionStatus complete');
-      } else {
-        console.log('[Purchase] No purchase made (cancelled or dismissed)');
       }
     } catch (err) {
       console.error('[Purchase] handleUpgrade error:', err);

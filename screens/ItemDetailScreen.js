@@ -41,19 +41,20 @@ const SUBCATEGORIES = {
 // Main screen component. Receives the item via route.params and keeps a local copy in
 // currentItem so edits and lent-state changes update the UI without a full refetch.
 export default function ItemDetailScreen({ route, navigation }) {
-  const [currentItem, setCurrentItem] = useState(route.params.item);
+  const item = route?.params?.item ?? null;
+  const [currentItem, setCurrentItem] = useState(item);
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [saving, setSaving] = useState(false);
 
   // Lent state — mirrors the item's lent fields and drives both the lent banner and the inline edit form.
-  const [isLent, setIsLent] = useState(currentItem.is_lent ?? false);
-  const [lentToName, setLentToName] = useState(currentItem.lent_to_name ?? '');
+  const [isLent, setIsLent] = useState(item?.is_lent ?? false);
+  const [lentToName, setLentToName] = useState(item?.lent_to_name ?? '');
   const [lentDate, setLentDate] = useState(
-    currentItem.lent_date ? parseDateFromDB(currentItem.lent_date) : new Date()
+    item?.lent_date ? parseDateFromDB(item.lent_date) : new Date()
   );
   const [expectedReturnDate, setExpectedReturnDate] = useState(
-    currentItem.expected_return_date ? parseDateFromDB(currentItem.expected_return_date) : null
+    item?.expected_return_date ? parseDateFromDB(item.expected_return_date) : null
   );
   const [showLentDatePicker, setShowLentDatePicker] = useState(false);
   const [showReturnDatePicker, setShowReturnDatePicker] = useState(false);
@@ -405,6 +406,11 @@ export default function ItemDetailScreen({ route, navigation }) {
     { label: 'Color', value: currentItem.color },
     { label: 'Season', value: currentItem.season },
   ].filter(Boolean);
+
+  if (!currentItem) {
+    navigation.goBack();
+    return null;
+  }
 
   // In edit mode, show the newly-picked photo immediately; fall back to the saved URL.
   const displayPhoto = newPhoto || currentItem.image_url;

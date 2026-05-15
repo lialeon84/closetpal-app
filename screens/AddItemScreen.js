@@ -188,7 +188,6 @@ export default function AddItemScreen({ navigation }) {
 
   const analyzeWithAI = async (imageUri) => {
     if (!ANTHROPIC_API_KEY) {
-      console.log('[AI] No EXPO_PUBLIC_ANTHROPIC_API_KEY set — skipping analysis');
       return;
     }
     const ok = await checkAiDetection();
@@ -227,7 +226,6 @@ export default function AddItemScreen({ navigation }) {
       });
 
       if (!response.ok) {
-        console.log('[AI] API error', response.status, await response.text());
         return;
       }
 
@@ -262,7 +260,6 @@ export default function AddItemScreen({ navigation }) {
       await incrementAiDetection();
       setAiAutoFilled(true);
     } catch (err) {
-      console.log('[AI] Analysis failed:', err.message);
     } finally {
       setAnalyzingAI(false);
     }
@@ -275,15 +272,9 @@ export default function AddItemScreen({ navigation }) {
     setProcessingBg(true);
 
     try {
-      console.log('[RemoveBg] Starting background removal');
-      console.log('[RemoveBg] Photo URI:', uri);
-      console.log('[RemoveBg] API key (first 6 chars):', REMOVE_BG_API_KEY.slice(0, 6));
-
       const formData = new FormData();
       formData.append('image_file', { uri, type: 'image/jpeg', name: 'photo.jpg' });
       formData.append('size', 'auto');
-
-      console.log('[RemoveBg] Sending request to:', REMOVE_BG_URL);
 
       const response = await fetch(REMOVE_BG_URL, {
         method: 'POST',
@@ -291,39 +282,26 @@ export default function AddItemScreen({ navigation }) {
         body: formData,
       });
 
-      console.log('[RemoveBg] Response status:', response.status, response.statusText);
-
-      const headers = {};
-      response.headers.forEach((value, key) => { headers[key] = value; });
-      console.log('[RemoveBg] Response headers:', JSON.stringify(headers, null, 2));
-
       if (!response.ok) {
         const rawBody = await response.text();
-        console.log('[RemoveBg] Error response body (raw):', rawBody);
         let message = `Remove.bg error (${response.status})`;
         try {
           const json = JSON.parse(rawBody);
-          console.log('[RemoveBg] Error response body (parsed):', JSON.stringify(json, null, 2));
           message = json.errors?.[0]?.title || message;
         } catch (parseErr) {
-          console.log('[RemoveBg] Body is not JSON:', parseErr.message);
         }
         throw new Error(message);
       }
 
-      console.log('[RemoveBg] Success — reading response body');
       const arrayBuffer = await response.arrayBuffer();
-      console.log('[RemoveBg] Response body size (bytes):', arrayBuffer.byteLength);
 
       const base64 = arrayBufferToBase64(arrayBuffer);
       const tempUri = `${FileSystem.cacheDirectory}item_${Date.now()}.png`;
-      console.log('[RemoveBg] Writing processed image to:', tempUri);
 
       await FileSystem.writeAsStringAsync(tempUri, base64, {
         encoding: FileSystem.EncodingType.Base64,
       });
 
-      console.log('[RemoveBg] Done — photo updated to processed URI');
       setPhoto(tempUri);
       analyzeWithAI(tempUri); // fire and forget — manages its own loading state
     } catch (error) {

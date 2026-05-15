@@ -29,7 +29,7 @@ export default function DeleteAccountScreen({ navigation }) {
   const confirmed = confirmText === 'DELETE';
 
   // Executes the full account deletion sequence:
-  // 1. Delete clothing_items and favorite_outfits rows in parallel.
+  // 1. Delete all user data rows in parallel (dependent tables before profile).
   // 2. Delete the profile row.
   // 3. Remove all storage files (clothing images and profile pictures).
   // 4. Invoke the delete-user Edge Function to remove the auth user from Supabase Auth.
@@ -45,6 +45,9 @@ export default function DeleteAccountScreen({ navigation }) {
       await Promise.all([
         supabase.from('clothing_items').delete().eq('user_id', user.id),
         supabase.from('favorite_outfits').delete().eq('user_id', user.id),
+        supabase.from('trips').delete().eq('user_id', user.id),
+        supabase.from('outfit_feedback').delete().eq('user_id', user.id),
+        supabase.from('usage_tracking').delete().eq('user_id', user.id),
       ]);
       await supabase.from('profiles').delete().eq('id', user.id);
 

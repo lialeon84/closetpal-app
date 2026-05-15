@@ -126,7 +126,7 @@ export default function HomeScreen() {
   };
 
   // Produces a stable, order-independent string key from an outfit's item IDs for deduplication and toggling.
-  var outfitKey = (outfit) => outfit.items.map(i => i.id).sort().join(',');
+  var outfitKey = (outfit) => (outfit?.items ?? []).map(i => i.id).sort().join(',');
 
   // Returns the saved favorite_outfits row matching this outfit, or undefined if not favorited.
   var findFavorite = (outfit) =>

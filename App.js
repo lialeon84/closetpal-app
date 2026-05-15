@@ -67,18 +67,24 @@ function MainTabs() {
   }, []);
 
   const loadUserInfo = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data } = await supabase
-        .from('profiles')
-        .select('username, profile_picture_url')
-        .eq('id', user.id)
-        .single();
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('username, profile_picture_url')
+          .eq('id', user.id)
+          .single();
 
-      if (data) {
-        setUserInitial(data.username?.charAt(0).toUpperCase() || 'U');
-        setProfilePicture(data.profile_picture_url);
+        if (data) {
+          setUserInitial(data.username?.charAt(0).toUpperCase() || 'U');
+          setProfilePicture(data.profile_picture_url);
+        }
       }
+    } catch (err) {
+      console.error('[loadUserInfo error]', err);
+      setUserInitial('U');
+      setProfilePicture(null);
     }
   };
 
@@ -286,20 +292,26 @@ export default function App() {
   }, []);
 
   const checkProfile = async (userId) => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('id, style_bio, created_at')
-      .eq('id', userId)
-      .single();
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('id, style_bio, created_at')
+        .eq('id', userId)
+        .single();
 
-    setHasProfile(!!data);
-    if (data && !data.style_bio) {
-      const ageMs = Date.now() - new Date(data.created_at).getTime();
-      const isNew = ageMs < 5 * 60 * 1000;
-      const skipped = await AsyncStorage.getItem('stylePrefsSkipped');
-      if (isNew && skipped !== 'true') setShowStylePrefsModal(true);
+      setHasProfile(!!data);
+      if (data && !data.style_bio) {
+        const ageMs = Date.now() - new Date(data.created_at).getTime();
+        const isNew = ageMs < 5 * 60 * 1000;
+        const skipped = await AsyncStorage.getItem('stylePrefsSkipped');
+        if (isNew && skipped !== 'true') setShowStylePrefsModal(true);
+      }
+    } catch (err) {
+      console.error('[checkProfile error]', err);
+      setHasProfile(false);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   if (!fontsLoaded || loading || (session && hasProfile === null)) return <SplashScreen />;
