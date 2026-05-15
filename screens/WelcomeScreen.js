@@ -1,8 +1,11 @@
+// Landing screen shown to unauthenticated users. Provides entry points to the Login
+// and Signup flows — no logic beyond navigation.
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { PRIMARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
 
+// Main screen component. Renders the app title and two navigation buttons (Login / Sign Up).
 export default function WelcomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
@@ -26,6 +29,8 @@ export default function WelcomeScreen({ navigation }) {
   );
 }
 
+// Styles for WelcomeScreen — centered container, app title, subtitle, primary login
+// button, and outlined secondary sign-up button.
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -1,3 +1,6 @@
+// Wardrobe grid screen. Fetches all clothing items for the user and renders them in a
+// two-column grid with category filter chips. Overdue lent items are sorted to the top.
+// A floating action button navigates to AddItemScreen to add a new item.
 import React, { useState, useCallback } from 'react';
 import {
   View,
@@ -20,25 +23,34 @@ import { Ionicons } from '@expo/vector-icons';
 
 const CATEGORIES = ['All', 'Tops', 'Bottoms', 'Shoes', 'Outerwear', 'Accessories', 'Dresses', 'Lent'];
 const SCREEN_WIDTH = Dimensions.get('window').width;
+// 15px side padding on each side (30px total) + 10px gap between columns, divided by 2.
 const CARD_WIDTH = (SCREEN_WIDTH - 15 * 2 - 10) / 2;
 
+// Returns true if the item is lent out and its expected return date has passed.
+// Compares ISO YYYY-MM-DD strings directly — lexicographic order matches chronological order.
 const isItemOverdue = (item) => {
   if (!item.is_lent || !item.expected_return_date) return false;
-  const todayStr = new Date().toISOString().split('T')[0];
-  return item.expected_return_date <= todayStr;
+  const todayStr = new Date().toISOString().split('T')[0]; // ISO date-only string for lexicographic comparison
+  return item.expected_return_date <= todayStr; // string comparison is valid for YYYY-MM-DD format
 };
 
+// Main screen component. Manages item loading, category filtering, and overdue sorting,
+// then renders the filter chip bar, item grid, and add-item FAB.
 export default function WardrobeScreen({ navigation }) {
+  // Full items list, initial-load flag, and the currently active category filter.
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All');
 
+  // Re-fetch every time the screen comes into focus so additions or edits made in
+  // AddItemScreen or ItemDetailScreen are reflected immediately on return.
   useFocusEffect(
     useCallback(() => {
       loadItems();
     }, [])
   );
 
+  // Fetches all clothing items for the signed-in user, ordered newest first.
   const loadItems = async () => {
     try {
       setLoading(true);
@@ -60,15 +72,21 @@ export default function WardrobeScreen({ navigation }) {
     }
   };
 
+  // Category filter: 'All' returns every item; 'Lent' is a virtual filter on the is_lent
+  // flag (not a real category value); all other chips filter by exact category match.
   const baseFiltered =
     selectedCategory === 'All' ? items
     : selectedCategory === 'Lent' ? items.filter(item => item.is_lent)
     : items.filter(item => item.category === selectedCategory);
 
+  // Sort a copy of the filtered list so overdue lent items bubble to the top as a visual alert.
   const filteredItems = [...baseFiltered].sort((a, b) =>
     (isItemOverdue(b) ? 1 : 0) - (isItemOverdue(a) ? 1 : 0)
   );
 
+  // Renders one wardrobe grid card: item thumbnail (or placeholder icon), an amber "Lent"
+  // badge if lent out, a red "!" overdue badge if the return date has passed, and the
+  // item name + category in the card footer.
   const renderItem = ({ item }) => (
     <Pressable
       style={[styles.card, item.is_lent && styles.cardLent]}
@@ -168,6 +186,9 @@ export default function WardrobeScreen({ navigation }) {
   );
 }
 
+// Styles for WardrobeScreen — brand header, horizontal filter chip bar, two-column grid
+// (card width derived from CARD_WIDTH), item thumbnail (aspect ratio 1.2×), lent badge,
+// overdue badge, card footer, and the floating action button.
 const styles = StyleSheet.create({
   fullScreen: {
     flex: 1,

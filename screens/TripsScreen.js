@@ -1,3 +1,6 @@
+// Trips list screen. Fetches all the user's saved trips from Supabase ordered newest
+// first, and renders them as tappable cards showing the destination, dates, weather vibe
+// badge, and a packing progress bar. A floating action button navigates to NewTripScreen.
 import React, { useState, useCallback } from 'react';
 import {
   View,
@@ -16,16 +19,22 @@ import { PRIMARY, SECONDARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
 import { Ionicons } from '@expo/vector-icons';
 
+// Main screen component. Manages the trips list and renders a FlatList of trip cards,
+// an empty state, and a FAB to create a new trip.
 export default function TripsScreen({ navigation }) {
+  // Full trips list and initial-load flag.
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Re-fetch on every screen focus so newly created trips (from NewTripScreen) appear
+  // immediately when the user navigates back.
   useFocusEffect(
     useCallback(() => {
       loadTrips();
     }, [])
   );
 
+  // Fetches all trips for the signed-in user, ordered most recent first.
   const loadTrips = async () => {
     try {
       setLoading(true);
@@ -35,7 +44,7 @@ export default function TripsScreen({ navigation }) {
         .from('trips')
         .select('*')
         .eq('user_id', user.id)
-        .order('start_date', { ascending: false });
+        .order('start_date', { ascending: false }); // newest trips appear at the top of the list
       if (error) throw error;
       setTrips(data || []);
     } catch (err) {
@@ -45,10 +54,12 @@ export default function TripsScreen({ navigation }) {
     }
   };
 
+  // Renders one trip card: destination + weather vibe badge, date range, inline packing
+  // progress bar, and optional trip purpose label.
   const renderTrip = ({ item }) => {
     const startDate = formatDateForDisplay(parseDateFromDB(item.start_date));
     const endDate = formatDateForDisplay(parseDateFromDB(item.end_date));
-    const items = item.packing_items || [];
+    const items = item.packing_items || []; // packing_items is JSONB; guard against null for older rows
     const packed = items.filter(i => i.packed).length;
     const total = items.length;
 
@@ -72,7 +83,7 @@ export default function TripsScreen({ navigation }) {
         {total > 0 && (
           <View style={styles.progressRow}>
             <View style={styles.progressBg}>
-              <View style={[styles.progressFill, { width: `${(packed / total) * 100}%` }]} />
+              <View style={[styles.progressFill, { width: `${(packed / total) * 100}%` }]} />{/* percentage string drives the flex-fill width */}
             </View>
             <Text style={styles.progressLabel}>{packed}/{total} packed</Text>
           </View>
@@ -108,7 +119,7 @@ export default function TripsScreen({ navigation }) {
         <FlatList
           data={trips}
           renderItem={renderTrip}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={item => item.id.toString()} // FlatList requires string keys; trip id is a number from Supabase
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
         />
@@ -121,6 +132,9 @@ export default function TripsScreen({ navigation }) {
   );
 }
 
+// Styles for TripsScreen — brand header, centered loading/empty state, FlatList trip
+// cards (destination row, weather vibe badge, date range, packing progress bar, purpose
+// label), and the floating action button.
 const styles = StyleSheet.create({
   fullScreen: {
     flex: 1,
