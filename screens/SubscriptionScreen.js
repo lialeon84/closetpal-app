@@ -1,3 +1,6 @@
+// Subscription status and management screen. Shows the active premium plan (tier, renewal
+// date, active/cancelled badge) or an upgrade prompt for free users. Delegates to RevenueCat
+// for customer info, purchase restoration, and the Customer Center management flow.
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -21,21 +24,28 @@ import { PRIMARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
 import { Ionicons } from '@expo/vector-icons';
 
+// Main screen component. Fetches subscription status on mount and renders the active-plan
+// view or the free-tier upgrade prompt depending on whether an entitlement is found.
 export default function SubscriptionScreen({ navigation }) {
+  // RevenueCat customer info object, initial-load flag, and extracted entitlement details.
   const [loading, setLoading] = useState(true);
   const [customerInfo, setCustomerInfo] = useState(null);
   const [activeSubscription, setActiveSubscription] = useState(null);
 
+  // Fetch subscription status once on mount.
   useEffect(() => {
     loadSubscriptionInfo();
   }, []);
 
+  // Fetches RevenueCat customer info and extracts the active entitlement details
+  // (expiration date, renewal flag, product ID) if the premium entitlement is present.
   const loadSubscriptionInfo = async () => {
     try {
       setLoading(true);
       const info = await getCustomerInfo();
       setCustomerInfo(info);
 
+      // Presence of this key means the premium entitlement is currently active.
       if (info.entitlements.active[ENTITLEMENT_ID]) {
         const entitlement = info.entitlements.active[ENTITLEMENT_ID];
         setActiveSubscription({
@@ -52,6 +62,8 @@ export default function SubscriptionScreen({ navigation }) {
     }
   };
 
+  // Opens the RevenueCat Customer Center (cancel, upgrade, purchase history), then
+  // re-fetches subscription info so the UI reflects any plan changes the user just made.
   const handleManageSubscription = async () => {
     try {
       await presentCustomerCenter();
@@ -62,6 +74,8 @@ export default function SubscriptionScreen({ navigation }) {
     }
   };
 
+  // Restores prior App Store / Play Store purchases via RevenueCat, then re-fetches
+  // subscription status so the UI updates if a premium entitlement was found.
   const handleRestore = async () => {
     try {
       setLoading(true);
@@ -75,6 +89,7 @@ export default function SubscriptionScreen({ navigation }) {
     }
   };
 
+  // Navigates to the Paywall screen (RevenueCatUI wrapper) to initiate a new purchase.
   const handleUpgrade = () => {
     navigation.navigate('Paywall');
   };
@@ -121,8 +136,10 @@ export default function SubscriptionScreen({ navigation }) {
 
                 {activeSubscription.expirationDate && (
                   <Text style={styles.renewalText}>
-                    {activeSubscription.willRenew ? 'Renews on' : 'Expires on'}{' '}
-                    {new Date(activeSubscription.expirationDate).toLocaleDateString()}
+                    {/* Label switches based on whether auto-renewal is still enabled. */}
+                  {activeSubscription.willRenew ? 'Renews on' : 'Expires on'}{' '}
+                    {/* toLocaleDateString formats the ISO date in the device's locale. */}
+                  {new Date(activeSubscription.expirationDate).toLocaleDateString()}
                   </Text>
                 )}
               </View>
@@ -197,6 +214,9 @@ export default function SubscriptionScreen({ navigation }) {
   );
 }
 
+// Styles for SubscriptionScreen — brand header, subscription status card (tier badge,
+// active/cancelled pill, renewal date), premium features list, manage/restore buttons,
+// free-plan upgrade prompt, auto-renewal disclosure text, and support card.
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,

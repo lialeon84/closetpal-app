@@ -1,3 +1,7 @@
+// Premium-only AI Stylist screen. Fetches the user's wardrobe, calls Claude to identify
+// gap items and generate prioritized suggestions, then caches results in AsyncStorage keyed
+// by wardrobe count so the API is skipped when nothing has changed. Free users see a
+// paywall gate (LockedStylistView) instead of the analysis.
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
@@ -21,15 +25,22 @@ import { syncSubscriptionStatus } from '../lib/revenuecat';
 var ANTHROPIC_API_KEY = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
 var CACHE_KEY_PREFIX = 'stylist_suggestions_';
 
+// Display configuration for each priority level — badge label, text color, and background.
 var PRIORITY_CONFIG = {
   high:   { label: 'High Priority',   color: '#FFFFFF', bg: SECONDARY },
   medium: { label: 'Medium Priority', color: '#D97706', bg: '#FEF3C7' },
   low:    { label: 'Low Priority',    color: '#059669', bg: '#D1FAE5' },
 };
 
+// Numeric sort keys used by sortSuggestions — lower number = shown first.
 var PRIORITY_ORDER = { high: 0, medium: 1, low: 2 };
 
+// Gate component shown to free-tier users. Presents the RevenueCatUI paywall inline and
+// syncs subscription status after a confirmed purchase or restore so StylistScreen
+// re-renders immediately as paid without waiting for the RevenueCat listener tick.
 function LockedStylistView() {
+  // Presents the full-screen paywall; calls syncSubscriptionStatus on purchase/restore
+  // so the useSubscription hook reflects the new entitlement right away.
   const handleUpgrade = async () => {
     try {
       console.log('[Purchase] Presenting paywall...');
@@ -78,19 +89,27 @@ function LockedStylistView() {
   );
 }
 
+// Main screen component. Gates on isPaid — shows LockedStylistView for free users,
+// otherwise loads wardrobe gap analysis from cache or Claude and renders suggestion cards.
 export default function StylistScreen() {
   const { isPaid, isLoading: subLoading } = useSubscription();
 
+  // AI analysis results, async state flags, and error discriminant ('too_few' | 'generic' | null).
   var [suggestions, setSuggestions] = useState(null);
   var [summary, setSummary] = useState('');
   var [loading, setLoading] = useState(true);
   var [refreshing, setRefreshing] = useState(false);
   var [error, setError] = useState(null);
 
+  // Trigger analysis only once subscription status is confirmed paid; avoids an
+  // unnecessary API call for free users who see LockedStylistView instead.
   useEffect(() => {
     if (isPaid) load(false);
   }, [isPaid]);
 
+  // Loads wardrobe gap analysis. On a non-forced load, checks AsyncStorage for a cached
+  // result with a matching wardrobe item count before calling Claude. After a successful
+  // API call, writes the result back to cache so subsequent loads with the same wardrobe skip it.
   var load = useCallback(async (forceRefresh) => {
     setError(null);
     if (!forceRefresh) setLoading(true);
@@ -114,9 +133,10 @@ export default function StylistScreen() {
       }
 
       if (!forceRefresh) {
-        var cached = await AsyncStorage.getItem(CACHE_KEY_PREFIX + user.id);
+        var cached = await AsyncStorage.getItem(CACHE_KEY_PREFIX + user.id); // per-user key prevents cross-user data leakage
         if (cached) {
           var parsed = JSON.parse(cached);
+          // Cache hit: wardrobe size unchanged since last analysis, so suggestions are still valid.
           if (parsed.wardrobeCount === count) {
             setSummary(parsed.data.summary);
             setSuggestions(sortSuggestions(parsed.data.suggestions));
@@ -165,13 +185,17 @@ Aim for 4-6 suggestions. Vary priority levels based on how significant the gap i
 
       var aiData = await aiResp.json();
       var rawText = aiData.content?.[0]?.text?.trim() ?? '';
-      var jsonStr = rawText.replace(/^```json?\s*/i, '').replace(/\s*```$/, '').trim();
+      var jsonStr = rawText.replace(/^```json?\s*/i, '').replace(/\s*```$/, '').trim(); // strip markdown fences Claude sometimes wraps around JSON
       var result = JSON.parse(jsonStr);
 
+      // Defensive shape check — surface a clear error rather than a cryptic runtime crash
+      // if Claude returns a malformed response.
       if (!result.summary || !Array.isArray(result.suggestions)) {
         throw new Error('Unexpected response shape from AI');
       }
 
+      // Cache result keyed by wardrobe count so that adding or removing items automatically
+      // invalidates the cache and triggers a fresh API call on the next load.
       await AsyncStorage.setItem(CACHE_KEY_PREFIX + user.id, JSON.stringify({
         wardrobeCount: count,
         data: result,
@@ -188,6 +212,8 @@ Aim for 4-6 suggestions. Vary priority levels based on how significant the gap i
     }
   }, []);
 
+  // Pull-to-refresh handler. Passes forceRefresh=true to bypass the AsyncStorage cache
+  // so Claude is always called on a manual refresh, even if the wardrobe count is unchanged.
   var handleRefresh = useCallback(() => {
     setRefreshing(true);
     load(true);
@@ -280,15 +306,19 @@ Aim for 4-6 suggestions. Vary priority levels based on how significant the gap i
   );
 }
 
+// Sorts suggestions high → medium → low using PRIORITY_ORDER numeric keys.
+// Unknown priority strings default to 3 so they sort after all recognized levels.
 function sortSuggestions(suggestions) {
   return [...suggestions].sort(
     (a, b) => (PRIORITY_ORDER[a.priority] ?? 3) - (PRIORITY_ORDER[b.priority] ?? 3)
   );
 }
 
+// Renders one gap suggestion with a color-coded priority badge, a gap description,
+// and a comma-separated list of existing wardrobe items it pairs well with.
 function SuggestionCard({ suggestion }) {
   var { category, reason, pairs_with, priority } = suggestion;
-  var cfg = PRIORITY_CONFIG[priority] ?? PRIORITY_CONFIG.low;
+  var cfg = PRIORITY_CONFIG[priority] ?? PRIORITY_CONFIG.low; // fall back to low display config for any unrecognized priority string
 
   return (
     <View style={styles.card}>
@@ -309,6 +339,9 @@ function SuggestionCard({ suggestion }) {
   );
 }
 
+// Styles for StylistScreen, LockedStylistView, and SuggestionCard — safe area, header,
+// loading/empty/error state boxes, stylist summary highlight box, suggestion cards with
+// priority badges and pairing lists, and the locked-view upgrade prompt with feature list.
 var styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#F7F5F0' },
   scrollContent: { paddingBottom: 48 },

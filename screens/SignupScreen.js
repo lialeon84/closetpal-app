@@ -1,3 +1,6 @@
+// Registration screen for new users. Validates email and password client-side (length,
+// uppercase, digit, special character, and confirmation match) before calling Supabase Auth.
+// After sign-up the user is directed to verify their email before signing in.
 import React, { useState } from 'react';
 import {
   View,
@@ -15,13 +18,18 @@ import { supabase } from '../lib/supabase';
 import { PRIMARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
 
+// Main screen component. Renders email, password, and confirm-password fields with live
+// strength validation, and delegates submission to handleSignup.
 export default function SignupScreen({ navigation }) {
+  // Form field values, async submission flag, and the current password-strength error string.
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [passwordError, setPasswordError] = useState('');
 
+  // Returns an error string if the password fails any strength rule, or '' when it passes.
+  // Called on every keystroke (live feedback) and again on submit to gate the button.
   const validatePassword = (pass) => {
     if (pass.length < 8) return 'At least 8 characters required';
     if (!/[A-Z]/.test(pass)) return 'Must include at least one uppercase letter';
@@ -30,6 +38,8 @@ export default function SignupScreen({ navigation }) {
     return '';
   };
 
+  // Validates all fields and password strength, then calls supabase.auth.signUp.
+  // On success, shows an email-verification prompt and navigates to the login screen.
   const handleSignup = async () => {
     if (!email || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill in all fields');
@@ -50,7 +60,7 @@ export default function SignupScreen({ navigation }) {
     setLoading(true);
 
     const { error } = await supabase.auth.signUp({
-      email: email.toLowerCase().trim(),
+      email: email.toLowerCase().trim(), // normalize before sending — Supabase auth is case-sensitive
       password: password,
     });
 
@@ -99,7 +109,7 @@ export default function SignupScreen({ navigation }) {
                 value={password}
                 onChangeText={(text) => {
                   setPassword(text);
-                  setPasswordError(text.length > 0 ? validatePassword(text) : '');
+                  setPasswordError(text.length > 0 ? validatePassword(text) : ''); // clear when empty; live-validate as the user types
                 }}
                 secureTextEntry
                 returnKeyType="next"
@@ -123,7 +133,7 @@ export default function SignupScreen({ navigation }) {
               <Pressable
                 style={[styles.button, (loading || passwordError !== '') && styles.buttonDisabled]}
                 onPress={handleSignup}
-                disabled={loading || passwordError !== ''}
+                disabled={loading || passwordError !== ''} // block submit while in-flight or password strength fails
               >
                 <Text style={styles.buttonText}>
                   {loading ? 'Creating account...' : 'Sign Up'}
@@ -143,6 +153,8 @@ export default function SignupScreen({ navigation }) {
   );
 }
 
+// Styles for SignupScreen — scroll container, title, form fields, sign-up button,
+// sign-in link, and inline password-strength error text.
 const styles = StyleSheet.create({
   container: {
     flex: 1,

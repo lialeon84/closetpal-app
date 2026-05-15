@@ -1,3 +1,7 @@
+// Detail view for a saved trip. Shows a summary card (destination, dates, weather vibe,
+// AI packing notes), a packing progress bar, and an interactive checklist. Items can be
+// toggled packed/unpacked with optimistic updates that revert on DB failure. Wardrobe data
+// is re-fetched on every screen focus so deleted items are handled gracefully.
 import React, { useState, useCallback } from 'react';
 import {
   View,
@@ -17,21 +21,30 @@ import { PRIMARY, SECONDARY, CARD_BG } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
 import { Ionicons } from '@expo/vector-icons';
 
+// Emoji lookup keyed by weather vibe string for the trip summary and progress header.
 const VIBE_EMOJI = { Warm: '☀️', Cold: '❄️', Mixed: '🌤️', Tropical: '🌴', Snow: '🌨️' };
 
+// Main screen component. Renders the trip summary card, packing progress bar, and the
+// interactive packing checklist. Refreshes from the DB on every screen focus.
 export default function TripDetailScreen({ route, navigation }) {
+  // Trip row (refreshed from DB on focus), packing items array, wardrobe id→item map,
+  // initial-load flag, and the clothing_item_id currently being saved (null when idle).
   const [trip, setTrip] = useState(route.params.trip);
   const [packingItems, setPackingItems] = useState(route.params.trip.packing_items || []);
   const [wardrobeMap, setWardrobeMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(null);
 
+  // Re-fetch on every screen focus so wardrobe edits (renamed items, new photos,
+  // deletions) are reflected when the user navigates back from another screen.
   useFocusEffect(
     useCallback(() => {
       loadData();
     }, [])
   );
 
+  // Fetches the latest trip row and the user's wardrobe in parallel. Builds a wardrobe
+  // id→item map so each packing list row can look up name and image in O(1).
   const loadData = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -49,6 +62,7 @@ export default function TripDetailScreen({ route, navigation }) {
         setPackingItems(freshTrip.packing_items || []);
       }
       if (wardrobe) {
+        // Build id→item map for O(1) lookups in the packing list render.
         setWardrobeMap(Object.fromEntries(wardrobe.map(i => [i.id, i])));
       }
     } catch (err) {
@@ -58,11 +72,14 @@ export default function TripDetailScreen({ route, navigation }) {
     }
   };
 
+  // Optimistically flips the packed state for one packing list item and persists the full
+  // updated array to Supabase. Reverts to the previous state if the write fails.
+  // `saving` holds the clothing_item_id currently being written to prevent concurrent saves.
   const togglePacked = async (clothingItemId) => {
-    if (saving) return;
-    setSaving(clothingItemId);
+    if (saving) return; // prevent concurrent saves while any item is being written
+    setSaving(clothingItemId); // track which item is saving so its row shows a spinner
 
-    const previous = packingItems;
+    const previous = packingItems; // capture pre-toggle state for rollback on DB failure
     const updated = packingItems.map(item =>
       item.clothing_item_id === clothingItemId
         ? { ...item, packed: !item.packed }
@@ -82,6 +99,8 @@ export default function TripDetailScreen({ route, navigation }) {
     setSaving(null);
   };
 
+  // Confirms deletion before removing the trip row from Supabase, then navigates back
+  // to the trips list on success.
   const deleteTrip = () => {
     Alert.alert(
       'Delete Trip',
@@ -104,13 +123,14 @@ export default function TripDetailScreen({ route, navigation }) {
     );
   };
 
+  // Derived display values — packing progress stats and formatted date/vibe strings.
   const packedCount = packingItems.filter(i => i.packed).length;
   const totalCount = packingItems.length;
-  const progressPct = totalCount > 0 ? packedCount / totalCount : 0;
+  const progressPct = totalCount > 0 ? packedCount / totalCount : 0; // guard against NaN when list is empty
 
   const startDate = formatDateForDisplay(parseDateFromDB(trip.start_date));
   const endDate = formatDateForDisplay(parseDateFromDB(trip.end_date));
-  const vibeEmoji = VIBE_EMOJI[trip.weather_vibe] || '🌡️';
+  const vibeEmoji = VIBE_EMOJI[trip.weather_vibe] || '🌡️'; // fallback for any unrecognized vibe string
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -191,7 +211,7 @@ export default function TripDetailScreen({ route, navigation }) {
                 key={item.clothing_item_id}
                 style={[styles.listItem, isPacked && styles.listItemPacked]}
                 onPress={() => togglePacked(item.clothing_item_id)}
-                disabled={!!saving}
+                disabled={!!saving} // !!clothingItemId string → true; disables all rows while any save is in flight
               >
                 {wardrobeItem?.image_url ? (
                   <Image
@@ -244,6 +264,9 @@ export default function TripDetailScreen({ route, navigation }) {
   );
 }
 
+// Styles for TripDetailScreen — header (back + destination title + delete), trip summary
+// info card (destination, dates, weather/purpose tags, AI notes box), packing progress
+// bar, and the interactive packing checklist rows (thumbnail, item info, packed checkbox).
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
