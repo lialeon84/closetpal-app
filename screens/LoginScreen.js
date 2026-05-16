@@ -14,6 +14,8 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
+  Modal,
+  ActivityIndicator,
 } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { PRIMARY } from '../constants/colors';
@@ -25,6 +27,12 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [resetEmail, setResetEmail]           = useState('');
+  const [resetLoading, setResetLoading]       = useState(false);
+  const [resetError, setResetError]           = useState('');
+  const [resetSuccess, setResetSuccess]       = useState(false);
 
   // Validates both fields are non-empty, then calls Supabase signInWithPassword.
   // On success, the root navigator's auth listener detects the session change and redirects.
@@ -45,6 +53,33 @@ export default function LoginScreen({ navigation }) {
 
     if (error) {
       Alert.alert('Error', error.message);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    const trimmed = resetEmail.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setResetError('Please enter a valid email address.');
+      return;
+    }
+    setResetError('');
+    setResetLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(trimmed, {
+        redirectTo: 'https://ariscloset.app/reset.html',
+      });
+      const isNotFound = error?.message?.toLowerCase().includes('not found');
+      if (error && !isNotFound) {
+        console.log('[ResetPassword error]', error); // TEMPORARY - remove before commit
+        setResetError('Something went wrong. Please try again.');
+      } else {
+        setResetSuccess(true);
+        setTimeout(() => { setShowForgotModal(false); setResetSuccess(false); }, 2000);
+      }
+    } catch (_) {
+      setResetError('Something went wrong. Please try again.');
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -86,6 +121,18 @@ export default function LoginScreen({ navigation }) {
               />
 
               <Pressable
+                style={styles.forgotPasswordLink}
+                onPress={() => {
+                  setResetEmail(email);
+                  setResetError('');
+                  setResetSuccess(false);
+                  setShowForgotModal(true);
+                }}
+              >
+                <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+              </Pressable>
+
+              <Pressable
                 style={[styles.button, loading && styles.buttonDisabled]}
                 onPress={handleLogin}
                 disabled={loading}
@@ -104,6 +151,63 @@ export default function LoginScreen({ navigation }) {
             </View>
           </View>
       </ScrollView>
+
+      <Modal
+        visible={showForgotModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => !resetLoading && setShowForgotModal(false)}
+      >
+        <TouchableWithoutFeedback onPress={() => !resetLoading && setShowForgotModal(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={styles.modalCard}>
+                <Text style={styles.modalHeading}>Reset Password</Text>
+                <Text style={styles.modalInstructions}>
+                  Enter your email address and we'll send you a link to reset your password.
+                </Text>
+
+                {resetSuccess ? (
+                  <Text style={styles.successText}>
+                    If an account exists for that email, you'll receive a password reset link shortly. The link expires in 1 hour.
+                  </Text>
+                ) : (
+                  <>
+                    <TextInput
+                      style={[styles.input, resetLoading && styles.inputDisabled]}
+                      placeholder="Email"
+                      placeholderTextColor="#9B9B9B"
+                      value={resetEmail}
+                      onChangeText={(t) => { setResetEmail(t); setResetError(''); }}
+                      autoCapitalize="none"
+                      keyboardType="email-address"
+                      editable={!resetLoading}
+                    />
+                    {resetError ? <Text style={styles.errorText}>{resetError}</Text> : null}
+                    <Pressable
+                      style={[styles.button, styles.resetButton, resetLoading && styles.buttonDisabled]}
+                      onPress={handleResetPassword}
+                      disabled={resetLoading}
+                    >
+                      {resetLoading
+                        ? <ActivityIndicator color="#fff" />
+                        : <Text style={styles.buttonText}>Send Reset Link</Text>
+                      }
+                    </Pressable>
+                    <Pressable
+                      style={styles.cancelLink}
+                      onPress={() => setShowForgotModal(false)}
+                      disabled={resetLoading}
+                    >
+                      <Text style={styles.cancelLinkText}>Cancel</Text>
+                    </Pressable>
+                  </>
+                )}
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -179,5 +283,72 @@ const styles = StyleSheet.create({
     color: PRIMARY,
     fontWeight: 'bold',
     fontFamily: FONTS.bodyBold,
+  },
+  forgotPasswordLink: {
+    alignSelf: 'flex-end',
+    marginTop: -5,
+    marginBottom: 12,
+  },
+  forgotPasswordText: {
+    fontSize: 13,
+    color: PRIMARY,
+    fontFamily: FONTS.body,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  modalCard: {
+    backgroundColor: '#F7F5F0',
+    borderRadius: 20,
+    padding: 24,
+    width: '100%',
+  },
+  modalHeading: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#1C1C1C',
+    marginBottom: 10,
+    fontFamily: FONTS.heading,
+  },
+  modalInstructions: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 18,
+    lineHeight: 20,
+    fontFamily: FONTS.body,
+  },
+  errorText: {
+    color: '#E53935',
+    fontSize: 13,
+    marginTop: -8,
+    marginBottom: 10,
+    fontFamily: FONTS.body,
+  },
+  successText: {
+    fontSize: 14,
+    color: '#4CAF50',
+    lineHeight: 22,
+    fontFamily: FONTS.body,
+    textAlign: 'center',
+    paddingVertical: 12,
+  },
+  resetButton: {
+    marginTop: 6,
+  },
+  cancelLink: {
+    alignItems: 'center',
+    marginTop: 14,
+  },
+  cancelLinkText: {
+    fontSize: 14,
+    color: '#6B7280',
+    fontFamily: FONTS.body,
+  },
+  inputDisabled: {
+    opacity: 0.5,
   },
 });

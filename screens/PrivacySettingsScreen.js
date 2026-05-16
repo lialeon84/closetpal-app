@@ -118,7 +118,19 @@ export default function PrivacySettingsScreen({ navigation }) {
           </Pressable>
         </View>
 
-        {/* 4 — Your Data */}
+        {/* 4 — Account */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Account</Text>
+          <Pressable
+            style={styles.settingButton}
+            onPress={() => navigation.navigate('ChangePassword')}
+          >
+            <Text style={styles.settingButtonText}>Change Password</Text>
+            <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />
+          </Pressable>
+        </View>
+
+        {/* 5 — Your Data */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Your Data</Text>
           <Pressable
