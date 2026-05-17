@@ -17,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   ENTITLEMENT_ID,
   getCustomerInfo,
+  getOfferings,
   restorePurchases,
   presentCustomerCenter,
 } from '../lib/revenuecat';
@@ -31,6 +32,8 @@ export default function SubscriptionScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [customerInfo, setCustomerInfo] = useState(null);
   const [activeSubscription, setActiveSubscription] = useState(null);
+  const [checkingOfferings, setCheckingOfferings]   = useState(false);
+  const [offeringsUnavailable, setOfferingsUnavailable] = useState(false);
 
   // Fetch subscription status once on mount.
   useEffect(() => {
@@ -89,9 +92,23 @@ export default function SubscriptionScreen({ navigation }) {
     }
   };
 
-  // Navigates to the Paywall screen (RevenueCatUI wrapper) to initiate a new purchase.
-  const handleUpgrade = () => {
-    navigation.navigate('Paywall');
+  // Pre-fetches offerings before navigating to Paywall to prevent raw RevenueCat
+  // configuration errors from surfacing to the user (App Store guideline 2.1(a)).
+  const handleUpgrade = async () => {
+    setOfferingsUnavailable(false);
+    setCheckingOfferings(true);
+    try {
+      const offering = await getOfferings();
+      if (offering && offering.availablePackages && offering.availablePackages.length > 0) {
+        navigation.navigate('Paywall');
+      } else {
+        setOfferingsUnavailable(true);
+      }
+    } catch (_) {
+      setOfferingsUnavailable(true);
+    } finally {
+      setCheckingOfferings(false);
+    }
   };
 
   if (loading) {
@@ -182,12 +199,31 @@ export default function SubscriptionScreen({ navigation }) {
                 </Text>
               </View>
 
-              <Pressable style={styles.subscribeButton} onPress={handleUpgrade}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                  <Text style={styles.subscribeButtonText}>View Premium Plans</Text>
-                  <Ionicons name="sparkles-outline" size={20} color="#FFFFFF" />
+              {offeringsUnavailable ? (
+                <View style={styles.unavailableCard}>
+                  <Ionicons name="cloud-offline-outline" size={32} color="#555555" style={styles.unavailableIcon} />
+                  <Text style={styles.unavailableTitle}>Subscription options are temporarily unavailable.</Text>
+                  <Text style={styles.unavailableSubtext}>Please check your connection and try again.</Text>
+                  <Pressable style={styles.subscribeButton} onPress={handleUpgrade}>
+                    <Text style={styles.subscribeButtonText}>Try Again</Text>
+                  </Pressable>
                 </View>
-              </Pressable>
+              ) : (
+                <Pressable
+                  style={[styles.subscribeButton, checkingOfferings && styles.buttonDisabled]}
+                  onPress={handleUpgrade}
+                  disabled={checkingOfferings}
+                >
+                  {checkingOfferings ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                      <Text style={styles.subscribeButtonText}>View Premium Plans</Text>
+                      <Ionicons name="sparkles-outline" size={20} color="#FFFFFF" />
+                    </View>
+                  )}
+                </Pressable>
+              )}
               <Text style={styles.autoRenewalText}>
                 Subscription automatically renews unless cancelled at least 24 hours before the end of the current period. Manage or cancel anytime in Settings → Apple ID → Subscriptions.
               </Text>
@@ -444,5 +480,34 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 40,
+  },
+  unavailableCard: {
+    backgroundColor: '#EDEAE4',
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#D9D5CE',
+    marginBottom: 12,
+  },
+  unavailableIcon: {
+    marginBottom: 12,
+  },
+  unavailableTitle: {
+    fontSize: 16,
+    color: '#1C1C1C',
+    textAlign: 'center',
+    fontFamily: FONTS.body,
+    marginBottom: 8,
+  },
+  unavailableSubtext: {
+    fontSize: 14,
+    color: '#555555',
+    textAlign: 'center',
+    fontFamily: FONTS.body,
+    marginBottom: 16,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
 });
