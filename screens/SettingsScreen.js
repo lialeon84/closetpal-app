@@ -143,7 +143,7 @@ export default function SettingsScreen({ navigation }) {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>About</Text>
 
-          <Pressable style={styles.settingButton}>
+          <Pressable style={styles.settingButton} onPress={() => navigation.navigate('HelpSupport')}>
             <Text style={styles.settingButtonText}>Help & Support</Text>
             <Ionicons name="chevron-forward-outline" size={20} color="#1C1C1C" />
           </Pressable>
