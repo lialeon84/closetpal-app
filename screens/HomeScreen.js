@@ -1,7 +1,7 @@
 // Home screen that generates AI-powered outfit recommendations from the user's wardrobe,
 // current weather (via Open-Meteo), and a selected occasion. Supports saving favorites,
 // per-item and per-outfit dislike feedback, and AI-powered item swapping.
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -104,6 +104,7 @@ export default function HomeScreen() {
   var [togglingKey, setTogglingKey] = useState(null);
   var [wardrobeItems, setWardrobeItems] = useState([]);
   var [currentUserId, setCurrentUserId] = useState(null);
+  var togglingKeysRef = useRef(new Set());
 
   // Opens the occasion picker, or prompts the paywall if the free-tier daily limit has been hit.
   var handleGetOutfits = async () => {
@@ -147,7 +148,8 @@ export default function HomeScreen() {
   var toggleFavorite = async (outfit, currentItems) => {
     var items = currentItems ?? outfit.items;
     var key = items.map(i => i.id).sort().join(',');
-    if (togglingKey === key) return;
+    if (togglingKeysRef.current.has(key)) return;
+    togglingKeysRef.current.add(key);
     setTogglingKey(key);
     try {
       var { data: { user } } = await supabase.auth.getUser();
@@ -178,7 +180,11 @@ export default function HomeScreen() {
         .select()
         .single();
       if (inserted) setFavorites(prev => [...prev, inserted]);
+    } catch (err) {
+      console.error('[toggleFavorite]', err.message);
+      Alert.alert('Something went wrong', 'Could not update favorites. Please try again.');
     } finally {
+      togglingKeysRef.current.delete(key);
       setTogglingKey(null);
     }
   };
@@ -403,8 +409,8 @@ export default function HomeScreen() {
                 index={idx + 1}
                 weather={weather}
                 occasion={occasion}
-                isFavorited={!!findFavorite(outfit)}
-                isToggling={togglingKey === outfitKey(outfit)}
+                findFavoriteForItems={(items) => favorites.find(f => [...f.clothing_item_ids].sort().join(',') === items.map(i => i.id).sort().join(','))}
+                togglingKey={togglingKey}
                 onToggleFavorite={(items) => toggleFavorite(outfit, items)}
                 wardrobe={wardrobeItems}
                 currentUserId={currentUserId}
@@ -453,11 +459,14 @@ export default function HomeScreen() {
 // and controls for favoriting, disliking (item or whole outfit), and AI-powered item swapping.
 function OutfitCard({
   outfit, index, weather, occasion,
-  isFavorited, isToggling, onToggleFavorite,
+  findFavoriteForItems, togglingKey, onToggleFavorite,
   wardrobe, currentUserId, onDislikeOutfit,
   canDoAISwap, incrementAISwap,
 }) {
   var [displayItems, setDisplayItems] = useState(outfit.items);
+  var isFavorited = !!findFavoriteForItems(displayItems);
+  var displayItemsKey = displayItems.map(i => i.id).sort().join(',');
+  var isToggling = togglingKey === displayItemsKey;
   var [swapModal, setSwapModal]       = useState(null);
   var [swapLoading, setSwapLoading]   = useState(null);
   var [redIconIds, setRedIconIds]     = useState(new Set());
