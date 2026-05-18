@@ -170,19 +170,43 @@ export default function HomeScreen() {
       const ok = await checkFavorites(favorites.length);
       if (!ok) return;
 
+      // Pre-insert sync: re-query in case a previous in-flight insert (offline -> online race)
+      // already created this favorite server-side. Prevents 23505 unique violation alerts.
+      var sortedIds = items.map(i => i.id).sort();
+      var { data: existingServer } = await supabase
+        .from('favorite_outfits')
+        .select('id, clothing_item_ids, created_at')
+        .eq('user_id', user.id)
+        .eq('clothing_item_ids', sortedIds)
+        .maybeSingle();
+
+      if (existingServer) {
+        setFavorites(prev => {
+          if (prev.some(f => f.id === existingServer.id)) return prev;
+          return [...prev, existingServer];
+        });
+        return;
+      }
+
       var { data: inserted } = await supabase
         .from('favorite_outfits')
         .insert({
           user_id: user.id,
-          clothing_item_ids: items.map(i => i.id),
+          clothing_item_ids: items.map(i => i.id).sort(),
           styling_note: outfit.styling_note ?? null,
         })
         .select()
         .single();
       if (inserted) setFavorites(prev => [...prev, inserted]);
     } catch (err) {
-      console.error('[toggleFavorite]', err.message);
-      Alert.alert('Something went wrong', 'Could not update favorites. Please try again.');
+      // Silently swallow unique-constraint violations — they mean the favorite already exists,
+      // not a real error. Other errors still surface to the user.
+      if (err?.code === '23505') {
+        console.warn('[toggleFavorite] unique violation (already favorited)', err.message);
+      } else {
+        console.error('[toggleFavorite]', err.message);
+        Alert.alert('Something went wrong', 'Could not update favorites. Please try again.');
+      }
     } finally {
       togglingKeysRef.current.delete(key);
       setTogglingKey(null);
@@ -562,7 +586,7 @@ function OutfitCard({
           'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-sonnet-4-6',
           max_tokens: 1000,
           system: 'You are a personal stylist assistant. Return ONLY valid JSON with no markdown, no explanation.',
           messages: [{

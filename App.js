@@ -270,17 +270,31 @@ export default function App() {
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      // CRITICAL: Do NOT make this callback async, and do NOT await Supabase calls
+      // directly inside it. Awaiting Supabase calls here causes deadlocks when the
+      // event was triggered by an in-flight Supabase call (e.g. updateUser firing
+      // USER_UPDATED before its own promise resolves). Defer async work to the next
+      // tick via setTimeout(0) so the listener returns immediately.
       setSession(session);
-      if (session) {
+
+      if (event === 'SIGNED_IN' && session) {
         setHasProfile(null);
-        await loginRevenueCat(session.user.id);
-        await syncSubscriptionStatus().catch(() => {});
-        await checkProfile(session.user.id); 
-      } else {
-        await logoutRevenueCat();
+        setTimeout(async () => {
+          await loginRevenueCat(session.user.id);
+          await syncSubscriptionStatus().catch(() => {});
+          await checkProfile(session.user.id);
+        }, 0);
+      } else if (event === 'SIGNED_OUT') {
+        setTimeout(async () => {
+          await logoutRevenueCat();
+        }, 0);
         setHasProfile(null);
         setLoading(false);
+      } else if (event === 'USER_UPDATED' || event === 'TOKEN_REFRESHED') {
+        setTimeout(() => {
+          syncSubscriptionStatus().catch(() => {});
+        }, 0);
       }
     });
 

@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { supabase } from '../lib/supabase';
+import { supabase, supabaseUrl, supabaseAnonKey } from '../lib/supabase';
 import { PRIMARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
 import { Ionicons } from '@expo/vector-icons';
@@ -63,11 +63,22 @@ export default function ChangePasswordScreen({ navigation }) {
     try {
       const { data: { user } } = await supabase.auth.getUser();
 
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: currentPassword,
+      // Verify current password via direct fetch to Supabase token endpoint.
+      // We use raw fetch rather than a second supabase-js client to avoid
+      // auth-lock contention on the main client (which makes updateUser hang).
+      const verifyResponse = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': supabaseAnonKey,
+        },
+        body: JSON.stringify({
+          email: user.email,
+          password: currentPassword,
+        }),
       });
-      if (signInError) {
+
+      if (!verifyResponse.ok) {
         setError('Current password is incorrect.');
         return;
       }
