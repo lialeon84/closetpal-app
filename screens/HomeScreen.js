@@ -522,17 +522,9 @@ function OutfitCard({
         feedback_type: 'dislike_item',
       });
     } catch (err) {
-      console.error('[DislikeItem]', err.message);
+      // Silent fail — DB unique index prevents dupes; tap retries are safe.
     }
     setRedIconIds(prev => new Set([...prev, item.id]));
-    // Reset the icon color after 800ms. A new Set is required — React needs a new reference to trigger a re-render.
-    setTimeout(() => {
-      setRedIconIds(prev => {
-        var next = new Set(prev);
-        next.delete(item.id);
-        return next;
-      });
-    }, 800);
   };
 
   // Opens the swap options modal (AI pick or manual wardrobe browse) for the given item index.
