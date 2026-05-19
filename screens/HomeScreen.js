@@ -22,6 +22,7 @@ import * as Location from 'expo-location';
 import { Heart } from 'lucide-react-native';
 import { Ionicons } from '@expo/vector-icons';
 import RevenueCatUI from 'react-native-purchases-ui';
+import { getOfferings } from '../lib/revenuecat';
 import { supabase } from '../lib/supabase';
 import { PRIMARY, SECONDARY, CARD_BG } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
@@ -75,6 +76,8 @@ export default function HomeScreen() {
   var { isPaid } = useSubscription();
   var { checkFavorites, checkOutfitRecs, incrementOutfitRecs, isOutfitRecsLocked, canDoAISwap, incrementAISwap } = usageLimits(isPaid);
   var [isLocked, setIsLocked] = useState(false);
+  var [checkingOfferings, setCheckingOfferings] = useState(false);
+  var [offeringsUnavailable, setOfferingsUnavailable] = useState(false);
 
   // Sync the lock state whenever isPaid changes (e.g. immediately after a purchase).
   useEffect(() => {
@@ -109,7 +112,20 @@ export default function HomeScreen() {
   // Opens the occasion picker, or prompts the paywall if the free-tier daily limit has been hit.
   var handleGetOutfits = async () => {
     if (!isPaid && isLocked) {
-      await RevenueCatUI.presentPaywall();
+      setOfferingsUnavailable(false);
+      setCheckingOfferings(true);
+      try {
+        const offering = await getOfferings();
+        if (offering && offering.availablePackages && offering.availablePackages.length > 0) {
+          navigation.navigate('Paywall');
+        } else {
+          setOfferingsUnavailable(true);
+        }
+      } catch (_) {
+        setOfferingsUnavailable(true);
+      } finally {
+        setCheckingOfferings(false);
+      }
       return;
     }
     setOutfits([]);
@@ -416,6 +432,17 @@ export default function HomeScreen() {
             <Ionicons name="sad-outline" size={48} color="#9B9B9B" style={styles.stateEmoji} />
             <Text style={styles.stateTitle}>Something went wrong</Text>
             <Text style={styles.stateSub}>Couldn't generate outfit recommendations. Please try again.</Text>
+            <TouchableOpacity style={styles.retryBtn} onPress={handleGetOutfits}>
+              <Text style={styles.retryBtnText}>Try Again</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {offeringsUnavailable && (
+          <View style={styles.stateBox}>
+            <Ionicons name="cloud-offline-outline" size={48} color="#9B9B9B" style={styles.stateEmoji} />
+            <Text style={styles.stateTitle}>Subscription options temporarily unavailable</Text>
+            <Text style={styles.stateSub}>Please check your connection and try again.</Text>
             <TouchableOpacity style={styles.retryBtn} onPress={handleGetOutfits}>
               <Text style={styles.retryBtnText}>Try Again</Text>
             </TouchableOpacity>
