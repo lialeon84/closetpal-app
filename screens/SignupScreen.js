@@ -17,6 +17,7 @@ import {
 import { supabase } from '../lib/supabase';
 import { PRIMARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
+import { Ionicons } from '@expo/vector-icons';
 
 // Main screen component. Renders email, password, and confirm-password fields with live
 // strength validation, and delegates submission to handleSignup.
@@ -27,6 +28,8 @@ export default function SignupScreen({ navigation }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [passwordError, setPasswordError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Returns an error string if the password fails any strength rule, or '' when it passes.
   // Called on every keystroke (live feedback) and again on submit to gate the button.
@@ -102,33 +105,43 @@ export default function SignupScreen({ navigation }) {
                 returnKeyType="next"
               />
 
-              <TextInput
-                style={styles.input}
-                placeholder="Password"
-                placeholderTextColor="#9B9B9B"
-                value={password}
-                onChangeText={(text) => {
-                  setPassword(text);
-                  setPasswordError(text.length > 0 ? validatePassword(text) : ''); // clear when empty; live-validate as the user types
-                }}
-                secureTextEntry
-                returnKeyType="next"
-                blurOnSubmit={true}
-                onSubmitEditing={() => Keyboard.dismiss()}
-              />
+              <View style={styles.passwordWrapper}>
+                <TextInput
+                  style={styles.passwordInput}
+                  placeholder="Password"
+                  placeholderTextColor="#9B9B9B"
+                  value={password}
+                  onChangeText={(text) => {
+                    setPassword(text);
+                    setPasswordError(text.length > 0 ? validatePassword(text) : '');
+                  }}
+                  secureTextEntry={!showPassword}
+                  returnKeyType="next"
+                  blurOnSubmit={true}
+                  onSubmitEditing={() => Keyboard.dismiss()}
+                />
+                <Pressable style={styles.eyeBtn} onPress={() => setShowPassword(v => !v)}>
+                  <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#9E9E9E" />
+                </Pressable>
+              </View>
               {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
 
-              <TextInput
-                style={styles.input}
-                placeholder="Confirm Password"
-                placeholderTextColor="#9B9B9B"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry
-                returnKeyType="done"
-                blurOnSubmit={true}
-                onSubmitEditing={() => Keyboard.dismiss()}
-              />
+              <View style={styles.passwordWrapper}>
+                <TextInput
+                  style={styles.passwordInput}
+                  placeholder="Confirm Password"
+                  placeholderTextColor="#9B9B9B"
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  secureTextEntry={!showConfirmPassword}
+                  returnKeyType="done"
+                  blurOnSubmit={true}
+                  onSubmitEditing={() => Keyboard.dismiss()}
+                />
+                <Pressable style={styles.eyeBtn} onPress={() => setShowConfirmPassword(v => !v)}>
+                  <Ionicons name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#9E9E9E" />
+                </Pressable>
+              </View>
 
               <Pressable
                 style={[styles.button, (loading || passwordError !== '') && styles.buttonDisabled]}
@@ -197,6 +210,27 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#D9D5CE',
     fontFamily: FONTS.bodyMedium,
+  },
+  passwordWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EDEAE4',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#D9D5CE',
+    marginBottom: 15,
+  },
+  passwordInput: {
+    flex: 1,
+    color: '#1C1C1C',
+    padding: 15,
+    fontSize: 16,
+    fontFamily: FONTS.bodyMedium,
+    marginBottom: 0,
+  },
+  eyeBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 15,
   },
   button: {
     backgroundColor: PRIMARY,
