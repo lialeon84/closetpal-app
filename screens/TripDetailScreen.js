@@ -163,8 +163,9 @@ export default function TripDetailScreen({ route, navigation }) {
           <Text style={styles.dates}>{startDate} → {endDate}</Text>
           <View style={styles.tagsRow}>
             {trip.weather_vibe ? (
-              <View style={styles.tag}>
-                <Text style={styles.tagText}>{vibeEmoji}  {trip.weather_vibe}</Text>
+              <View style={[styles.tag, { flexDirection: 'row', alignItems: 'center', gap: 4 }]}>
+                <Text style={styles.tagText}>{vibeEmoji}</Text>
+                <Text style={styles.tagText}>{trip.weather_vibe}</Text>
               </View>
             ) : null}
             {trip.trip_purpose ? (
@@ -247,11 +248,6 @@ export default function TripDetailScreen({ route, navigation }) {
                   ) : (
                     <Text style={styles.itemRemoved}>Item removed from wardrobe</Text>
                   )}
-                  {item.reason ? (
-                    <Text style={styles.itemReason} numberOfLines={2}>
-                      {item.reason}
-                    </Text>
-                  ) : null}
                 </View>
 
                 <View style={[styles.checkbox, isPacked && styles.checkboxChecked]}>
@@ -491,13 +487,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#9CA3AF',
     fontStyle: 'italic',
-    fontFamily: FONTS.body,
-  },
-  itemReason: {
-    fontSize: 12,
-    color: '#6B7280',
-    lineHeight: 16,
-    marginTop: 2,
     fontFamily: FONTS.body,
   },
   checkbox: {

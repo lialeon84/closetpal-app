@@ -86,7 +86,6 @@ export default function WardrobeScreen({ navigation }) {
 
   // Renders one wardrobe grid card: item thumbnail (or placeholder icon), an amber "Lent"
   // badge if lent out, a red "!" overdue badge if the return date has passed, and the
-  // item name + category in the card footer.
   const renderItem = ({ item }) => (
     <Pressable
       style={[styles.card, item.is_lent && styles.cardLent]}
@@ -110,10 +109,6 @@ export default function WardrobeScreen({ navigation }) {
             <Text style={styles.overdueBadgeText}>!</Text>
           </View>
         )}
-      </View>
-      <View style={styles.cardFooter}>
-        <Text style={styles.cardName} numberOfLines={1}>{item.name}</Text>
-        <Text style={styles.cardCategory}>{item.category}</Text>
       </View>
     </Pressable>
   );
@@ -298,21 +293,6 @@ const styles = StyleSheet.create({
   },
   cardImagePlaceholderIcon: {
     fontSize: 40,
-  },
-  cardFooter: {
-    padding: 10,
-  },
-  cardName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1C1C1C',
-    marginBottom: 2,
-    fontFamily: FONTS.bodyMedium,
-  },
-  cardCategory: {
-    fontSize: 12,
-    color: '#6B7280',
-    fontFamily: FONTS.body,
   },
   cardLent: {
     opacity: 0.6,

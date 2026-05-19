@@ -1,7 +1,7 @@
 // Screen for adding a new clothing item to the user's wardrobe. Handles photo selection
 // (camera or library), background removal via remove.bg, AI-powered metadata detection
 // via Claude, and saving the final item with its uploaded image to Supabase.
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -114,6 +114,7 @@ export default function AddItemScreen({ navigation }) {
   const [season, setSeason] = useState('All Season');
   const [formality, setFormality] = useState(null);
   const [saving, setSaving] = useState(false);
+  const submittingRef = useRef(false);
 
   // Resets subcategory to the first valid option whenever the parent category changes.
   const handleCategoryChange = (newCat) => {
@@ -319,6 +320,7 @@ export default function AddItemScreen({ navigation }) {
   // ─── Submit ───────────────────────────────────────────────────────────────
 
   const handleSubmit = async () => {
+    if (submittingRef.current) return;
     if (!photo) {
       Alert.alert('Missing photo', 'Please add a photo of your item.');
       return;
@@ -331,7 +333,7 @@ export default function AddItemScreen({ navigation }) {
       Alert.alert('Missing color', 'Please select or enter a color.');
       return;
     }
-
+    submittingRef.current = true;
     const ok = await checkWardrobe();
     if (!ok) return;
 
@@ -378,6 +380,7 @@ export default function AddItemScreen({ navigation }) {
       Alert.alert('Error', error.message);
     } finally {
       setSaving(false);
+      submittingRef.current = false;
     }
   };
 

@@ -1,7 +1,7 @@
 // Screen for creating a new trip with an AI-generated packing list. Geocodes the destination,
 // optionally fetches a real weather forecast and maps it to a "weather vibe", then calls
 // Claude to select appropriate wardrobe items. Saves the trip and navigates to TripDetail.
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -46,6 +46,7 @@ export default function NewTripScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
+  const generatingRef = useRef(false);
 
   // Trip length in days — 86400000 ms per day; +1 because both start and end dates are inclusive.
   const durationDays = Math.max(1, Math.ceil((endDate - startDate) / 86400000) + 1);
@@ -131,6 +132,8 @@ export default function NewTripScreen({ navigation }) {
   // 5. Insert the trip row into Supabase, increment the usage counter, and navigate to TripDetail.
   const handleGenerate = async () => {
     if (!validate()) return;
+    if (generatingRef.current) return;
+    generatingRef.current = true;
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -246,6 +249,7 @@ Rules: Pick 8-15 items depending on trip length. Use exact item IDs from the war
       Alert.alert('Error', 'Failed to generate packing list. Please try again.');
     } finally {
       setLoading(false);
+      generatingRef.current = false;
     }
   };
 
