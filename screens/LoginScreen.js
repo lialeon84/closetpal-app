@@ -20,6 +20,7 @@ import {
 import { supabase } from '../lib/supabase';
 import { PRIMARY } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
+import { Ionicons } from '@expo/vector-icons';
 
 // Main screen component. Provides email/password fields and a link to the signup flow.
 export default function LoginScreen({ navigation }) {
@@ -33,6 +34,7 @@ export default function LoginScreen({ navigation }) {
   const [resetLoading, setResetLoading]       = useState(false);
   const [resetError, setResetError]           = useState('');
   const [resetSuccess, setResetSuccess]       = useState(false);
+  const [showPassword, setShowPassword]       = useState(false);
 
   // Validates both fields are non-empty, then calls Supabase signInWithPassword.
   // On success, the root navigator's auth listener detects the session change and redirects.
@@ -108,17 +110,22 @@ export default function LoginScreen({ navigation }) {
                 returnKeyType="next"
               />
 
-              <TextInput
-                style={styles.input}
-                placeholder="Password"
-                placeholderTextColor="#9B9B9B"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                returnKeyType="done"
-                blurOnSubmit={true}
-                onSubmitEditing={() => Keyboard.dismiss()} // dismiss keyboard when the user taps the Done key
-              />
+              <View style={styles.passwordWrapper}>
+                <TextInput
+                  style={styles.passwordInput}
+                  placeholder="Password"
+                  placeholderTextColor="#9B9B9B"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                  returnKeyType="done"
+                  blurOnSubmit={true}
+                  onSubmitEditing={() => Keyboard.dismiss()}
+                />
+                <Pressable style={styles.eyeBtn} onPress={() => setShowPassword(v => !v)}>
+                  <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#9E9E9E" />
+                </Pressable>
+              </View>
 
               <Pressable
                 style={styles.forgotPasswordLink}
@@ -255,6 +262,27 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#D9D5CE',
     fontFamily: FONTS.bodyMedium,
+  },
+  passwordWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EDEAE4',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#D9D5CE',
+    marginBottom: 15,
+  },
+  passwordInput: {
+    flex: 1,
+    color: '#1C1C1C',
+    padding: 15,
+    fontSize: 16,
+    fontFamily: FONTS.bodyMedium,
+    marginBottom: 0,  // wrapper handles spacing
+  },
+  eyeBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 15,
   },
   button: {
     backgroundColor: PRIMARY,
