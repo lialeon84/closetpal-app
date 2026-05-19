@@ -44,7 +44,7 @@ export default function TripsScreen({ navigation }) {
         .from('trips')
         .select('*')
         .eq('user_id', user.id)
-        .order('start_date', { ascending: false }); // newest trips appear at the top of the list
+        .order('start_date', { ascending: true });
       if (error) throw error;
       setTrips(data || []);
     } catch (err) {

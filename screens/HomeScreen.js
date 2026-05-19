@@ -734,7 +734,7 @@ function OutfitCard({
                     hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
                     style={styles.itemActionBtn}
                   >
-                    <Ionicons name="swap-horizontal-outline" size={16} color={PRIMARY} />
+                    <Ionicons name="sync-circle-outline" size={18} color={PRIMARY} />
                   </TouchableOpacity>
                 </>
               )}
