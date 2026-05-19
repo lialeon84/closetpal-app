@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.bodyMedium,
   },
   notesBox: {
-    backgroundColor: '#F9F5FF',
+    backgroundColor: CARD_BG,
     borderRadius: 10,
     padding: 12,
     borderLeftWidth: 3,

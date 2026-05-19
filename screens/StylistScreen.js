@@ -393,7 +393,7 @@ var styles = StyleSheet.create({
   summaryBox: {
     marginHorizontal: 16,
     marginTop: 20,
-    backgroundColor: '#F9F5FF',
+    backgroundColor: CARD_BG,
     borderRadius: 16,
     padding: 16,
     borderLeftWidth: 3,

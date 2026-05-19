@@ -1015,7 +1015,7 @@ var styles = StyleSheet.create({
 
   // ── Styling note ────────────────────────────────────────────────────────────
   noteBox: {
-    backgroundColor: '#F9F5FF',
+    backgroundColor: CARD_BG,
     borderRadius: 12,
     padding: 12,
     borderLeftWidth: 3,
